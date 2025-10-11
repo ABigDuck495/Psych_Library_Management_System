@@ -3,9 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Penalty;
+use App\Models\Transaction;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
@@ -18,9 +20,11 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
         'email',
         'password',
+        'first_name',
+        'last_name',
+        'role'
     ];
 
     /**
@@ -45,4 +49,28 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getfullNameAttribute(): string
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+    public function isAdmin(): bool
+    {
+        return in_array($this->role, ['admin', 'super-admin']);
+    }
+
+    public function transactions(){
+        return $this->hasMany(Transaction::class);
+    }
+    public function penalties(){
+        return $this->hasMany(Penalty::class);
+    }
+    public function activeTransactions(){
+        return $this->hasMany(Transaction::class)->where('transaction_status', 'borrowed');
+    }
+    public function overdueTransactions(){
+        return $this->hasMany(Transaction::class)->where('transaction_status', 'overdue');
+    }
+
+
 }
