@@ -5,12 +5,13 @@ namespace App\Models;
 use App\Models\Book;
 use App\Models\Thesis;
 use Illuminate\Database\Eloquent\Model;
-use illuminate\database\Eloquent\Factories\HasFactory;
+use Illuminate\database\Eloquent\Factories\HasFactory;
 
 class Author extends Model
 {
     use HasFactory;
     protected $fillable = ['first_name', 'last_name'];
+    protected $table = 'authors';
 
     public function books()
     {
