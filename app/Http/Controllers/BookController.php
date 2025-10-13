@@ -7,26 +7,20 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    /**
-     * Display a listing of the resource - READ (like books.php)
-     */
+    // shows all books (like index.php)
     public function index()
     {
         $books = Book::all(); // SELECT * FROM books
         return view('books.index', compact('books'));
     }
 
-    /**
-     * Show the form for creating a new resource - CREATE form (like create_book.php)
-     */
+    // creates new book (like create.php)
     public function create()
     {
         return view('books.create');
     }
 
-    /**
-     * Store a newly created resource - CREATE handling (like create_book.php form action)
-     */
+    // stores new book (like store.php)
     public function store(Request $request)
     {
         $request->validate([
@@ -42,25 +36,19 @@ class BookController extends Controller
                          ->with('success', 'Book created successfully.');
     }
 
-    /**
-     * Display the specified resource - READ single (like show_book.php)
-     */
+    //displays a specific book (like show.php)
     public function show(Book $book)
     {
         return view('books.show', compact('book'));
     }
 
-    /**
-     * Show the form for editing the specified resource - EDIT form (like edit_book.php)
-     */
+    // edits a specific book (like edit.php)
     public function edit(Book $book)
     {
         return view('books.edit', compact('book'));
     }
 
-    /**
-     * Update the specified resource - EDIT handling (like edit_book.php form action)
-     */
+    // updates a specific book (like update.php)
     public function update(Request $request, Book $book)
     {
         $request->validate([
@@ -76,9 +64,7 @@ class BookController extends Controller
                          ->with('success', 'Book updated successfully.');
     }
 
-    /**
-     * Remove the specified resource - DELETE (like delete_book.php)
-     */
+    // deletes a specific book (like delete.php)
     public function destroy(Book $book)
     {
         $book->delete(); // DELETE FROM books WHERE id...

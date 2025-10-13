@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    // show all users (like index.php)
+    public function index()
+    {
+        $users = User::all();
+        return view('users.index', compact('users'));
+    }
     // Show method (like show.php)
     public function show($id)
     {
@@ -35,5 +41,13 @@ class UserController extends Controller
 
         return redirect()->route('users.show', $user->id)
                          ->with('success', 'User updated successfully');
+    }
+    // Delete method
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect()->route('users.index')
+                         ->with('success', 'User deleted successfully');
     }
 }
