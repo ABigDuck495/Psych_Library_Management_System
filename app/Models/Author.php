@@ -42,5 +42,7 @@ class Author extends Model
     {
         return $query->whereHas('thesis');
     }
-
+    public function orderByName(){
+        return $this->orderBy('last_name')->orderBy('first_name');
+    }
 }

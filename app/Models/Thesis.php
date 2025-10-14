@@ -49,6 +49,26 @@ class Thesis extends Model
     {
         return $query->where('dept_id', $deptId);
     }
+    public function getAuthorsListAttribute()
+    {
+        return $this->authors->pluck('full_name')->implode(', ');
+    }
+
+    public function getAuthorIdsAttribute()
+    {
+        return $this->authors->pluck('id')->toArray();
+    }
+        // Sync authors with validation
+    public function syncAuthors(array $authorIds)
+    {
+        $existingAuthors = Author::whereIn('id', $authorIds)->pluck('id')->toArray();
+        
+        if (count($existingAuthors) !== count($authorIds)) {
+            throw new \Exception('Some author IDs are invalid');
+        }
+
+        return $this->authors()->sync($authorIds);
+    }
     
 
 }
