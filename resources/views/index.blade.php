@@ -9,6 +9,7 @@
     <h1>Welcome to Psych Library Management System</h1>
 
     <!-- Button linking to authors index -->
+     <h3>admin/superadmin view</h3>
     <a href="{{ route('authors.index') }}">
         <button type="button">Go to Authors</button>
     </a>
@@ -16,6 +17,8 @@
      <a href="{{ route('catalogue') }}">
         <button type="button">Go to Catalogue</button>
     </a>
+
+    <h3>student/staff view</h3>
 </a>
 </body>
 </html>
