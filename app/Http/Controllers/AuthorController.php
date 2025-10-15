@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Author;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class AuthorController extends Controller
 {
@@ -51,5 +52,15 @@ class AuthorController extends Controller
     {
         $author->delete();
         return redirect()->route('authors.index')->with('success', 'Author deleted successfully!');
+    }
+    public function books(Author $author)
+    {
+        $books = $author->books()->paginate(10);
+        return view('authors.books', compact('author', 'books'));
+    }
+    public function theses(Author $author)
+    {
+        $theses = $author->thesis()->paginate(10);
+        return view('authors.theses', compact('author', 'theses'));
     }
 }

@@ -42,9 +42,5 @@ class Author extends Model
     {
         return $query->whereHas('thesis');
     }
-    public function theses()
-    {
-        return $this->belongsToMany(Thesis::class, 'thesis_authors');
-    }
 
 }
