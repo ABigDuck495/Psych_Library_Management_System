@@ -60,7 +60,7 @@
     </form>
 
     {{-- 📖 Academic Paper Form --}}
-    <form id="thesisForm" action="{{ route('books.store') }}" method="POST" style="display:none;">
+    <form id="thesisForm" action="{{ route('theses.store') }}" method="POST" style="display:none;">
         @csrf
         <input type="hidden" name="type" value="thesis">
 

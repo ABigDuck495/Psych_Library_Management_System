@@ -16,3 +16,5 @@ Route::get('/catalogue', function () {
 
 Route::get('/books/add-inventory', [BookController::class, 'addInventory'])->name('books.addInventory');
 Route::post('/books/store', [BookController::class, 'store'])->name('books.store');
+Route::get('/books/add-inventory', [BookController::class, 'addInventory'])->name('books.addInventory');
+Route::post('/books/store', [BookController::class, 'store'])->name('books.store');
