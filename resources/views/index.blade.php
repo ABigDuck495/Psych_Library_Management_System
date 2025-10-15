@@ -12,5 +12,10 @@
     <a href="{{ route('authors.index') }}">
         <button type="button">Go to Authors</button>
     </a>
+    <!-- Button linking to catalogue -->
+     <a href="{{ route('catalogue') }}">
+        <button type="button">Go to Catalogue</button>
+    </a>
+</a>
 </body>
 </html>

@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Book;
 use PhpParser\Node\Expr\FuncCall;
 use Illuminate\Database\Eloquent\Model;
-use illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Category extends Model
 {
