@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\AuthorController;
+use App\Http\Controllers\ThesisController;
 
 Route::get('/', function () {
     return view('index');
@@ -16,5 +17,5 @@ Route::get('/catalogue', function () {
 
 Route::get('/books/add-inventory', [BookController::class, 'addInventory'])->name('books.addInventory');
 Route::post('/books/store', [BookController::class, 'store'])->name('books.store');
-Route::get('/books/add-inventory', [BookController::class, 'addInventory'])->name('books.addInventory');
-Route::post('/books/store', [BookController::class, 'store'])->name('books.store');
+Route::resource('theses', ThesisController::class);
+Route::resource('author', AuthorController::class);

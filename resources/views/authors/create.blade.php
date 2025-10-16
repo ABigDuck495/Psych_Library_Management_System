@@ -19,6 +19,9 @@
 
     <form action="{{ route('authors.store') }}" method="POST">
         @csrf
+        //for uhhh when you add an author while adding a book or thesis
+        <input type="hidden" name="return_to" value="{{ request('return_to', url()->previous()) }}">
+
         <label>First Name:</label>
         <input type="text" name="first_name" value="{{ old('first_name') }}"><br><br>
 

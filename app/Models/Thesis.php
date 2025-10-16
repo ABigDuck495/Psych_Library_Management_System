@@ -19,6 +19,10 @@ class Thesis extends Model
         'advisor',
         'pages'
     ];
+    protected $casts = [
+        'year_published' => 'integer',
+        'pages' => 'integer',
+    ];
 
     public function department(){
         return $this->belongsTo(ThesisDept::class, 'dept_id');

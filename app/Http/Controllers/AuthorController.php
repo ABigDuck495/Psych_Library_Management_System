@@ -8,9 +8,16 @@ use Illuminate\Routing\Controller;
 
 class AuthorController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $authors = Author::orderBy('last_name')->paginate(10);
+        $query = Author::withCount(['books', 'theses']);
+
+        if ($request->has('search')) {
+            $query->search($request->search);
+        }
+
+        $authors = $query->orderByName()->paginate(25);
+
         return view('authors.index', compact('authors'));
     }
 

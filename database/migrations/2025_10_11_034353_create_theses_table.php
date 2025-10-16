@@ -10,13 +10,13 @@ return new class extends Migration
     {
         Schema::create('theses', function (Blueprint $table) {
             $table->id();
-            $table->string('SKU')->unique();
-            $table->foreignId('dept_id')->constrained('thesis_dept')->onDelete('cascade');
+            //$table->string('SKU')->unique();
+            $table->enum('department', ['AB Psychology', 'BS Psychology']);
             $table->string('title');
             $table->text('abstract')->nullable();
             $table->year('year_published');
-            $table->string('advisor')->nullable();
-            $table->integer('pages')->nullable();
+            //$table->string('advisor')->nullable();
+            //$table->integer('pages')->nullable();
             $table->timestamps();
 
             // Performance indexes
