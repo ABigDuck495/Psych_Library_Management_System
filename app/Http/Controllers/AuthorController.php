@@ -10,13 +10,13 @@ class AuthorController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Author::withCount(['books', 'theses']);
+        $query = Author::withCount(['books', 'thesis']);
 
         if ($request->has('search')) {
             $query->search($request->search);
         }
 
-        $authors = $query->orderByName()->paginate(25);
+        $authors = $query->paginate(25);
 
         return view('authors.index', compact('authors'));
     }

@@ -78,23 +78,22 @@
 
         <label>Year Published:</label>
         <input type="text" name="year_published" required><br>
-
+<!-- 
         <label>Advisor:</label>
-        <input type="text" name="advisor" required><br>
+        <input type="text" name="advisor"br> -->
 
-        <label>Category:</label>
+        <!-- <label>Category:</label>
         <select name="category_name" required>
             <option value="Thesis">Thesis</option>
             <option value="Research Paper">Research Paper</option>
             <option value="Case Study">Case Study</option>
             <option value="Narrative Report">Narrative Report</option>
-        </select><br>
+        </select><br> -->
 
         <label>Department:</label>
-        <select name="department_id" required>
-            @foreach($departments as $department)
-                <option value="{{ $department->id }}">{{ $department->name }}</option>
-            @endforeach
+        <select name="department" required>
+            <option value="AB Psychology">AB Psychology</option>
+            <option value="BS Schology">BS Psychology</option>
         </select><br>
 
         <button type="submit">Save Academic Paper</button>
