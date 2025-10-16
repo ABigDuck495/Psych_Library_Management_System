@@ -11,13 +11,5 @@
     <a href="{{ route('books.addInventory') }}">
         <button type="button">Add Inventory</button>
     </a>
-
-     <a href="{{ route('book_authors.index') }}">
-        <button type="button">Manage Book Authors</button>
-    </a>
-
-    <a href="{{ route('theses.index') }}">
-        <button type="button">Manage Theses</button>
-    </a>
 </body>
 </html>

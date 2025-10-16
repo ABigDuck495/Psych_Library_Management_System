@@ -18,8 +18,8 @@ class BookController extends Controller
     public function addInventory()
     {
         $categories = Category::all();
-        $departments = ThesisDept::all(); // Fetch all departments from thesis_dept table
-        return view('books.addInventory', compact('categories', 'departments'));
+        //$departments = ThesisDept::all(); // Fetch all departments from thesis_dept table
+        return view('books.addInventory', compact('categories'));
     }
 
     public function store(Request $request)
