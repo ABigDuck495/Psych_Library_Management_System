@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\ThesisDept;
 use Illuminate\Database\Eloquent\Model;
-use illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Thesis extends Model
 {

@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Transaction;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Database\Eloquent\Model;
-use illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Penalty extends Model
 {
