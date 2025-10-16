@@ -3,51 +3,75 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\PasswordRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    // show all users (like index.php)
     public function index()
     {
-        $users = User::all();
-        return view('users.index', compact('users'));
-    }
-    // Show method (like show.php)
-    public function show($id)
-    {
-        $user = User::findOrFail($id);
-        return view('users.show', compact('user'));
+        $users = User::orderBy('id', 'desc')->get();
+        $requests = PasswordRequest::with('user')->orderBy('id', 'desc')->get();
+
+        return view('users.index', compact('users', 'requests'));
     }
 
-    // Edit method (like edit.php)
-    public function edit($id)
+    public function create()
     {
-        $user = User::findOrFail($id);
+        return view('users.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'role' => 'required|string',
+            'password' => 'required|min:8',
+        ]);
+
+        $validated['password'] = Hash::make($validated['password']);
+        User::create($validated);
+
+        return redirect()->route('users.index')->with('success', 'User created successfully!');
+    }
+
+    public function edit(User $user)
+    {
         return view('users.edit', compact('user'));
     }
 
-    // Update method to handle form submission
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
-        $user = User::findOrFail($id);
-        
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email',
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'role' => 'required|string',
         ]);
 
-        $user->update($request->all());
+        if ($request->filled('password')) {
+            $validated['password'] = Hash::make($request->password);
+        }
 
-        return redirect()->route('users.show', $user->id)
-                         ->with('success', 'User updated successfully');
+        $user->update($validated);
+        return redirect()->route('users.index')->with('success', 'User updated successfully!');
     }
-    // Delete method
-    public function destroy($id)
+
+    public function destroy(User $user)
     {
-        $user = User::findOrFail($id);
         $user->delete();
-        return redirect()->route('users.index')
-                         ->with('success', 'User deleted successfully');
+        return redirect()->route('users.index')->with('success', 'User deleted.');
+    }
+
+    public function requestPasswordReset(User $user)
+    {
+        PasswordRequest::create([
+            'user_id' => $user->id,
+        ]);
+
+        return back()->with('success', 'Password reset request submitted to super-admin.');
     }
 }
