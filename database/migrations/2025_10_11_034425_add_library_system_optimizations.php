@@ -9,9 +9,6 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('theses', function (Blueprint $table) {
-            $table->index('advisor');
-        });
 
         Schema::table('transactions', function (Blueprint $table) {
             $table->index(['return_date', 'transaction_status']);
@@ -78,10 +75,6 @@ return new class extends Migration
         // Remove additional indexes
         Schema::table('books', function (Blueprint $table) {
             $table->dropIndex(['isbn']);
-        });
-
-        Schema::table('theses', function (Blueprint $table) {
-            $table->dropIndex(['advisor']);
         });
 
         Schema::table('transactions', function (Blueprint $table) {
