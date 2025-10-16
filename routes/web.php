@@ -7,7 +7,7 @@ use App\Http\Controllers\ThesisController;
 
 // Public homepage
 Route::get('/', function () {
-    return view('index');
+    return view('welcome');
 });
 
 // Authenticated dashboard

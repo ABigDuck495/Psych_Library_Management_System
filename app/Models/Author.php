@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Book;
 use App\Models\Thesis;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\database\Eloquent\Factories\HasFactory;
 
 class Author extends Model
 {
