@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use Illuminate\Http\Request;
+use App\Models\Author;
+use App\Models\Thesis;
 use App\Models\BookCopy;
 use App\Models\Category;
-use App\Models\Author;
 use App\Models\BookAuthor;
-use App\Models\Thesis;
 use App\Models\ThesisAuthor;
-use App\Models\ThesisDept;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class BookController extends Controller
 {

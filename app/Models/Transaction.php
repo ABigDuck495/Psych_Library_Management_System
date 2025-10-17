@@ -68,13 +68,5 @@ class Transaction extends Model
         $this->transaction_status = 'returned';
         $this->save();
 
-        if($this->isOverdue()){
-            Penalty::create([
-                'user_id' => $this->user_id,
-                'transaction_id' => $this->id,
-                'amount' => $this->calculatePenalty(),
-                'status' => 'pending'
-            ]);
-        }
     }
 }
