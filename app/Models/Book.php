@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Models\BookCopy;
 use App\Models\Category;
 use App\Models\Transaction;
-use PharIo\Manifest\Author;
 use Illuminate\Database\Eloquent\Model;
 
 class Book extends Model
@@ -14,10 +13,14 @@ class Book extends Model
     
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'category_id');
     }
-    public function authors(){
-        return $this->belongsToMany(Author::class, 'book_authors', 'book_id', 'author_id');
+    // public function authors(){
+    //     return $this->belongsToMany(Author::class, 'book_authors', 'book_id', 'author_id');
+    // }
+    public function authors()
+    {
+        return $this->belongsToMany(Author::class, 'book_authors');
     }
     public function copies(){
         return $this->hasMany(BookCopy::class);

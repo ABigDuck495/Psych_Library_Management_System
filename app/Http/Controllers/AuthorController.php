@@ -16,7 +16,7 @@ class AuthorController extends Controller
             $query->search($request->search);
         }
 
-        $authors = $query->orderByName()->paginate(25);
+        $authors = $query->paginate(25);
 
         return view('authors.index', compact('authors'));
     }

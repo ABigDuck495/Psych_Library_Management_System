@@ -21,9 +21,8 @@ return new class extends Migration
 
             // Performance indexes
             $table->index('title');
-            $table->index('dept_id');
+            $table->index('department');
             $table->index('year_published');
-            $table->index(['dept_id', 'year_published']);
             $table->fullText(['title', 'abstract']); // For search functionality
         });
     }
