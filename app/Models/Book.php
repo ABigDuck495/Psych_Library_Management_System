@@ -26,7 +26,7 @@ class Book extends Model
         return $this->hasMany(BookCopy::class);
     }
     public function availableCopies(){
-        return $this->hasMany(BookCopy::class)->where('status', 'available');
+        return $this->hasMany(BookCopy::class)->where('is_available', true);
     }
     public function transactions(){
         return $this->hasManyThrough(Transaction::class, BookCopy::class, 'book_id', 'copy_id', 'id', 'id');

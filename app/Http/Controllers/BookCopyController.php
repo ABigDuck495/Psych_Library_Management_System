@@ -30,4 +30,11 @@ class BookCopyController extends Controller
         $bookCopy = BookCopy::findOrFail($id);
         return view('book_copies.show', compact('bookCopy'));
     }
+    //returns how many available copies there are for a book
+    public function availableCopies($bookId){
+        $availableCopiesCount = BookCopy::where('book_id', $bookId)
+                                        ->where('isAvailable', true)
+                                        ->count();
+        return $availableCopiesCount;
+    }
 }

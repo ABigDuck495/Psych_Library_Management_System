@@ -29,43 +29,46 @@ class BookController extends Controller
     {
         // Validate the book data
         $validated = $request->validate([
-            'SKU' => 'required|unique:books',
             'title' => 'required',
             'year_published' => 'required|digits:4',
             'category_id' => 'required|exists:categories,id',
             'description' => 'nullable',
-            'publisher' => 'nullable',
-            'isbn' => 'nullable|unique:books',
-            'pages' => 'nullable|integer',
+            // 'publisher' => 'nullable',
+            // 'isbn' => 'nullable|unique:books',
+            // 'pages' => 'nullable|integer',
             'author_ids' => 'required|array',
             'author_ids.*' => 'exists:authors,id',
-            'copies_count' => 'required|integer|min:1|max:20' // Limit to reasonable number
+            'copies_count' => 'required|integer'
         ]);
 
         // Create the book
+            $authorIds = $validated['author_ids'] ?? [];
+        unset($validated['author_ids']);
+
+        // Create the thesis record
         $book = Book::create($validated);
-        
-        // Attach authors
-        $book->authors()->attach($request->author_ids);
+
+        // Link thesis to authors
+        $book->authors()->sync($authorIds);
         
         // Create book copies
         for ($i = 0; $i < $request->copies_count; $i++) {
             BookCopy::create([
                 'book_id' => $book->id,
-                'status' => 'available'
+                'is_Available' => true
             ]);
         }
 
-    return redirect()->route('books.show', $book)
+    return redirect()->route('books.index', $book)
                     ->with('success', 'Book and ' . $request->copies_count . ' copies created successfully!');
 }
 
     public function show(Book $book)
     {
-        $book->load(['authors', 'category']);
+        $book->load(['authors', 'category', 'copies']);
         return view('books.show', compact('book'));
     }
-
+// 
     public function edit(Book $book)
     {
         $categories = Category::pluck('category_name', 'id');

@@ -1,16 +1,63 @@
-<div class="container">
-    <h2>{{ $book->title }}</h2>
-    <p><strong>Category:</strong> {{ $book->category->category_name ?? 'Uncategorized' }}</p>
-    <p><strong>Year Published:</strong> {{ $book->year_published }}</p>
-    <p><strong>Description:</strong></p>
-    <p>{{ $book->description }}</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ $book->title }}</title>
+</head>
+<body>
+    <h1>{{ $book->title }}</h1>
+    
+    <!-- Display book details -->
+    <div>
+        <p><strong>Authors:</strong>
+            {{ $book->authors->map(function($a) { return trim($a->first_name . ' ' . $a->last_name); })->implode(', ') ?: 'N/A' }}
+        </p>
+        <p><strong>Year Published:</strong> {{ $book->year_published }}</p>
+        <p><strong>Category:</strong> {{ $book->category->category_name }}</p>
+        <p><strong>Available Copies:</strong>{{ $book->availableCopies()->count() }}</p>
+    </div>
 
-    <h4>Authors:</h4>
-    <ul>
-        @foreach ($book->authors as $author)
-            <li>{{ $author->first_name }} {{ $author->last_name }}</li>
-        @endforeach
-    </ul>
+    <!-- Request Button Section -->
+    <div>
+        @auth
+            @if($book->canBeRequested() && !$book->hasUserRequested(Auth::id()))
+                <form action="{{ route('transactions.request-book', $book) }}" method="POST">
+                    @csrf
+                    <button type="submit" style="background: blue; color: white; padding: 10px 20px;">
+                        Request This Book
+                    </button>
+                </form>
+            @elseif($book->hasUserRequested(Auth::id()))
+                <button disabled style="background: orange; color: white; padding: 10px 20px;">
+                    Request Pending
+                </button>
+            @else
+                <button disabled style="background: gray; color: white; padding: 10px 20px;">
+                    No Copies Available
+                </button>
+            @endif
+            
+            <!-- Link to view user's requests -->
+            <div style="margin-top: 10px;">
+                <a href="{{ route('transactions.my-requests') }}">View My Requests</a>
+            </div>
+        @else
+            <!-- login shit but it dont work rn so -->
+        @endauth
+    </div>
 
-    <a href="{{ route('books.index') }}" class="btn btn-secondary">Back</a>
-</div>
+    <!-- Display messages -->
+    @if(session('success'))
+        <div style="background: lightgreen; padding: 10px; margin: 10px 0;">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div style="background: lightcoral; padding: 10px; margin: 10px 0;">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <!-- Other book details... -->
+</body>
+</html>

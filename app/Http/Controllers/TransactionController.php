@@ -11,7 +11,13 @@ class TransactionController extends Controller
         return view('transactions.create');
     }
     public function store(Request $request){
-        // Validate and store transaction logic here
+
+        $validated = $request->validate([
+            'user_id' => 'required|integer',
+            'copy_id' => 'required|integer',
+            'return_date' => 'nullable|date',
+            'transaction_status' => 'required|string|in:borrow,return',
+        ]);
 
         return redirect()->route('transactions.index')->with('success', 'Transaction created successfully!');
     }
