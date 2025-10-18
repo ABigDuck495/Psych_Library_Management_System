@@ -10,99 +10,85 @@ use Illuminate\Routing\Controller;
 
 class ThesisController extends Controller
 {
-    public function index(Request $request)
+    public function show(Thesis $thesis)
+{
+    // Load the thesis with its authors
+    $thesis->load('authors');
+    return view('theses.show', compact('thesis'));
+}
+    public function index()
     {
-        $query = Thesis::with(['department', 'authors']);
-
-        if ($request->has('search')) {
-            $query->search($request->search);
-        }
-
-        if ($request->has('dept_id')) {
-            $query->byDepartment($request->dept_id);
-        }
-
-        if ($request->has('year')) {
-            $query->byYear($request->year);
-        }
-
-        $theses = $query->latest()->paginate(20);
-
-        $departments = ThesisDept::all();
-        $years = Thesis::select('year_published')->distinct()->orderBy('year_published', 'desc')->pluck('year_published');
-
-        return view('theses.index', compact('theses', 'departments', 'years'));
+        // Load theses with their related authors
+        $theses = Thesis::with('authors')->get();
+        return view('theses.index', compact('theses'));
     }
-     public function create()
+
+    public function create()
     {
-        $departments = ThesisDept::all();
-        $authors = Author::orderByName()->get();
-        
-        return view('theses.create', compact('departments', 'authors'));
+        // Dropdown options for department field (from ENUM)
+        $departments = ['AB Psychology', 'BS Psychology'];
+        return view('theses.create', compact('departments'));
     }
+
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'SKU' => 'required|unique:theses',
-            'dept_id' => 'required|exists:thesis_dept,id',
-            'title' => 'required|string|max:500',
-            'abstract' => 'required|string',
-            'year_published' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
-            'advisor' => 'nullable|string|max:255',
-            'pages' => 'nullable|integer|min:1',
-            'author_ids' => 'required|array|min:1',
-            'author_ids.*' => 'exists:authors,id',
+        $request->validate([
+            'title' => 'required',
+            'abstract' => 'required',
+            'year_published' => 'required|integer',
+            'department' => 'required',
+            'first_name' => 'required',
+            'last_name' => 'required',
         ]);
 
-        // Create the thesis
-        $thesis = Thesis::create($validated);
-        
-        // Sync authors
-        $thesis->syncAuthors($request->author_ids);
+        // 1️⃣ Create/find author
+        $author = Author::firstOrCreate([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+        ]);
 
-        return redirect()->route('theses.show', $thesis)
-                        ->with('success', 'Thesis added successfully');
-    }
-    public function show(Thesis $thesis)
-    {
-        $thesis->load(['department', 'authors']);
-        
-        return view('theses.show', compact('thesis'));
+        // 2️⃣ Create thesis
+        $thesis = Thesis::create([
+            'title' => $request->title,
+            'abstract' => $request->abstract,
+            'year_published' => $request->year_published,
+            'department' => $request->department,
+        ]);
+
+        // 3️⃣ Link thesis ↔ author
+        $thesis->authors()->attach($author->id);
+
+        return redirect()->route('theses.index')->with('success', 'Thesis added successfully.');
     }
 
     public function edit(Thesis $thesis)
     {
-        $departments = ThesisDept::all();
-        $authors = Author::orderByName()->get();
-        $thesis->load('authors');
-
-        return view('theses.edit', compact('thesis', 'departments', 'authors'));
+        $departments = ['AB Psychology', 'BS Psychology'];
+        return view('theses.update', compact('thesis', 'departments'));
     }
+
     public function update(Request $request, Thesis $thesis)
     {
-        $validated = $request->validate([
-            'dept_id' => 'required|exists:thesis_dept,id',
-            'title' => 'required|string|max:500',
-            'abstract' => 'required|string',
-            'year_published' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
-            'advisor' => 'nullable|string|max:255',
-            'pages' => 'nullable|integer|min:1',
-            'author_ids' => 'required|array|min:1',
-            'author_ids.*' => 'exists:authors,id',
+        $request->validate([
+            'title' => 'required',
+            'abstract' => 'required',
+            'year_published' => 'required|integer',
+            'department' => 'required',
         ]);
 
-        $thesis->update($validated);
-        $thesis->syncAuthors($request->author_ids);
+        $thesis->update([
+            'title' => $request->title,
+            'abstract' => $request->abstract,
+            'year_published' => $request->year_published,
+            'department' => $request->department,
+        ]);
 
-        return redirect()->route('theses.show', $thesis)
-                        ->with('success', 'Thesis updated successfully');
+        return redirect()->route('theses.index')->with('success', 'Thesis updated successfully.');
     }
+
     public function destroy(Thesis $thesis)
     {
         $thesis->delete();
-
-        return redirect()->route('theses.index')
-                        ->with('success', 'Thesis deleted successfully');
+        return redirect()->route('theses.index')->with('success', 'Thesis deleted successfully.');
     }
-
 }

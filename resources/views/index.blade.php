@@ -13,10 +13,13 @@
     <a href="{{ route('authors.index') }}">
         <button type="button">Go to Authors</button>
     </a>
-    <!-- Button linking to catalogue -->
-     <a href="{{ route('catalogue') }}">
-        <button type="button">Go to Catalogue</button>
+    <a href="{{ route('books.index') }}">
+        <button type="button">Go to Books</button>
     </a>
+    
+    <a href="{{ route('theses.index') }}">
+        <button type="button">Go to Theses</button>
+     
 
     <h3>student/staff view</h3>
 </a>

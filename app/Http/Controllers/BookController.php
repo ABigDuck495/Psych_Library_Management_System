@@ -3,130 +3,91 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\Author;
-use App\Models\Thesis;
+use Illuminate\Http\Request;
 use App\Models\BookCopy;
 use App\Models\Category;
+use App\Models\Author;
 use App\Models\BookAuthor;
+use App\Models\Thesis;
 use App\Models\ThesisAuthor;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use App\Models\ThesisDept;
 
 class BookController extends Controller
 {
-
-    public function addInventory()
+    public function index()
     {
-        $categories = Category::all();
-        //$departments = ThesisDept::all(); // Fetch all departments from thesis_dept table
-        return view('books.addInventory', compact('categories'));
+        $books = Book::with(['authors', 'category'])->get();
+        return view('books.index', compact('books'));
+    }
+
+    public function create()
+    {
+        $categories = Category::pluck('category_name', 'id');
+        return view('books.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
-        if ($request->type === 'book') {
-            // ✅ Create author
-            $author = Author::firstOrCreate([
-                'firstname' => $request->author_firstname,
-                'lastname' => $request->author_lastname,
-            ]);
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'year_published' => 'required|integer|min:1900|max:' . date('Y'),
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'category_id' => 'required|exists:categories,id',
+        ]);
 
-            // ✅ Create book
-            $book = Book::create([
-                'title' => $request->title,
-                'description' => $request->description,
-                'year_published' => $request->year_published,
-                'category_id' => $request->category_id,
-            ]);
+        // Create or find the author
+        $author = Author::firstOrCreate([
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+        ]);
 
-            // ✅ Link author to book
-            BookAuthor::create([
-                'book_id' => $book->id,
-                'author_id' => $author->id,
-            ]);
+        // Create the book
+        $book = Book::create([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'year_published' => $validated['year_published'],
+            'category_id' => $validated['category_id'],
+        ]);
 
-            // ✅ Create book copy
-            BookCopy::create([
-                'book_id' => $book->id,
-                'num_copies' => $request->num_copies,
-            ]);
+        // Attach author to book
+        $book->authors()->attach($author->id);
 
-            return redirect()->route('catalogue')->with('success', 'Book added successfully!');
-
-        } elseif ($request->type === 'thesis') {
-            // ✅ Create author
-            $author = Author::firstOrCreate([
-                'first_name' => $request->author_firstname,
-                'last_name' => $request->author_lastname,
-            ]);
-
-            // ✅ Create thesis
-            $thesis = Thesis::create([
-                'title' => $request->title,
-                'abstract' => $request->abstract,
-                'year_published' => $request->year_published,
-                'advisor' => $request->advisor,
-                'category_name' => $request->category_name,
-            ]);
-
-            // ✅ Link author to thesis
-            ThesisAuthor::create([
-                'thesis_id' => $thesis->id,
-                'author_id' => $author->id,
-            ]);
-
-            return redirect()->route('catalogue')->with('success', 'Academic paper added successfully!');
-        }
-    }
-    
-    // shows all books (like index.php)
-    public function index()
-    {
-        $books = Book::all(); // SELECT * FROM books
-        return view('books.index', compact('books'));
+        return redirect()->route('books.index')->with('success', 'Book created successfully!');
     }
 
-    // creates new book (like create.php)
-    public function create()
-    {
-        return view('books.create');
-    }
-    //displays a specific book (like show.php)
     public function show(Book $book)
     {
+        $book->load(['authors', 'category']);
         return view('books.show', compact('book'));
     }
 
-    // edits a specific book (like edit.php)
     public function edit(Book $book)
     {
-        return view('books.edit', compact('book'));
+        $categories = Category::pluck('category_name', 'id');
+        return view('books.update', compact('book', 'categories'));
     }
 
-    // updates a specific book (like update.php)
     public function update(Request $request, Book $book)
     {
-        $request->validate([
-            'title' => 'required|max:255',
-            'author' => 'required|max:255',
-            'description' => 'nullable',
-            'published_year' => 'required|integer',
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'year_published' => 'required|integer|min:1900|max:' . date('Y'),
+            'category_id' => 'required|exists:categories,id',
         ]);
 
-        $book->update($request->all()); // UPDATE books SET...
+        $book->update($validated);
 
-        return redirect()->route('books.index')
-                         ->with('success', 'Book updated successfully.');
+        return redirect()->route('books.index')->with('success', 'Book updated successfully!');
     }
 
-    // deletes a specific book (like delete.php)
     public function destroy(Book $book)
     {
-        $book->delete(); // DELETE FROM books WHERE id...
+        $book->authors()->detach();
+        $book->delete();
 
-        return redirect()->route('books.index')
-                         ->with('success', 'Book deleted successfully.');
+        return redirect()->route('books.index')->with('success', 'Book deleted successfully!');
     }
-
-    
 }

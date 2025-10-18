@@ -12,19 +12,33 @@ class Author extends Model
     use HasFactory;
     protected $fillable = ['first_name', 'last_name'];
     protected $table = 'authors';
-
+    
     public function books()
     {
-        return $this->belongsToMany(Book::class);
+        return $this->belongsToMany(Book::class, 'book_authors');
     }
-    public function thesis()
+
+    public function theses()
     {
-        return $this->belongsToMany(Thesis::class);
+        return $this->belongsToMany(Thesis::class, 'thesis_authors');
     }
-    public function getFullNameAttribute(): string
+
+    public function getFullNameAttribute()
     {
-        return $this->first_name . ' ' . $this->last_name;
+        return "{$this->first_name} {$this->last_name}";
     }
+    // public function books()
+    // {
+    //     return $this->belongsToMany(Book::class);
+    // }
+    // public function thesis()
+    // {
+    //     return $this->belongsToMany(Thesis::class);
+    // }
+    // public function getFullNameAttribute(): string
+    // {
+    //     return $this->first_name . ' ' . $this->last_name;
+    // }
     public function getBookCountAttribute(): int
     {
         return $this->books()->count();
