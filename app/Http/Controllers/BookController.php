@@ -3,14 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use Illuminate\Http\Request;
+use App\Models\Author;
 use App\Models\BookCopy;
 use App\Models\Category;
-use App\Models\Author;
-use App\Models\BookAuthor;
-use App\Models\Thesis;
-use App\Models\ThesisAuthor;
-use App\Models\ThesisDept;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+
 
 class BookController extends Controller
 {
@@ -23,39 +21,44 @@ class BookController extends Controller
     public function create()
     {
         $categories = Category::pluck('category_name', 'id');
-        return view('books.create', compact('categories'));
+        $authors = Author::all();
+        return view('books.create', compact('categories', 'authors'));
     }
 
-    public function store(Request $request)
+     public function store(Request $request)
     {
+        // Validate the book data
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'year_published' => 'required|integer|min:1900|max:' . date('Y'),
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
+            'SKU' => 'required|unique:books',
+            'title' => 'required',
+            'year_published' => 'required|digits:4',
             'category_id' => 'required|exists:categories,id',
-        ]);
-
-        // Create or find the author
-        $author = Author::firstOrCreate([
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
+            'description' => 'nullable',
+            'publisher' => 'nullable',
+            'isbn' => 'nullable|unique:books',
+            'pages' => 'nullable|integer',
+            'author_ids' => 'required|array',
+            'author_ids.*' => 'exists:authors,id',
+            'copies_count' => 'required|integer|min:1|max:20' // Limit to reasonable number
         ]);
 
         // Create the book
-        $book = Book::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'year_published' => $validated['year_published'],
-            'category_id' => $validated['category_id'],
-        ]);
+        $book = Book::create($validated);
+        
+        // Attach authors
+        $book->authors()->attach($request->author_ids);
+        
+        // Create book copies
+        for ($i = 0; $i < $request->copies_count; $i++) {
+            BookCopy::create([
+                'book_id' => $book->id,
+                'status' => 'available'
+            ]);
+        }
 
-        // Attach author to book
-        $book->authors()->attach($author->id);
-
-        return redirect()->route('books.index')->with('success', 'Book created successfully!');
-    }
+    return redirect()->route('books.show', $book)
+                    ->with('success', 'Book and ' . $request->copies_count . ' copies created successfully!');
+}
 
     public function show(Book $book)
     {

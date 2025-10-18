@@ -33,7 +33,15 @@ class AuthorController extends Controller
             'last_name' => 'required|string|max:255',
         ]);
 
-        Author::create($request->only('first_name', 'last_name'));
+        $author = Author::create($request->only('first_name', 'last_name'));
+
+        //for creating author from another page
+        if ($request->has('return_to') && !empty($request->return_to)) {
+            return redirect($request->return_to)->with([
+                'success' => 'Author created successfully',
+                'new_author_id' => $author->id 
+            ]);
+        }
 
         return redirect()->route('authors.index')->with('success', 'Author added successfully!');
     }
