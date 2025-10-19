@@ -96,4 +96,9 @@ class BookController extends Controller
 
         return redirect()->route('books.index')->with('success', 'Book deleted successfully!');
     }
+    public function canBeRequested(Book $book)
+    {
+        $availableCopies = $book->copies()->where('is_available', true)->count();
+        return $availableCopies > 0;
+    }
 }

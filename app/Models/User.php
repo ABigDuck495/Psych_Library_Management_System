@@ -62,14 +62,22 @@ class User extends Authenticatable
     public function transactions(){
         return $this->hasMany(Transaction::class);
     }
-    public function penalties(){
-        return $this->hasMany(Penalty::class);
-    }
     public function activeTransactions(){
         return $this->hasMany(Transaction::class)->where('transaction_status', 'borrowed');
     }
     public function overdueTransactions(){
         return $this->hasMany(Transaction::class)->where('transaction_status', 'overdue');
+    }
+    public function hasPendingRequestForBook($bookId)
+    {
+        // Check transactions for copies that belong to the given book id
+        return $this->transactions()
+                    ->whereHas('bookCopy', function ($q) use ($bookId) {
+                        $q->where('book_id', $bookId);
+                    })
+                    // treat both 'requested' and 'pending' as pending states if your app uses either
+                    ->whereIn('transaction_status', ['requested', 'pending'])
+                    ->exists();
     }
 
 

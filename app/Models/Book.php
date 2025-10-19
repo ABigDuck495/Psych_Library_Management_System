@@ -28,6 +28,20 @@ class Book extends Model
     public function availableCopies(){
         return $this->hasMany(BookCopy::class)->where('is_available', true);
     }
+    /**
+     * Return next available BookCopy model for this book or null.
+     */
+    public function getNextAvailableCopy()
+    {
+        return $this->copies()->where('is_available', true)->first();
+    }
+    /**
+     * Whether the book currently has at least one available copy.
+     */
+    public function canBeRequested()
+    {
+        return $this->copies()->where('is_available', true)->exists();
+    }
     public function transactions(){
         return $this->hasManyThrough(Transaction::class, BookCopy::class, 'book_id', 'copy_id', 'id', 'id');
     }

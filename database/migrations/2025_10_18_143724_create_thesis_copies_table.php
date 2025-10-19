@@ -13,10 +13,17 @@ return new class extends Migration
     {
         Schema::create('thesis_copies', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('thesis_id')->constrained('theses');
+            $table->foreignId('thesis_id')
+                ->constrained('theses')
+                ->onDelete('cascade'); //makes it so it deletes the copies when you delete a thesis
             $table->boolean('is_available')->default(true);
             $table->timestamps();
-        });
+
+            //indexes for performance
+            $table->index('thesis_id');
+            $table->index('is_available');
+            $table->index(['thesis_id', 'is_available']); // For finding available copies
+        });     
     }
 
     /**

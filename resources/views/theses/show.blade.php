@@ -10,7 +10,7 @@
     <div>
         <p><strong>Authors:</strong> {{ $thesis->authors_list }}</p>
         <p><strong>Year Published:</strong> {{ $thesis->year_published }}</p>
-        <p><strong>Available Copies:</strong> {{ $thesis->available_copies_count }} / {{ $thesis->total_copies_count }}</p>
+        <p><strong>Available Copies:</strong> {{ $thesis->availableCopies()->count() }}</p>
     </div>
 
     <!-- Request Button Section -->

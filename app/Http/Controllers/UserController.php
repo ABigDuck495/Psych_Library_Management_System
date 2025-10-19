@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
@@ -50,4 +51,5 @@ class UserController extends Controller
         return redirect()->route('users.index')
                          ->with('success', 'User deleted successfully');
     }
+
 }

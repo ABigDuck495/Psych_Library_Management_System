@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Author;
+use App\Models\ThesisCopy;
 use App\Models\ThesisDept;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Thesis extends Model
 {
     protected $fillable = [
+        'id',
         'title',
         'abstract',
         'year_published',
@@ -18,6 +21,10 @@ class Thesis extends Model
     public function authors()
     {
         return $this->belongsToMany(Author::class, 'thesis_authors');
+    }
+    public function copies()
+    {
+        return $this->hasMany(ThesisCopy::class, 'thesis_id');
     }
     public function scopeSearch($query, $search)
     {
@@ -72,5 +79,9 @@ class Thesis extends Model
 
         // Sync the authors (this handles attaching/detaching automatically)
         return $this->authors()->sync($authorIds);
+    }
+    public function availableCopies()
+    {
+        return $this->hasMany(ThesisCopy::class)->where('is_available', true);
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Author;
 use App\Models\Thesis;
-use App\Models\ThesisDept;
+use App\Models\ThesisCopy;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -39,6 +39,7 @@ class ThesisController extends Controller
             'year_published' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
             'author_ids' => 'required|array|min:1',
             'author_ids.*' => 'exists:authors,id',
+            'copies_count' => 'required|integer|min:1'
         ]);
 
         // extract authors and remove before creating the thesis
@@ -50,6 +51,13 @@ class ThesisController extends Controller
 
         // Link thesis ↔ authors (use sync to ensure exact set)
         $thesis->authors()->sync($authorIds);
+
+        for($i = 0; $i < $request->copies_count; $i++) {
+            ThesisCopy::create([
+                'thesis_id' => $thesis->id,
+                'is_Available' => true
+            ]);
+        }
 
         return redirect()->route('theses.index')->with('success', 'Thesis added successfully.');
     }
@@ -83,5 +91,11 @@ class ThesisController extends Controller
     {
         $thesis->delete();
         return redirect()->route('theses.index')->with('success', 'Thesis deleted successfully.');
+    }
+    public function availableCopies($thesisId){
+        $availableCopiesCount = ThesisCopy::where('thesis_id', $thesisId)
+                                        ->where('isAvailable', true)
+                                        ->count();
+        return $availableCopiesCount;
     }
 }

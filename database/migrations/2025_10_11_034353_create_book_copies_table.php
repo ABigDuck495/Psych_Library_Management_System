@@ -10,7 +10,9 @@ return new class extends Migration
     {
         Schema::create('book_copies', function (Blueprint $table) {
             $table->id('copy_id');
-            $table->foreignId('book_id')->constrained('books');
+            $table->foreignId('book_id')
+                ->constrained('books')
+                ->onDelete('cascade'); //makes it so it deletes the copies when you delete a book
             $table->boolean('is_available')->default(true);
             $table->timestamps();
 

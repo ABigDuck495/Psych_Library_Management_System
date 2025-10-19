@@ -24,6 +24,12 @@
         <option value="AB Psychology">AB Psychology</option>
         <option value="BS Psychology">BS Psychology</option>
     </select>
+    
+    <label for="copies_count">Number of Copies: </label>
+    <input type="number" id="copies_count" name="copies_count" 
+            value="{{ old('copies_count', 1) }}" min="1" max="20" required>
+    @error('copies_count')<div>{{ $message }}</div>@enderror
+
 
     <h3>Author Information</h3>
     <label for="author_ids">Authors *</label>
