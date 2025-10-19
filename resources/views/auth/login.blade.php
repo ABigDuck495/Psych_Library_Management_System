@@ -34,6 +34,9 @@
        <div>
            <button type="submit">Login</button>
        </div>
+        <div>
+        <p>Don't have an account? <a href="{{ route('register') }}">Register here</a></p>
+    </div>
    </form>
 </body>
 </html>

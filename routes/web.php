@@ -1,12 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ThesisController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TransactionController;
-use Illuminate\Support\Facades\Auth;
 
 
 
@@ -16,21 +17,31 @@ use Illuminate\Support\Facades\Auth;
 
 
 //login shit
-// Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', [\App\Http\Controllers\Auth\LogoutController::class, 'logout'])->name('logout');
 
+
+//register
+
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
+
 // Home route: redirect guests to login immediately, authenticated users to dashboard
 Route::get('/', function () {
-    return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
+    return Auth::check() ? redirect()->route('catalogue') : redirect()->route('login');
 })->name('home');
+
+// Simple index route for post-login redirect
+Route::get('/index', function () {
+    return view('index');
+})->name('index');
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/catalogue.catalogue', function () {
+        return view('catalogue.catalogue');
+    })->name('catalogue');
 
     Route::resource('authors', AuthorController::class);
     Route::resource('transaction', TransactionController::class);
