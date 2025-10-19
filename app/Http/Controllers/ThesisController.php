@@ -10,6 +10,10 @@ use Illuminate\Routing\Controller;
 
 class ThesisController extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function show(Thesis $thesis)
 {
     // Load the thesis with its authors

@@ -47,7 +47,8 @@ class TransactionController extends Controller
     {
         $user = Auth::user();
         if (!$user) {
-            return redirect()->route('login');
+            // show the login view located at resources/views/auth/login.blade.php
+            return view('auth.login');
         }
 
         // if (!$book->canBeRequested()) {
@@ -80,7 +81,8 @@ class TransactionController extends Controller
     {
         $user = Auth::user();
         if (!$user) {
-            return redirect()->route('login');
+            // show the login view located at resources/views/auth/login.blade.php
+            return view('auth.login');
         }
 
         if (!$thesis->canBeRequested()) {

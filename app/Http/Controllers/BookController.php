@@ -12,6 +12,11 @@ use Illuminate\Routing\Controller;
 
 class BookController extends Controller
 {
+    public function __construct()
+    {
+        // Require authentication for all book routes (viewing, creating, etc.)
+        $this->middleware('auth');
+    }
     public function index()
     {
         $books = Book::with(['authors', 'category'])->get();

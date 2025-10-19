@@ -17,4 +17,5 @@ require __DIR__.'/../vendor/autoload.php';
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
+// Bootstrap handles the incoming HTTP request; re-enable it so the app responds.
 $app->handleRequest(Request::capture());
