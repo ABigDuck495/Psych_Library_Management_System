@@ -17,9 +17,10 @@
         <button type="button">Go to Books</button>
     </a>
     
-    <a href="{{ route('theses.index') }}">
-        <button type="button">Go to Theses</button>
-     
+    <form action="{{ route('logout') }}" method="POST">
+        @csrf
+        <button type="submit">Logout</button>
+    </form>
 
     <h3>student/staff view</h3>
 </a>

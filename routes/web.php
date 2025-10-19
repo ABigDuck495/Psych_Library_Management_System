@@ -29,7 +29,7 @@ Route::post('/register', [RegisterController::class, 'register']);
 
 // Home route: redirect guests to login immediately, authenticated users to dashboard
 Route::get('/', function () {
-    return Auth::check() ? redirect()->route('catalogue') : redirect()->route('login');
+    return Auth::check() ? redirect()->route('index') : redirect()->route('login');
 })->name('home');
 
 // Simple index route for post-login redirect
