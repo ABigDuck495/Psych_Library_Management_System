@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Psych Library Management System</title>
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
     <nav>
