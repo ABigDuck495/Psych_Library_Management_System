@@ -87,6 +87,7 @@ Route::middleware(['auth'])->group(function () {
         // authors and transactions
         Route::resource('authors', AuthorController::class);
         Route::resource('transactions', TransactionController::class);
+        //Route::get('adminInterface', UserController::class)->name('adminInterface.index');
         // Route::resource('requested', TransactionController::class);
 
         // admin transaction actions

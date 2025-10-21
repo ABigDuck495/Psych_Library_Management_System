@@ -25,8 +25,7 @@
         <button type="button">User Interface</button>
     </a>
 
-    <a href="{{ route('adminInterface.index') }}">
-        <button type="button">Admin Interface</button>
+    
     <a href="{{ route('theses.index') }}">
         <button type="button"> Go to index</button>
     </a>
