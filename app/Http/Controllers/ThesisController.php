@@ -28,6 +28,14 @@ class ThesisController extends Controller
         return view('theses.index', compact('theses'));
     }
 
+     public function userInterface()
+    {
+    $theses = Thesis::with('authors')->get();
+    $books = collect(); // empty placeholder
+    return view('userInterface.index', compact('theses', 'books'));
+    }
+
+
     public function create()
     {
         // Dropdown options for department field

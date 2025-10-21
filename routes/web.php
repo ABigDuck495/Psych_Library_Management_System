@@ -6,9 +6,11 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ThesisController;
+use App\Http\Controllers\UserInterfaceController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\Auth\RegisterController;
+
 
 
 
@@ -51,8 +53,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('books', [BookController::class, 'index'])->name('books.index');
         Route::get('books/{book}', [BookController::class, 'show'])->name('books.show');
 
-        Route::get('theses', [ThesisController::class, 'index'])->name('theses.index');
-        Route::get('theses/{thesis}', [ThesisController::class, 'show'])->name('theses.show');
+    Route::resource('theses', ThesisController::class);
+    Route::resource('theses', ThesisController::class)->except(['show']);
+
+    // --- user routes ---
+   Route::get('/user/userInterface', [UserInterfaceController::class, 'index'])->name('userInterface.index');
+
+
 
         // Request actions (users can request)
         Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');
