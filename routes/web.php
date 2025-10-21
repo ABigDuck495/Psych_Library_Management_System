@@ -3,11 +3,12 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ThesisController;
-use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\Auth\RegisterController;
 
 
 
@@ -39,26 +40,51 @@ Route::get('/index', function () {
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/catalogue.catalogue', function () {
-        return view('catalogue.catalogue');
-    })->name('catalogue');
+    // Public for authenticated 'user' role: view catalogue, books, theses and request
+    Route::middleware(['role:user,librarian,admin,super-admin'])->group(function () {
+        // catalogue view
+        Route::get('/catalogue.catalogue', function () {
+            return view('catalogue.catalogue');
+        })->name('catalogue');
 
-    Route::resource('authors', AuthorController::class);
-    Route::resource('transaction', TransactionController::class);
+        // viewing routes
+        Route::get('books', [BookController::class, 'index'])->name('books.index');
+        Route::get('books/{book}', [BookController::class, 'show'])->name('books.show');
 
+        Route::get('theses', [ThesisController::class, 'index'])->name('theses.index');
+        Route::get('theses/{thesis}', [ThesisController::class, 'show'])->name('theses.show');
 
-    Route::post('/books/store', [BookController::class, 'store'])->name('books.store');
-    Route::resource('books', BookController::class);
+        // Request actions (users can request)
+        Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');
+        Route::post('/theses/{thesis}/request', [ThesisController::class, 'request'])->name('transactions.request-thesis');
+    });
 
-    Route::resource('theses', ThesisController::class);
-    Route::resource('theses', ThesisController::class)->except(['show']);
+    // Librarian: basic CRUD for books and theses and can view users
+    Route::middleware(['role:librarian,admin,super-admin'])->group(function () {
+        Route::resource('books', BookController::class)->except(['index', 'show']);
+        Route::resource('theses', ThesisController::class)->except(['index', 'show']);
 
-    //Transactions
-    Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');
-    //Route::get('/my-requests', [TransactionController::class, 'myRequests'])->name('transactions.my-requests');
-    Route::get('/requested-books', [TransactionController::class, 'requestedBooks'])->name('transactions.requested-books');
-    Route::patch('/transactions/{transaction}/approve', [TransactionController::class, 'approveRequest'])->name('transactions.approve-request');
-    Route::patch('/transactions/{transaction}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
+        // show users
+        Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+    });
 
+    // Admin & Super-admin: full access including approve/return and user management
+    Route::middleware(['role:admin,super-admin'])->group(function () {
+        // users management
+        Route::resource('users', UserController::class)->except(['show']);
+        Route::patch('/users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
+        Route::patch('/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
+
+        // authors and transactions
+        Route::resource('authors', AuthorController::class);
+        Route::resource('transactions', TransactionController::class);
+        // Route::resource('requested', TransactionController::class);
+
+        // admin transaction actions
+        Route::get('/requested-books', [TransactionController::class, 'requestedBooks'])->name('transactions.requested-books');
+        Route::get('/requested-theses', [TransactionController::class, 'requestedTheses'])->name('transactions.requested-theses');
+        Route::patch('/transactions/{transaction}/approve', [TransactionController::class, 'approveRequest'])->name('transactions.approve-request');
+        Route::patch('/transactions/{transaction}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
+    });
 
 });

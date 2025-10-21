@@ -3,16 +3,66 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\User;
 use App\Models\Thesis;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 
 class TransactionController extends Controller
 {
- 
+    public function index(Request $request)
+    {
+        // Only admin, super-admin, and librarian can view all transactions
+        if (!in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $query = Transaction::with(['user', 'copy.book']);
+
+        // Filter by status
+        if ($request->has('status') && $request->status) {
+            $query->where('transaction_status', $request->status);
+        }
+
+        // Filter by user
+        if ($request->has('user_id') && $request->user_id) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        // Filter by date range
+        if ($request->has('date_from') && $request->date_from) {
+            $query->where('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->has('date_to') && $request->date_to) {
+            $query->where('created_at', '<=', $request->date_to . ' 23:59:59');
+        }
+
+        $transactions = $query->latest()->paginate(50);
+        $users = User::where('role', 'user')->get();
+
+        return view('transactions.index', compact('transactions', 'users'));
+    }
+    // Admin/Librarian: View requested books for approval
+    public function requestedBooks()
+    {
+        // Only admin, super-admin, and librarian can view requested books
+        if (!in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $requests = Transaction::requested()
+            ->with(['user', 'copy.book'])
+            ->latest()
+            ->paginate(20);
+
+        return view('transactions.requested-books', compact('requests'));
+    }
+
     public function create(){
         return view('transactions.create');
     }
@@ -51,25 +101,29 @@ class TransactionController extends Controller
             return view('auth.login');
         }
 
-        // if (!$book->canBeRequested()) {
-        //     return redirect()->back()->with('error', 'This book is currently not available for request.');
-        // }
-
         if ($user->hasPendingRequestForBook($book->id)) {
             return redirect()->back()->with('error', 'You already have a pending request for this book.');
         }
 
-        $availableCopy = $book->getNextAvailableCopy();
-        if (!$availableCopy) {
+        // atomic reserve: find one available copy and mark as unavailable inside a DB transaction
+        $reservedCopy = DB::transaction(function () use ($book) {
+            $copy = $book->copies()->where('is_available', 1)->lockForUpdate()->first();
+            if (!$copy) return null;
+            $copy->is_available = false;
+            $copy->save();
+            return $copy;
+        });
+
+        if (!$reservedCopy) {
             return redirect()->back()->with('error', 'No available copies found for this book.');
         }
 
         $transaction = Transaction::create([
             'user_id' => $user->id,
-            // use ->id unless your copy model uses copy_id
-            'copy_id' => $availableCopy->id,
-            'borrow_date' => null,
-            'due_date' => null,
+            'copy_id' => $reservedCopy->id,
+            'copy_type' => get_class($reservedCopy),
+            'borrow_date' => now(),
+            'due_date' => now()->addDays(14),
             'return_date' => null,
             'transaction_status' => 'requested',
         ]);
@@ -85,30 +139,70 @@ class TransactionController extends Controller
             return view('auth.login');
         }
 
-        if (!$thesis->canBeRequested()) {
-            return redirect()->back()->with('error', 'This thesis is currently not available for request.');
-        }
-
-        // ensure the user helper can handle theses too (rename if needed)
         if ($user->hasPendingRequestForBook($thesis->id)) {
             return redirect()->back()->with('error', 'You already have a pending request for this thesis.');
         }
 
-        $availableCopy = $thesis->getNextAvailableCopy();
-        if (!$availableCopy) {
+        $reservedCopy = DB::transaction(function () use ($thesis) {
+            $copy = $thesis->copies()->where('is_available', 1)->lockForUpdate()->first();
+            if (!$copy) return null;
+            $copy->is_available = false;
+            $copy->save();
+            return $copy;
+        });
+
+        if (!$reservedCopy) {
             return redirect()->back()->with('error', 'No available copies found for this thesis.');
         }
 
         $transaction = Transaction::create([
             'user_id' => $user->id,
-            'copy_id' => $availableCopy->id,
-            'borrow_date' => null,
-            'due_date' => null,
+            'copy_id' => $reservedCopy->id,
+            'copy_type' => get_class($reservedCopy),
+            'borrow_date' => now(),
+            'due_date' => now()->addDays(14),
             'return_date' => null,
             'transaction_status' => 'requested',
         ]);
 
         return redirect()->back()->with('success', 'Thesis request submitted successfully. Please wait for approval.');
+    }
+
+    public function approveRequest(Request $request, Transaction $transaction)
+    {
+        // simple permission check could be added here
+        if ($transaction->transaction_status !== 'requested') {
+            return redirect()->back()->with('error', 'Only requested transactions can be approved.');
+        }
+
+        $transaction->transaction_status = 'borrowed';
+        $transaction->borrow_date = $transaction->borrow_date ?? now();
+        $transaction->due_date = $transaction->due_date ?? now()->addDays(14);
+        $transaction->save();
+
+        return redirect()->back()->with('success', 'Transaction approved.');
+    }
+
+    public function returnBook(Request $request, Transaction $transaction)
+    {
+        if ($transaction->transaction_status === 'returned') {
+            return redirect()->back()->with('error', 'Transaction already returned.');
+        }
+
+        DB::transaction(function () use ($transaction) {
+            $transaction->return_date = now();
+            $transaction->transaction_status = 'returned';
+            $transaction->save();
+
+            // mark copy available again
+            $copyModel = $transaction->bookCopy;
+            if ($copyModel) {
+                $copyModel->is_available = true;
+                $copyModel->save();
+            }
+        });
+
+        return redirect()->back()->with('success', 'Item returned successfully.');
     }
 
 

@@ -28,7 +28,7 @@ class ThesisCopyController extends Controller
     }
     public function availableCopies($thesisId){
         $availableCopiesCount = ThesisCopy::where('thesis_id', $thesisId)
-                                        ->where('isAvailable', true)
+                                        ->where('is_available', true)
                                         ->count();
         return $availableCopiesCount;
     }

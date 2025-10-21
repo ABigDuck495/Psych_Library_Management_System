@@ -10,6 +10,9 @@ class ThesisCopy extends Model
         'thesis_id',
         'is_available',
     ];
+    protected $casts = [
+        'is_available' => 'boolean',
+    ];
     //relations rawr freaky
     public function thesis()
     {
