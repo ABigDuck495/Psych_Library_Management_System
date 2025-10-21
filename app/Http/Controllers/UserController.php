@@ -4,16 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+// use App\Http\Controllers\Controller;
+use Illuminate\Routing\Controller;
 
 class UserController extends Controller
 {
-    // public function __construct()
-    // {
-    //     // Only admin and super-admin can access all user management functions
-    //     $this->middleware('auth');
-    //     $this->middleware('can:manage-users')->except(['show']);
-    // }
+    public function __construct()
+    {
+        // Only admin and super-admin can access all user management functions
+        $this->middleware('auth');
+        $this->middleware('can:manage-users')->except(['show']);
+    }
 
     // show all users (like index.php)
     public function index()

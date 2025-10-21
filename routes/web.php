@@ -42,58 +42,52 @@ Route::get('/index', function () {
 
 Route::middleware(['auth'])->group(function () {
 
-    // Public for authenticated 'user' role: view catalogue, books, theses and request
+    // Viewing routes - accessible to any authenticated user
     Route::middleware(['role:user,librarian,admin,super-admin'])->group(function () {
-        // catalogue view
-        Route::get('/catalogue.catalogue', function () {
+        Route::get('/catalogue', function () {
             return view('catalogue.catalogue');
         })->name('catalogue');
 
-        // viewing routes
+        // Books: users may only view index & show
         Route::get('books', [BookController::class, 'index'])->name('books.index');
         Route::get('books/{book}', [BookController::class, 'show'])->name('books.show');
 
-    Route::resource('theses', ThesisController::class);
-    Route::resource('theses', ThesisController::class)->except(['show']);
+        // Theses: users may only view index & show
+        Route::get('theses', [ThesisController::class, 'index'])->name('theses.index');
+        Route::get('theses/{thesis}', [ThesisController::class, 'show'])->name('theses.show');
 
-    // --- user routes ---
-   Route::get('/user/userInterface', [UserInterfaceController::class, 'index'])->name('userInterface.index');
-
-
-
-        // Request actions (users can request)
-        Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');
-        Route::post('/theses/{thesis}/request', [ThesisController::class, 'request'])->name('transactions.request-thesis');
-        // Users can renew their own borrowed transactions
-        Route::patch('/transactions/{transaction}/renew', [TransactionController::class, 'renew'])->name('transactions.renew');
+        // Simple user-facing interface
+        Route::get('/user/userInterface', [UserInterfaceController::class, 'index'])->name('userInterface.index');
     });
 
-    // Librarian: basic CRUD for books and theses and can view users
+    // Librarian: basic CRUD for books, theses and transactions (create/update/delete)
     Route::middleware(['role:librarian,admin,super-admin'])->group(function () {
+        // Provide create/store/edit/update/destroy for books/theses
         Route::resource('books', BookController::class)->except(['index', 'show']);
         Route::resource('theses', ThesisController::class)->except(['index', 'show']);
 
-        // show users
-        Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+        // Transactions: librarians manage transactions (index/show/create/store/edit/update/destroy)
+        Route::resource('transactions', TransactionController::class);
+
+        // Librarians may also create request actions and renew
+        Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');
+        Route::post('/theses/{thesis}/request', [TransactionController::class, 'requestThesis'])->name('transactions.request-thesis');
+        Route::patch('/transactions/{transaction}/renew', [TransactionController::class, 'renew'])->name('transactions.renew');
     });
 
-    // Admin & Super-admin: full access including approve/return and user management
+    // Admin & Super-admin: full access including user and author management and admin-only transaction actions
     Route::middleware(['role:admin,super-admin'])->group(function () {
-        // users management
-        Route::resource('users', UserController::class)->except(['show']);
+        // Full CRUD for users and authors
+        Route::resource('users', UserController::class);
         Route::patch('/users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
         Route::patch('/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
 
-        // authors and transactions
         Route::resource('authors', AuthorController::class);
-        Route::resource('transactions', TransactionController::class);
-        //Route::get('adminInterface', UserController::class)->name('adminInterface.index');
-        // Route::resource('requested', TransactionController::class);
 
-        // admin transaction actions
+        // Admin-level transaction actions
         Route::get('/requested-books', [TransactionController::class, 'requestedBooks'])->name('transactions.requested-books');
         Route::get('/requested-theses', [TransactionController::class, 'requestedTheses'])->name('transactions.requested-theses');
-        Route::get('transactions.overdue', [TransactionController::class, 'overdueTransactions'])->name('transactions.overdue');
+        Route::get('/transactions/overdue', [TransactionController::class, 'overdueTransactions'])->name('transactions.overdue');
         Route::patch('/transactions/{transaction}/approve', [TransactionController::class, 'approveRequest'])->name('transactions.approve-request');
         Route::patch('/transactions/{transaction}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
         Route::patch('/transactions/{transaction}/mark-overdue', [TransactionController::class, 'markOverdue'])->name('transactions.mark-overdue');
