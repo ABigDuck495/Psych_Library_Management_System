@@ -50,45 +50,14 @@
         </div>
 
         <!-- Specific User Type Information -->
-        <div style="flex: 1;">
-            @if($user->isStudent())
-                <h2>Student Information</h2>
-                <p><strong>Academic Program:</strong> {{ $user->student->academic_program }}</p>
-                <p><strong>Major/Department:</strong> {{ $user->student->major_department }}</p>
-            @else
-                <h2>Employee Information</h2>
-                <p><strong>Department:</strong> {{ $user->employee->department }}</p>
-                <p><strong>Position Title:</strong> {{ $user->employee->position_title }}</p>
-            @endif
-        </div>
+ 
     </div>
 
     <div style="margin-top: 20px;">
         <a href="{{ route('users.index') }}">Back to Users</a>
         
-        @can('manage-users')
-            <a href="{{ route('users.edit', $user) }}">Edit User</a>
-            
-            @if($user->account_status === 'Active')
-                <form action="{{ route('users.deactivate', $user) }}" method="POST" style="display: inline;">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" onclick="return confirm('Deactivate this user?')">Deactivate User</button>
-                </form>
-            @else
-                <form action="{{ route('users.activate', $user) }}" method="POST" style="display: inline;">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit">Activate User</button>
-                </form>
-            @endif
-
-            <form action="{{ route('users.destroy', $user) }}" method="POST" style="display: inline;">
-                @csrf
-                @method('DELETE')
-                <button type="submit" onclick="return confirm('Delete this user permanently?')">Delete User</button>
-            </form>
-        @endcan
+        
+        
     </div>
 </body>
 </html>
