@@ -22,7 +22,7 @@ class RegisterController extends Controller
             'university_id' => 'required|string|max:255|unique:users',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            //'username' => 'required|string|max:255|unique:users',
+            'username' => 'required|string|max:255|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'role' => 'string|max:50',
             'phone_number' => 'string|max:20',
@@ -34,7 +34,7 @@ class RegisterController extends Controller
             'university_id' => $validated['university_id'],
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
-            //'username' => $validated['username'],
+            'username' => $validated['username'],
             'email' => $validated['email'],
             'role' => 'admin', // Default role
             'phone_number' => $validated['phone_number'],

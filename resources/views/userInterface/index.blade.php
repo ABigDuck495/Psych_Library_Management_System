@@ -15,6 +15,8 @@
         
         .content-preview {
             display: -webkit-box;
+            /* Standard property for compatibility */
+            line-clamp: 3;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;

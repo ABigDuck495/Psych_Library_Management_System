@@ -15,8 +15,8 @@
         
         .form-input:focus {
             outline: none;
-            ring: 2px;
-            ring-color: #3b82f6;
+            /* emulate Tailwind's ring using box-shadow */
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.25);
             border-color: #3b82f6;
         }
     </style>

@@ -34,10 +34,10 @@
             <input type="text" id="last_name" name="last_name" value="{{ old('last_name') }}" required>
         </div>
 
-        <!-- <div>
+        <div>
             <label for="username">Username</label>
             <input type="text" id="username" name="username" value="{{ old('username') }}" required>
-        </div> -->
+        </div>
 
         <div>
             <label for="email">Email Address</label>
