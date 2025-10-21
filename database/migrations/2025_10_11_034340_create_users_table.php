@@ -14,7 +14,8 @@ return new class extends Migration
 
         //base profile for all users
         Schema::create('users', function (Blueprint $table) {
-            $table->id('university_id');
+            $table->id('id');
+            $table->string('university_id')->unique();
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('first_name');
@@ -40,7 +41,8 @@ return new class extends Migration
 
         //students table (extends users)
         Schema::create('students', function (Blueprint $table) {
-            $table->foreignId('university_id')->unique()->constrained('users')->onDelete('cascade');
+            $table->id('student_id');
+            $table->foreignId('id')->unique()->constrained('users')->onDelete('cascade');
             $table->enum('academic_program', ['Undergraduate', 'Masters', 'PhD'])->default('Undergraduate');
             $table->string('department');
             $table->timestamps();
@@ -52,7 +54,8 @@ return new class extends Migration
 
         //employee table (extends users)
         Schema::create('employees', function (Blueprint $table) {
-            $table->foreignId('university_id')->unique()->constrained('users')->onDelete('cascade');
+            $table->id('employee_id');
+            $table->foreignId('id')->unique()->constrained('users')->onDelete('cascade');
             $table->string('department');
             $table->string('position_title');
             $table->timestamps();

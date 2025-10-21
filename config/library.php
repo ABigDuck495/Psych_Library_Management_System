@@ -1,6 +1,6 @@
 <?php
 return [
-    'daily_penalty_rate' => 50, // Penalty rate per day for overdue books
+    'daily_penalty_rate', // Penalty rate per day for overdue books
 ]
 
 ?>

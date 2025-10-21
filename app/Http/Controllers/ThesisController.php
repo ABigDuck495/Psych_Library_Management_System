@@ -126,7 +126,7 @@ class ThesisController extends Controller
         $transaction = Transaction::create([
             'user_id' => $user->id,
             'copy_id' => $availableCopy->id,
-            'copy_type' => 'thesis',
+            'copy_type' => get_class($availableCopy),
             'borrow_date' => now(),
             'due_date' => now()->addDays(7),
             'return_date' => null,
@@ -137,6 +137,6 @@ class ThesisController extends Controller
         $availableCopy->is_available = false;
         $availableCopy->save();
 
-        return redirect()->route('theses','Thesis request submitted successfully. Please wait for approval.');
+        return redirect()->route('theses.index')->with('success','Thesis request submitted successfully. Please wait for approval.');
     }
 }

@@ -44,16 +44,18 @@ class Transaction extends Model
     {
         return $this->morphTo(null, 'copy_type', 'copy_id');
     }
-    public function requested(){
-        return $this->where('status', 'requested');
+    // Query scopes using the transaction_status column
+    public function scopeRequested($query)
+    {
+        return $query->where('transaction_status', 'requested');
     }
     public function scopeBorrowed($query)
     {
-        return $query->where('status', 'borrowed');
+        return $query->where('transaction_status', 'borrowed');
     }
     public function scopeReturned($query)
     {
-        return $query->where('status', 'returned');
+        return $query->where('transaction_status', 'returned');
     }
     public function scopeOverdue($query)
     {
@@ -63,7 +65,6 @@ class Transaction extends Model
         if ($this->transaction_status !== 'overdue' || $this->return_date) {
             return 0;
         }
-
         $daysOverdue = now()->diffInDays($this->due_date);
         $penaltyRate = config('library.daily_penalty_rate', 50);
         

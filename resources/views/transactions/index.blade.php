@@ -17,9 +17,6 @@
             <a href="{{ route('transactions.overdue') }}">
                 <button>Overdue Report</button>
             </a>
-            <a href="{{ route('transactions.due-soon') }}">
-                <button>Due Soon Report</button>
-            </a>
         </div>
     @endif
 
@@ -37,7 +34,7 @@
             <select name="user_id">
                 <option value="">All Users</option>
                 @foreach($users as $user)
-                    <option value="{{ $user->university_id }}" {{ request('user_id') == $user->university_id ? 'selected' : '' }}>
+                    <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
                         {{ $user->first_name }} {{ $user->last_name }}
                     </option>
                 @endforeach
@@ -82,7 +79,20 @@
                 <tr>
                     <td>{{ $transaction->id }}</td>
                     <td>{{ $transaction->user->first_name }} {{ $transaction->user->last_name }}</td>
-                    <td>{{ $transaction->copy->book->title }}</td>
+                    <td>
+                        @php
+                            $copy = $transaction->copy;
+                            $title = 'N/A';
+                            if ($copy) {
+                                if (isset($copy->book) && $copy->book) {
+                                    $title = $copy->book->title;
+                                } elseif (isset($copy->thesis) && $copy->thesis) {
+                                    $title = $copy->thesis->title;
+                                }
+                            }
+                        @endphp
+                        {{ $title }}
+                    </td>
                     <td>
                         <span style="
                             padding: 3px 8px;
