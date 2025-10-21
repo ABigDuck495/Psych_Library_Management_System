@@ -30,6 +30,11 @@
         </div>
 
         <div>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="{{ old('username') }}" required>
+        </div>
+
+        <div>
             <label for="email">Email Address</label>
             <input type="email" id="email" name="email" value="{{ old('email') }}" required>
         </div>

@@ -37,9 +37,7 @@
             @endif
             
             <!-- Link to view user's requests -->
-            <div style="margin-top: 10px;">
-                <a href="{{ route('transactions.my-requests') }}">View My Requests</a>
-            </div>
+
         @else
             <!-- login shit but it dont work rn so -->
         @endauth

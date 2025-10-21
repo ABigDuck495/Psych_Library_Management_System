@@ -8,6 +8,13 @@ use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
+    // public function __construct()
+    // {
+    //     // Only admin and super-admin can access all user management functions
+    //     $this->middleware('auth');
+    //     $this->middleware('can:manage-users')->except(['show']);
+    // }
+
     // show all users (like index.php)
     public function index()
     {

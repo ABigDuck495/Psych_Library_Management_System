@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\Author;
 use App\Models\BookCopy;
 use App\Models\Category;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -111,5 +112,38 @@ class BookController extends Controller
     {
         $availableCopies = $book->copies()->where('is_available', true)->count();
         return $availableCopies > 0;
+    }
+    public function availableCopies($thesisId){
+        $availableCopiesCount = BookCopy::where('thesis_id', $thesisId)
+                                        ->where('is_available', true)
+                                        ->count();
+        return $availableCopiesCount;
+    }
+    public function request(Request $request, Book $book){
+        $user = auth()->user();
+        if(!$user){
+            return view('auth.login');
+        }
+
+        $availableCopy = $book->getNextAvailableCopy();
+        if(!$availableCopy){
+            return redirect()->back()->with('error', 'No available copies found for this book.');
+        }
+
+        $transaction = Transaction::create([
+            'user_id' => $user->id,
+            'copy_id' => $availableCopy->id,
+            'copy_type' => 'book',
+            'borrow_date' => now(),
+            'due_date' => now()->addDays(7),
+            'return_date' => null,
+            'transaction_status' => 'requested',
+        ]);
+
+        // mark copy unavailable so others can't request it
+        $availableCopy->is_available = false;
+        $availableCopy->save();
+
+        return redirect()->route('books','Book request submitted successfully. Please wait for approval.');
     }
 }

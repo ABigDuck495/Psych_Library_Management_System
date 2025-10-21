@@ -27,6 +27,14 @@
 
     <a href="{{ route('adminInterface.index') }}">
         <button type="button">Admin Interface</button>
+    <a href="{{ route('theses.index') }}">
+        <button type="button"> Go to index</button>
+    </a>
+    <a href="{{ route('users.index') }}">
+        <button type="button">Go to Users</button>
+    </a>
+    <a href="{{ route('transactions.index') }}">
+        <button type="button">Go to Transactions </button>
     </a>
     
     <form action="{{ route('logout') }}" method="POST">

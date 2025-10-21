@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Author;
 use App\Models\Thesis;
 use App\Models\ThesisCopy;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -67,7 +68,7 @@ class ThesisController extends Controller
         for($i = 0; $i < $request->copies_count; $i++) {
             ThesisCopy::create([
                 'thesis_id' => $thesis->id,
-                'is_Available' => true
+                'is_available' => true
             ]);
         }
 
@@ -106,8 +107,36 @@ class ThesisController extends Controller
     }
     public function availableCopies($thesisId){
         $availableCopiesCount = ThesisCopy::where('thesis_id', $thesisId)
-                                        ->where('isAvailable', true)
+                                        ->where('is_available', true)
                                         ->count();
         return $availableCopiesCount;
+    }
+    
+    public function request(Request $request, Thesis $thesis){
+        $user = auth()->user();
+        if(!$user){
+            return view('auth.login');
+        }
+
+        $availableCopy = $thesis->getNextAvailableCopy();
+        if(!$availableCopy){
+            return redirect()->back()->with('error', 'No available copies found for this thesis.');
+        }
+
+        $transaction = Transaction::create([
+            'user_id' => $user->id,
+            'copy_id' => $availableCopy->id,
+            'copy_type' => 'thesis',
+            'borrow_date' => now(),
+            'due_date' => now()->addDays(7),
+            'return_date' => null,
+            'transaction_status' => 'requested',
+        ]);
+
+        // mark copy unavailable so others can't request it
+        $availableCopy->is_available = false;
+        $availableCopy->save();
+
+        return redirect()->route('theses','Thesis request submitted successfully. Please wait for approval.');
     }
 }
