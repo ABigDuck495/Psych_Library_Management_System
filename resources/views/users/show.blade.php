@@ -180,8 +180,6 @@
                         Edit User
                     </a>
                     
-                
-                    
                     <a href="mailto:{{ $user->email }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
                         <i class="fas fa-envelope mr-2"></i>
                         Send Message
@@ -359,7 +357,11 @@
                             <label class="block text-sm font-medium text-gray-500 mb-1">Year Level</label>
                             <p class="text-gray-800 font-medium">{{ $user->year_level ?? 'Not Specified' }}</p>
                         </div>
-                    
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Academic Standing</label>
+                            <span class="status-badge bg-green-100 text-green-800">{{ $user->academic_standing ?? 'Good Standing' }}</span>
+                        </div>
                     </div>
                 </div>
                 @elseif(isset($user->user_type) && $user->user_type === 'employee')
@@ -399,6 +401,11 @@
                     </h2>
                     
                     <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">User Type</label>
+                            <p class="text-gray-800 font-medium capitalize">{{ $user->user_type ?? 'Not Specified' }}</p>
+                        </div>
+                        
                         <div class="text-center py-8 text-gray-400">
                             <i class="fas fa-user-tag text-4xl mb-2"></i>
                             <p>No additional information available</p>

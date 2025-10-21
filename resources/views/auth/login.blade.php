@@ -200,7 +200,7 @@
     .submit-button {
       width: 100%;
       padding: 0.875rem;
-      background: linear-gradient(135deg, #355F2E 0%, #06D001 100%);
+      background: linear-gradient(135deg, #3eb928ff 0%, #06D001 100%);
       color: white;
       border: none;
       border-radius: 8px;
