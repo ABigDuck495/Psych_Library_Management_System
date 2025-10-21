@@ -24,6 +24,10 @@
     <a href="{{ route('userInterface.index') }}">
         <button type="button">User Interface</button>
     </a>
+
+    <a href="{{ route('adminInterface.index') }}">
+        <button type="button">Admin Interface</button>
+    </a>
     
     <form action="{{ route('logout') }}" method="POST">
         @csrf
