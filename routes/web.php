@@ -12,7 +12,14 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TransactionController;
 
 
-
+//================================gamitin if mag checheck ng roles sa routes====================================================//
+Route::get('/whoami', function () {
+    if (auth()->check()) {
+        return 'Logged in as: ' . auth()->user()->role;
+    }
+    return 'Not logged in';
+});
+//==http://127.0.0.1:8000/whoami===gamitin if mag checheck ng roles sa routes====================================================//
 
 // Route::get('/catalogue', [CatalogueController::class, 'index'])->name('catalogue.index');
 // Route::get('/inventory/select-type', [CatalogueController::class, 'selectType'])->name('inventory.selectType');
@@ -92,5 +99,7 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/transactions/{transaction}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
         Route::patch('/transactions/{transaction}/mark-overdue', [TransactionController::class, 'markOverdue'])->name('transactions.mark-overdue');
     });
+
+    
 
 });
