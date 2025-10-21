@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\Author;
 use App\Models\ThesisCopy;
-use App\Models\ThesisDept;
+use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -22,9 +22,23 @@ class Thesis extends Model
     {
         return $this->belongsToMany(Author::class, 'thesis_authors');
     }
+    public function transactions()
+    {
+        return $this->hasManyThrough(Transaction::class, ThesisCopy::class, 'thesis_id', 'copy_id', 'id', 'id');
+    }
     public function copies()
     {
         return $this->hasMany(ThesisCopy::class, 'thesis_id');
+    }
+    public function canbeRequested()
+    {
+        return $this->copies()->where('is_available', true)->exists();
+    }
+    public function hasUserRequested($userId)
+    {
+        return $this->copies()->whereHas('transactions', function($q) use ($userId) {
+            $q->where('user_id', $userId);
+        })->exists();
     }
     public function scopeSearch($query, $search)
     {
@@ -83,5 +97,15 @@ class Thesis extends Model
     public function availableCopies()
     {
         return $this->hasMany(ThesisCopy::class)->where('is_available', true);
+    }
+    public function getNextAvailableCopy()
+    {
+        return $this->copies()->where('is_available', 1)->orderBy('id')->first();
+    }
+
+    public function markCopyUnavailable(ThesisCopy $copy)
+    {
+        $copy->is_available = false;
+        $copy->save();
     }
 }

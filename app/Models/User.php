@@ -3,7 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Penalty;
+use App\Models\Student;
+use App\Models\Employee;
 use App\Models\Transaction;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,36 +21,27 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'email',
-        'password',
-        'first_name',
-        'last_name',
-        'role'
+        'username', 'email', 'password', 'first_name', 'last_name', 'role',
+        'phone_number', 'account_status', 'user_type'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', 'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+    protected $casts = [
+        'registration_date' => 'datetime',
+        'last_login_date' => 'datetime',
+    ];
+    public function student(){
+        return $this->hasOne(Student::class, 'university_id', 'id');
     }
-
+    public function employee(){
+        return $this->hasOne(Employee::class, 'university_id', 'id');
+    }
+    public function transactions(){
+        return $this->hasMany(Transaction::class);
+    }
     public function getfullNameAttribute(): string
     {
         return $this->first_name . ' ' . $this->last_name;
@@ -58,9 +50,13 @@ class User extends Authenticatable
     {
         return in_array($this->role, ['admin', 'super-admin']);
     }
-
-    public function transactions(){
-        return $this->hasMany(Transaction::class);
+    public function isStudent()
+    {
+        return $this->user_type === 'student';
+    }
+    public function isEmployee()
+    {
+        return $this->user_type === 'employee';
     }
     public function activeTransactions(){
         return $this->hasMany(Transaction::class)->where('transaction_status', 'borrowed');
@@ -79,6 +75,19 @@ class User extends Authenticatable
                     ->whereIn('transaction_status', ['requested', 'pending'])
                     ->exists();
     }
+    public function scopeStudents($query)
+    {
+        return $query->where('user_type', 'student');
+    }
 
+    public function scopeEmployees($query)
+    {
+        return $query->where('user_type', 'employee');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('account_status', 'Active');
+    }
 
 }

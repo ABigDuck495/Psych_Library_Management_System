@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Penalty;
 use App\Models\BookCopy;
-use Illuminate\Foundation\Auth\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -20,7 +19,8 @@ class Transaction extends Model
         'return_date',
         'due_date',
         'status',
-        'transaction_status'
+        'transaction_status',
+        'copy_type'
     ];
     protected $casts = [
         'borrow_date' => 'datetime',
@@ -34,7 +34,18 @@ class Transaction extends Model
     }
     public function bookCopy()
     {
-        return $this->belongsTo(BookCopy::class, 'copy_id');
+        // legacy accessor: only valid when copy_type is BookCopy::class
+        if ($this->copy_type === BookCopy::class) {
+            return $this->belongsTo(BookCopy::class, 'copy_id');
+        }
+        return null;
+    }
+    public function copy()
+    {
+        return $this->morphTo(null, 'copy_type', 'copy_id');
+    }
+    public function requested(){
+        return $this->where('status', 'requested');
     }
     public function scopeBorrowed($query)
     {

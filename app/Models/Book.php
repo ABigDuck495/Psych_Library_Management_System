@@ -42,6 +42,11 @@ class Book extends Model
     {
         return $this->copies()->where('is_available', true)->exists();
     }
+    public function hasUserRequested($userId){
+        return $this->copies()->whereHas('transactions', function($q) use ($userId) {
+            $q->where('user_id', $userId);
+        })->exists();
+    }
     public function transactions(){
         return $this->hasManyThrough(Transaction::class, BookCopy::class, 'book_id', 'copy_id', 'id', 'id');
     }
