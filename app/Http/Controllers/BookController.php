@@ -23,6 +23,12 @@ class BookController extends Controller
         return view('books.index', compact('books'));
     }
 
+    public function userInterface()
+    {
+        $books = Book::with(['authors', 'category'])->get();
+        return view('userInterface.index', compact('books'));
+    }
+
     public function create()
     {
         $categories = Category::pluck('category_name', 'id');

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ThesisController;
+use App\Http\Controllers\UserInterfaceController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TransactionController;
@@ -52,6 +53,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('theses', ThesisController::class);
     Route::resource('theses', ThesisController::class)->except(['show']);
+
+    // --- user routes ---
+   Route::get('/user/userInterface', [UserInterfaceController::class, 'index'])->name('userInterface.index');
+
+
 
     //Transactions
     Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');

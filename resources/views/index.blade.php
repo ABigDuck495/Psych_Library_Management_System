@@ -16,6 +16,14 @@
     <a href="{{ route('books.index') }}">
         <button type="button">Go to Books</button>
     </a>
+
+    <a href="{{ route('theses.index') }}">
+        <button type="button">Go to Theses</button>
+    </a>
+
+    <a href="{{ route('userInterface.index') }}">
+        <button type="button">User Interface</button>
+    </a>
     
     <form action="{{ route('logout') }}" method="POST">
         @csrf
