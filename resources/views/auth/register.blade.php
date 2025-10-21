@@ -19,6 +19,7 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
+       
         <div>
             <label for="university_id">University ID</label>
             <input type="text" id="university_id" name="university_id" value="{{ old('university_id') }}" required>

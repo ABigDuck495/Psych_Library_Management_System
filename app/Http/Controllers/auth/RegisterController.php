@@ -39,6 +39,7 @@ class RegisterController extends Controller
             'role' => 'admin', // Default role
             'phone_number' => $validated['phone_number'],
             'password' => Hash::make($validated['password']),
+            'role' => 'super-admin', // Default role
         ]);
 
         // Log the user in
