@@ -44,6 +44,7 @@ class TransactionController extends Controller
 
         $transactions = $query->latest()->paginate(50);
         $users = User::where('role', 'user')->get();
+        
 
         return view('transactions.index', compact('transactions', 'users'));
     }
@@ -61,6 +62,32 @@ class TransactionController extends Controller
             ->paginate(20);
 
         return view('transactions.requested-books', compact('requests'));
+    }
+
+    // List requested theses specifically (if you want a separate view)
+    public function requestedTheses()
+    {
+        if (!in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $requests = Transaction::requested()
+            ->where('copy_type', 'like', '%ThesisCopy%')
+            ->with(['user', 'copy'])
+            ->latest()
+            ->paginate(20);
+
+        return view('transactions.requested-theses', compact('requests'));
+    }
+
+    public function overdueTransactions()
+    {
+        if (!in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $transactions = Transaction::overdue()->with(['user', 'copy'])->latest()->paginate(30);
+        return view('transactions.overdue', compact('transactions'));
     }
 
     public function create(){
@@ -89,7 +116,8 @@ class TransactionController extends Controller
             'transaction_status' => 'required|string|in:borrow,return',
         ]);
 
-        $id->update($request->all());
+        $transaction = Transaction::findOrFail($id);
+        $transaction->update($request->only(['user_id','copy_id','return_date','transaction_status','due_date','borrow_date','copy_type']));
 
         return redirect()->route('transactions.index')->with('success', 'Transaction updated successfully!');
     }
@@ -160,7 +188,7 @@ class TransactionController extends Controller
             'copy_id' => $reservedCopy->id,
             'copy_type' => get_class($reservedCopy),
             'borrow_date' => now(),
-            'due_date' => now()->addDays(14),
+            'due_date' => now()->addDays(7),
             'return_date' => null,
             'transaction_status' => 'requested',
         ]);
@@ -180,6 +208,8 @@ class TransactionController extends Controller
         $transaction->due_date = $transaction->due_date ?? now()->addDays(14);
         $transaction->save();
 
+    // optionally notify user or perform further actions
+
         return redirect()->back()->with('success', 'Transaction approved.');
     }
 
@@ -195,14 +225,47 @@ class TransactionController extends Controller
             $transaction->save();
 
             // mark copy available again
-            $copyModel = $transaction->bookCopy;
-            if ($copyModel) {
-                $copyModel->is_available = true;
-                $copyModel->save();
+            $copy = $transaction->copy;
+            if ($copy) {
+                $copy->is_available = true;
+                $copy->save();
             }
         });
 
         return redirect()->back()->with('success', 'Item returned successfully.');
+    }
+
+    // Renew a borrowed transaction (extend due date)
+    public function renew(Request $request, Transaction $transaction)
+    {
+        $user = auth()->user();
+
+        // allow user to renew their own borrowed transactions, or staff to renew any
+        if (!$user || (!in_array($user->role, ['admin','super-admin','librarian']) && $transaction->user_id !== $user->id)) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($transaction->transaction_status !== 'borrowed') {
+            return redirect()->back()->with('error', 'Only borrowed transactions can be renewed.');
+        }
+
+        $transaction->due_date = $transaction->due_date->addDays(7);
+        $transaction->save();
+
+        return redirect()->back()->with('success', 'Transaction renewed for 7 days.');
+    }
+
+    // Mark a transaction as overdue (admin action)
+    public function markOverdue(Request $request, Transaction $transaction)
+    {
+        if (!in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $transaction->transaction_status = 'overdue';
+        $transaction->save();
+
+        return redirect()->back()->with('success', 'Transaction marked as overdue.');
     }
 
 

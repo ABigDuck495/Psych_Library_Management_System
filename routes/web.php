@@ -57,6 +57,8 @@ Route::middleware(['auth'])->group(function () {
         // Request actions (users can request)
         Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');
         Route::post('/theses/{thesis}/request', [ThesisController::class, 'request'])->name('transactions.request-thesis');
+        // Users can renew their own borrowed transactions
+        Route::patch('/transactions/{transaction}/renew', [TransactionController::class, 'renew'])->name('transactions.renew');
     });
 
     // Librarian: basic CRUD for books and theses and can view users
@@ -83,8 +85,10 @@ Route::middleware(['auth'])->group(function () {
         // admin transaction actions
         Route::get('/requested-books', [TransactionController::class, 'requestedBooks'])->name('transactions.requested-books');
         Route::get('/requested-theses', [TransactionController::class, 'requestedTheses'])->name('transactions.requested-theses');
+        Route::get('transactions.overdue', [TransactionController::class, 'overdueTransactions'])->name('transactions.overdue');
         Route::patch('/transactions/{transaction}/approve', [TransactionController::class, 'approveRequest'])->name('transactions.approve-request');
         Route::patch('/transactions/{transaction}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
+        Route::patch('/transactions/{transaction}/mark-overdue', [TransactionController::class, 'markOverdue'])->name('transactions.mark-overdue');
     });
 
 });
