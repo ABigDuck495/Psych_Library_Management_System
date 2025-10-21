@@ -21,6 +21,12 @@ Route::get('/whoami', function () {
 });
 //==http://127.0.0.1:8000/whoami===gamitin if mag checheck ng roles sa routes====================================================//
 
+//=================for testing=============================================//
+Route::middleware(['auth', 'role:user'])->get('/test', function () {
+    return 'Access granted to user role!';
+});
+//=================for testing=============================================//
+
 // Route::get('/catalogue', [CatalogueController::class, 'index'])->name('catalogue.index');
 // Route::get('/inventory/select-type', [CatalogueController::class, 'selectType'])->name('inventory.selectType');
 

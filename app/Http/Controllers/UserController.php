@@ -66,11 +66,7 @@ class UserController extends Controller
             'account_status' => 'nullable|string'
         ]);
 
-        // create with a random password (admin can reset)
-        $user = User::create(array_merge($validated, [
-            'password' => bcrypt(str()->random(12)),
-            'account_status' => $validated['account_status'] ?? 'Active'
-        ]));
+       
 
         return redirect()->route('users.index')->with('success', 'User created successfully');
     }

@@ -15,6 +15,12 @@ class CheckUserRole
      */
     public function handle(Request $request, Closure $next, ...$roles)
     {
+        // Flatten roles if they come as comma-separated strings
+        $allRoles = [];
+        foreach ($roles as $role) {
+            $allRoles = array_merge($allRoles, explode(',', $role));
+        }
+
         // Check if user is authenticated
         if (!auth()->check()) {
             return redirect()->route('login');
@@ -28,12 +34,12 @@ class CheckUserRole
         }
 
         // If no specific roles were passed, allow authenticated users
-        if (empty($roles)) {
+        if (empty($allRoles)) {
             return $next($request);
         }
 
         // Check if user has any of the required roles
-        if (in_array($user->role, $roles)) {
+        if (in_array($user->role, $allRoles)) {
             return $next($request);
         }
 
