@@ -54,25 +54,26 @@ class BookController extends Controller
         ]);
 
         // Create the book
-            $authorIds = $validated['author_ids'] ?? [];
+        $authorIds = $validated['author_ids'] ?? [];
         unset($validated['author_ids']);
 
-        // Create the thesis record
+        $copiesCount = $validated['copies_count'] ?? $request->input('copies_count', 1);
+
         $book = Book::create($validated);
 
-        // Link thesis to authors
+        // Link book to authors
         $book->authors()->sync($authorIds);
-        
-        // Create book copies
-        for ($i = 0; $i < $request->copies_count; $i++) {
+
+        // Create book copies (use correct column name 'is_available')
+        for ($i = 0; $i < (int)$copiesCount; $i++) {
             BookCopy::create([
                 'book_id' => $book->id,
-                'is_Available' => true
+                'is_available' => true
             ]);
         }
 
-    return redirect()->route('books.index', $book)
-                    ->with('success', 'Book and ' . $request->copies_count . ' copies created successfully!');
+        return redirect()->route('books.index')
+                        ->with('success', 'Book and ' . $copiesCount . ' copies created successfully!');
 }
 
     public function show(Book $book)
@@ -114,10 +115,28 @@ class BookController extends Controller
         return $availableCopies > 0;
     }
     public function availableCopies($thesisId){
-        $availableCopiesCount = BookCopy::where('thesis_id', $thesisId)
+        // Return number of available copies for a given book id
+        $availableCopiesCount = BookCopy::where('book_id', $thesisId)
                                         ->where('is_available', true)
                                         ->count();
         return $availableCopiesCount;
+    }
+    /**
+     * Fallback view used in several places in the app to add inventory.
+     * Some older views expect 'catalogue.addInventory' or 'books.addInventory'.
+     * Provide categories and authors so those blades won't error.
+     */
+    public function addInventory()
+    {
+        $categories = Category::pluck('category_name', 'id');
+        $authors = Author::all();
+
+        // Prefer catalogue.addInventory if it exists, otherwise fall back to books.create
+        if (view()->exists('catalogue.addInventory')) {
+            return view('catalogue.addInventory', compact('categories', 'authors'));
+        }
+
+        return view('books.create', compact('categories', 'authors'));
     }
     public function request(Request $request, Book $book){
         $user = auth()->user();
@@ -133,7 +152,7 @@ class BookController extends Controller
         $transaction = Transaction::create([
             'user_id' => $user->id,
             'copy_id' => $availableCopy->id,
-            'copy_type' => 'book',
+            'copy_type' => get_class($availableCopy),
             'borrow_date' => now(),
             'due_date' => now()->addDays(7),
             'return_date' => null,
@@ -144,6 +163,6 @@ class BookController extends Controller
         $availableCopy->is_available = false;
         $availableCopy->save();
 
-        return redirect()->route('books','Book request submitted successfully. Please wait for approval.');
+        return redirect()->back()->with('success', 'Book request submitted successfully. Please wait for approval.');
     }
 }

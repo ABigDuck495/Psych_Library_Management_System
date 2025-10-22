@@ -10,7 +10,7 @@ class AuthorController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Author::withCount(['books', 'thesis']);
+        $query = Author::withCount(['books', 'theses']);
 
         if ($request->has('search')) {
             $query->search($request->search);

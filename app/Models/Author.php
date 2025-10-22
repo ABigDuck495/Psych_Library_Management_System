@@ -45,7 +45,7 @@ class Author extends Model
     }
     public function getThesisCountAttribute(): int
     {
-        return $this->thesis()->count();
+        return $this->theses()->count();
     }
 
     public function scopeWithBooks($query)
