@@ -117,6 +117,21 @@
                             <i class="fas fa-exchange-alt mr-3"></i>
                             Transactions
                         </a>
+
+                         <a href="{{ route('userInterface.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-exchange-alt mr-3"></i>
+                            User Interface
+                        </a>
+
+                        <a href="{{ route('adminInterface.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-exchange-alt mr-3"></i>
+                            Admin Interface
+                        </a>
+
+                        <a href="{{ route('librarianInterface.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-exchange-alt mr-3"></i>
+                            Librarian Interface
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -383,3 +398,4 @@
     </div>
 </body>
 </html>
+

@@ -1,15 +1,20 @@
 <?php
 
+//fvck this
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ThesisController;
-use App\Http\Controllers\UserInterfaceController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\TransactionController;
+
+//Role Based Access Control Controllers
+use App\Http\Controllers\UserInterfaceController;
+use App\Http\Controllers\AdminInterfaceController;
+use App\Http\Controllers\LibrarianInterfaceController;
 
 
 //================================gamitin if mag checheck ng roles sa routes====================================================//
@@ -54,6 +59,12 @@ Route::get('/index', function () {
 })->name('index');
 
 Route::middleware(['auth'])->group(function () {
+
+    // Admin Interface
+    Route::get('/admin/interface', [AdminInterfaceController::class, 'index'])->name('adminInterface.index');
+
+    // Librarian Interface
+    Route::get('/librarian/interface', [LibrarianInterfaceController::class, 'index'])->name('librarianInterface.index');
 
     // Viewing routes - accessible to any authenticated user
     Route::middleware(['role:user,librarian,admin,super-admin'])->group(function () {
