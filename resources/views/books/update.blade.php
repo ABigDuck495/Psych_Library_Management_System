@@ -48,6 +48,14 @@
             </select>
         </div>
 
+         <div class="mb-3">
+            <label for="copies_count" class="form-label">Number of Copies</label>
+            <input type="number" id="copies_count" name="copies_count" value="{{ old('copies_count', $copies_count ?? 1) }}" min="1" class="form-control" />
+            @error('copies_count')
+                <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+            @enderror
+        </div>
+
         <div class="mb-3">
             <label class="form-label">Current Authors:</label>
             <label for="author_ids" class="form-label mt-2">Authors:</label>

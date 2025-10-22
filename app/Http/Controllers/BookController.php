@@ -86,7 +86,8 @@ class BookController extends Controller
     {
         $categories = Category::pluck('category_name', 'id');
         $authors = Author::all();
-        return view('books.update', compact('book', 'categories', 'authors'));
+        $copies_count = $book->copies()->count();
+        return view('books.update', compact('book', 'categories', 'authors', 'copies_count'));
     }
 
     public function update(Request $request, Book $book)

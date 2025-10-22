@@ -77,7 +77,7 @@
         {{-- Copies Count (allow modifying number of copies similar to create) --}}
         <div class="mb-3">
             <label for="copies_count" class="form-label">Number of Copies</label>
-            <input type="number" id="copies_count" name="copies_count" value="{{ old('copies_count', $thesis->copies_count ?? 1) }}" min="1" max="20" class="form-control" />
+            <input type="number" id="copies_count" name="copies_count" value="{{ old('copies_count', $copies_count ?? 1) }}" min="1" class="form-control" />
             @error('copies_count')
                 <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
             @enderror

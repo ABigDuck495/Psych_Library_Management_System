@@ -24,7 +24,7 @@ class ThesisController extends Controller
     public function index()
     {
         // Load theses with their related authors
-        $theses = Thesis::with('authors')->get();
+        $theses = Thesis::with('authors')->paginate(10);
         return view('theses.index', compact('theses'));
     }
 
@@ -79,7 +79,8 @@ class ThesisController extends Controller
     {
         $departments = ['AB Psychology', 'BS Psychology'];
         $authors = Author::all();
-        return view('theses.update', compact('thesis', 'departments', 'authors'));
+        $copies_count = $thesis->copies()->count();
+        return view('theses.update', compact('thesis', 'departments', 'authors', 'copies_count'));
     }
 
     public function update(Request $request, Thesis $thesis)
