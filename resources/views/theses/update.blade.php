@@ -57,16 +57,30 @@
 
         {{-- Author List (read-only display) --}}
         <div class="mb-3">
-            <label class="form-label">Current Authors:</label>
-            @if($thesis->authors->isNotEmpty())
-                <ul>
-                    @foreach ($thesis->authors as $author)
-                        <li>{{ $author->first_name }} {{ $author->last_name }}</li>
-                    @endforeach
-                </ul>
-            @else
-                <p class="text-muted">No authors linked to this thesis.</p>
-            @endif
+            <label class="form-label">Authors</label>
+            <select id="author_ids" name="author_ids[]" multiple class="form-select" style="min-height: 150px;">
+                @foreach($authors as $author)
+                    <option value="{{ $author->id }}"
+                        {{ in_array($author->id, old('author_ids', $thesis->authors->pluck('id')->toArray())) ? 'selected' : '' }}>
+                        {{ $author->first_name }} {{ $author->last_name }}
+                    </option>
+                @endforeach
+            </select>
+            <div class="mt-2">
+                <a href="{{ route('authors.create', ['return_to' => url()->current()]) }}" class="bg-gray-200 px-3 py-1 rounded text-sm">Add New Author</a>
+            </div>
+            @error('author_ids')
+                <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- Copies Count (allow modifying number of copies similar to create) --}}
+        <div class="mb-3">
+            <label for="copies_count" class="form-label">Number of Copies</label>
+            <input type="number" id="copies_count" name="copies_count" value="{{ old('copies_count', $thesis->copies_count ?? 1) }}" min="1" max="20" class="form-control" />
+            @error('copies_count')
+                <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+            @enderror
         </div>
 
         {{-- Submit button --}}

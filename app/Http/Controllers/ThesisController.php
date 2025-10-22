@@ -78,24 +78,43 @@ class ThesisController extends Controller
     public function edit(Thesis $thesis)
     {
         $departments = ['AB Psychology', 'BS Psychology'];
-        return view('theses.update', compact('thesis', 'departments'));
+        $authors = Author::all();
+        return view('theses.update', compact('thesis', 'departments', 'authors'));
     }
 
     public function update(Request $request, Thesis $thesis)
     {
-        $request->validate([
-            'title' => 'required',
-            'abstract' => 'required',
-            'year_published' => 'required|integer',
-            'department' => 'required',
+        $validated = $request->validate([
+            'title' => 'required|string|max:500',
+            'abstract' => 'required|string',
+            'year_published' => 'required|integer|min:1900|max:' . date('Y'),
+            'department' => 'required|string',
+            'author_ids' => 'sometimes|array',
+            'author_ids.*' => 'exists:authors,id',
+            'copies_count' => 'sometimes|integer|min:1'
         ]);
 
-        $thesis->update([
-            'title' => $request->title,
-            'abstract' => $request->abstract,
-            'year_published' => $request->year_published,
-            'department' => $request->department,
-        ]);
+        $thesis->update(
+            collect($validated)->only(['title', 'abstract', 'year_published', 'department'])->toArray()
+        );
+
+        if ($request->has('author_ids')) {
+            $thesis->authors()->sync($validated['author_ids'] ?? []);
+        }
+
+        if ($request->filled('copies_count')) {
+            $desired = (int)$request->input('copies_count');
+            $existing = $thesis->copies()->count();
+            if ($desired > $existing) {
+                $toCreate = $desired - $existing;
+                for ($i = 0; $i < $toCreate; $i++) {
+                    ThesisCopy::create([
+                        'thesis_id' => $thesis->id,
+                        'is_available' => true
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('theses.index')->with('success', 'Thesis updated successfully.');
     }

@@ -36,7 +36,7 @@ class RegisterController extends Controller
             'last_name' => $validated['last_name'],
             'username' => $validated['username'],
             'email' => $validated['email'],
-            'role' => 'admin', // Default role
+            // 'role' => 'admin', // pang test para admin kagad
             'phone_number' => $validated['phone_number'],
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'], // Assign role from input

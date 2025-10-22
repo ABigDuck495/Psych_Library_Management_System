@@ -85,7 +85,8 @@ class BookController extends Controller
     public function edit(Book $book)
     {
         $categories = Category::pluck('category_name', 'id');
-        return view('books.update', compact('book', 'categories'));
+        $authors = Author::all();
+        return view('books.update', compact('book', 'categories', 'authors'));
     }
 
     public function update(Request $request, Book $book)
@@ -95,9 +96,35 @@ class BookController extends Controller
             'description' => 'required|string',
             'year_published' => 'required|integer|min:1900|max:' . date('Y'),
             'category_id' => 'required|exists:categories,id',
+            'author_ids' => 'sometimes|array',
+            'author_ids.*' => 'exists:authors,id',
+            'copies_count' => 'sometimes|integer|min:1'
         ]);
 
-        $book->update($validated);
+        // Update basic fields
+        $book->update(
+            collect($validated)->only(['title', 'description', 'year_published', 'category_id'])->toArray()
+        );
+
+        // Sync authors if provided
+        if ($request->has('author_ids')) {
+            $book->authors()->sync($validated['author_ids'] ?? []);
+        }
+
+        // If copies_count provided, add copies if the requested count is greater than existing
+        if ($request->filled('copies_count')) {
+            $desired = (int)$request->input('copies_count');
+            $existing = $book->copies()->count();
+            if ($desired > $existing) {
+                $toCreate = $desired - $existing;
+                for ($i = 0; $i < $toCreate; $i++) {
+                    BookCopy::create([
+                        'book_id' => $book->id,
+                        'is_available' => true
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('books.index')->with('success', 'Book updated successfully!');
     }

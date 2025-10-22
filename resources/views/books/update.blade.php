@@ -50,15 +50,21 @@
 
         <div class="mb-3">
             <label class="form-label">Current Authors:</label>
-            @if($book->authors->isNotEmpty())
-                <ul>
-                    @foreach ($book->authors as $author)
-                        <li>{{ $author->first_name }} {{ $author->last_name }}</li>
-                    @endforeach
-                </ul>
-            @else
-                <p class="text-muted">No authors linked to this book.</p>
-            @endif
+            <label for="author_ids" class="form-label mt-2">Authors:</label>
+            <select id="author_ids" name="author_ids[]" multiple class="form-select" style="min-height: 150px;">
+                @foreach($authors as $author)
+                    <option value="{{ $author->id }}"
+                        {{ in_array($author->id, old('author_ids', $book->authors->pluck('id')->toArray())) ? 'selected' : '' }}>
+                        {{ $author->first_name }} {{ $author->last_name }}
+                    </option>
+                @endforeach
+            </select>
+            <div class="mt-2">
+                <a href="{{ route('authors.create', ['return_to' => url()->current()]) }}" class="btn btn-outline-secondary btn-sm">Add New Author</a>
+            </div>
+            @error('author_ids')
+                <div class="text-danger mt-2">{{ $message }}</div>
+            @enderror
         </div>
 
         <button type="submit" class="btn btn-success">Update Book</button>
