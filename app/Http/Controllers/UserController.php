@@ -61,12 +61,26 @@ class UserController extends Controller
             'last_name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|email|unique:users',
+            'phone_number' => 'nullable|string|max:20',
+            'university_id' => 'nullable|string|max:50',
+            'password' => 'required|string|min:8|confirmed',
             'role' => 'required|string',
             'user_type' => 'nullable|string',
             'account_status' => 'nullable|string'
         ]);
 
-       
+       User::create([
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'] ?? null,
+            'university_id' => $validated['university_id'] ?? null,
+            'password' => bcrypt($validated['password']),
+            'role' => $validated['role'],
+            'user_type' => $validated['user_type'] ?? null,
+            'account_status' => $validated['account_status'] ?? 'Active'
+        ]);
 
         return redirect()->route('users.index')->with('success', 'User created successfully');
     }
