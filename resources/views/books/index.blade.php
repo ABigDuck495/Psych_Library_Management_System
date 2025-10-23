@@ -350,11 +350,7 @@
             </div>
 
             <!-- Pagination -->
-            @if($books->count() > 0)
-                <div class="mt-6">
-                    {{ $books->links() }}
-                </div>
-            @endif
+           
         </div>
     </div>
 
