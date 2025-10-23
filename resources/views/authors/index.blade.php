@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Authors List</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+   
 </head>
 <body>
     <h1>Authors</h1>
