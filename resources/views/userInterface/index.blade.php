@@ -95,7 +95,7 @@
                 <h2 class="text-sm uppercase tracking-wider text-blue-200 mb-4">Main Navigation</h2>
                 <ul class="space-y-2">
                     <li>
-                        <a href="#" class="flex items-center p-3 rounded-lg active-nav">
+                        <a href="{{ route('userInterface.index') }}" class="flex items-center p-3 rounded-lg active-nav">
                             <i class="fas fa-home mr-3"></i>
                             Dashboard
                         </a>

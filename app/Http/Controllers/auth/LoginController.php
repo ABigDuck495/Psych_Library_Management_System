@@ -14,20 +14,34 @@ class LoginController extends Controller
     }
 
     public function authenticate(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+{
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
+    if (Auth::attempt($credentials, $request->filled('remember'))) {
+        $request->session()->regenerate();
 
-            return redirect()->intended(route('index'));
+        $user = Auth::user();
+
+        // Check role and redirect accordingly
+        switch ($user->role) {
+            case 'admin':
+                return redirect()->route('adminInterface.index');
+            case 'librarian':
+                return redirect()->route('librarianInterface.index');
+            case 'user':
+                return redirect()->route('userInterface.index');
+            default:
+                Auth::logout();
+                abort(403, 'Unauthorized role.');
         }
-
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
     }
+
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ])->onlyInput('email');
+}
+
 }
