@@ -349,10 +349,7 @@
                 </div>
             </div>
 
-            <!-- Pagination -->
            
-        </div>
-    </div>
 
     <script>
         // Toggle description visibility
