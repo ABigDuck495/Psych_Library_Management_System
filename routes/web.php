@@ -26,13 +26,25 @@ Route::post('/register', [RegisterController::class, 'register']);
 
 // Home route
 Route::get('/', function () {
-    return Auth::check() ? redirect()->route('index') : redirect()->route('login');
+    if (Auth::check()) {
+        $role = Auth::user()->role;
+
+        return match ($role) {
+            'admin' => redirect()->route('adminInterface.index'),
+            'librarian' => redirect()->route('librarianInterface.index'),
+            'user' => redirect()->route('userInterface.index'),
+            default => redirect()->route('login'),
+        };
+    }
+
+    return redirect()->route('login');
 })->name('home');
 
-// Simple index route
-Route::get('/index', function () {
-    return view('index');
-})->name('index');
+// // Simple index route
+// Route::get('/index', function () {
+//     return view('index');
+// })->name('index');
+
 
 // Debug routes
 Route::get('/whoami', function () {
@@ -105,3 +117,20 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/user/userInterface', [UserInterfaceController::class, 'index'])->name('userInterface.index');
     });
 });
+
+// Login routes
+Route::get('/login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'authenticate'])->name('login.post');
+
+// // Role-based dashboards
+// Route::middleware(['auth', 'role:admin'])->group(function () {
+//     Route::get('/admin/interface', [AdminInterfaceController::class, 'index'])->name('admin.interface');
+// });
+
+// Route::middleware(['auth', 'role:librarian'])->group(function () {
+//     Route::get('/librarian/interface', [LibrarianInterfaceController::class, 'index'])->name('librarian.interface');
+// });
+
+// Route::middleware(['auth', 'role:user'])->group(function () {
+//     Route::get('/user/interface', [UserInterfaceController::class, 'index'])->name('user.interface');
+// });
