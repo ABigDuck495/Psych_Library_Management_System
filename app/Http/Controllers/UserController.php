@@ -74,7 +74,8 @@ class UserController extends Controller
             'account_status' => 'required|string',
             'position_title' => 'nullable|string|max:255',
             'academic_program' => 'nullable|string|max:255',
-            'department' => 'required|string|max:255',
+            'department' => 'nullable|string|max:255',
+            'major_department' => 'nullable|string|max:255',
             
         ]);
 
@@ -96,7 +97,7 @@ class UserController extends Controller
             Student::create([
                 'id' => $user->id,
                 'academic_program' => $validated['academic_program'],
-                'department' => $validated['department']
+                'department' => $validated['major_department']
                 // Add other default student fields if necessary
             ]);
         } elseif ($validated['user_type'] === 'employee'){

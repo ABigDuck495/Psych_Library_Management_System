@@ -10,7 +10,7 @@ class Student extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'id', 'academic_program', 'major_department'
+        'id', 'academic_program', 'department'
     ];
 
     // Relationships
