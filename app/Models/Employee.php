@@ -10,17 +10,13 @@ class Employee extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'university_id';
-    public $incrementing = false;
-    protected $keyType = 'int';
-
     protected $fillable = [
-        'university_id', 'department', 'position_title'
+        'id', 'department', 'position_title'
     ];
 
     // Relationships
     public function user()
     {
-        return $this->belongsTo(User::class, 'university_id', 'university_id');
+        return $this->belongsTo(User::class, 'id', 'id');
     }
 }

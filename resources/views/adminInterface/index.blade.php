@@ -160,7 +160,7 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Total Books</p>
-                            <h3 class="text-2xl font-bold mt-2">1,248</h3>
+                            <h3 class="text-2xl font-bold mt-2">1,267</h3>
                         </div>
                         <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
                             <i class="fas fa-book text-blue-600 text-xl"></i>

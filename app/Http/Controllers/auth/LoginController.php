@@ -24,6 +24,8 @@ class LoginController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
+        $user->last_login_date = now();
+        $user->save();
 
         // Check role and redirect accordingly
         switch ($user->role) {

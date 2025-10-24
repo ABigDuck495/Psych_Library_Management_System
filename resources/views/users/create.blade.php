@@ -81,7 +81,7 @@
                 <h2 class="text-sm uppercase tracking-wider text-blue-200 mb-4">Main Navigation</h2>
                 <ul class="space-y-2">
                     <li>
-                        <a href="{{ route('index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
+                        <a href="{{ route('home') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
                             <i class="fas fa-home mr-3"></i>
                             Dashboard
                         </a>
@@ -334,7 +334,7 @@
                             </div>
 
                             <div>
-                                <label for="position_title" class="block text-sm font-medium text-gray-700 mb-2">Position Title *</label>
+                                <label for="position_title" class="block text-sm font-medium text-gray-700 mb-2">positionuse/Title *</label>
                                 <input type="text" id="position_title" name="position_title" value="{{ old('position_title') }}" 
                                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>

@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Models\Student;
 // use App\Http\Controllers\Controller;
+use App\Models\Employee;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -56,7 +59,9 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        DB::beginTransaction();
+        try {
+            $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users',
@@ -65,22 +70,49 @@ class UserController extends Controller
             'university_id' => 'nullable|string|max:50',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|string',
-            'user_type' => 'nullable|string',
-            'account_status' => 'nullable|string'
+            'user_type' => 'required|string',
+            'account_status' => 'required|string',
+            'position_title' => 'nullable|string|max:255',
+            'academic_program' => 'nullable|string|max:255',
+            'department' => 'required|string|max:255',
+            
         ]);
 
-       User::create([
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
+        $user = User::create([
+            'university_id' => $validated['university_id'] ?? null,
             'username' => $validated['username'],
             'email' => $validated['email'],
-            'phone_number' => $validated['phone_number'] ?? null,
-            'university_id' => $validated['university_id'] ?? null,
-            'password' => bcrypt($validated['password']),
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
             'role' => $validated['role'],
+            'account_status' => $validated['account_status'] ?? 'Active',
+            'phone_number' => $validated['phone_number'] ?? null,
+            'password' => bcrypt($validated['password']),
             'user_type' => $validated['user_type'] ?? null,
-            'account_status' => $validated['account_status'] ?? 'Active'
         ]);
+
+        if($validated['user_type'] === 'student'){
+            // Create associated student record
+            Student::create([
+                'id' => $user->id,
+                'academic_program' => $validated['academic_program'],
+                'department' => $validated['department']
+                // Add other default student fields if necessary
+            ]);
+        } elseif ($validated['user_type'] === 'employee'){
+            // Create associated employee record
+            Employee::create([
+                'id' => $user->id,
+                'position_title' => $validated['position_title'],
+                'department' => $validated['department']
+                // Add other default employee fields if necessary
+            ]);
+        }
+        DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors('Failed to create user: ' . $e->getMessage());
+        }
 
         return redirect()->route('users.index')->with('success', 'User created successfully');
     }
@@ -103,15 +135,39 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         
-        $request->validate([
+        DB::beginTransaction();
+        try {
+            $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email',
             'role' => 'nullable|string',
             'user_type' => 'nullable|string',
-            'account_status' => 'nullable|string'
+            'account_status' => 'nullable|string',
+            'username' => 'required|string|max:255|unique:users,username,',
         ]);
-
+        if($request['user_type'] === 'student'){
+            // Create associated student record
+            Student::create([
+                'id' => $user->id,
+                'academic_program' => $request['academic_program'],
+                'department' => $request['department']
+                // Add other default student fields if necessary
+            ]);
+        } elseif ($request['user_type'] === 'employee'){
+            // Create associated employee record
+            Employee::create([
+                'id' => $user->id,
+                'position' => $request['position'],
+                'department' => $request['department']
+                // Add other default employee fields if necessary
+            ]);
+        }
+        DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withErrors('Failed to update user: ' . $e->getMessage());
+        }
         $user->update($request->only(['first_name','last_name','email','role','user_type','account_status','username']));
 
         return redirect()->route('users.show', $user->id)

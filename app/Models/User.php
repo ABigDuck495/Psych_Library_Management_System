@@ -44,10 +44,10 @@ class User extends Authenticatable
         'last_login_date' => 'datetime',
     ];
     public function student(){
-        return $this->hasOne(Student::class, 'university_id', 'id');
+        return $this->hasOne(Student::class, 'id', 'id');
     }
     public function employee(){
-        return $this->hasOne(Employee::class, 'university_id', 'id');
+        return $this->hasOne(Employee::class, 'id', 'id');
     }
     public function transactions(){
         return $this->hasMany(Transaction::class);

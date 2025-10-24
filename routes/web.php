@@ -105,6 +105,8 @@ Route::middleware(['auth'])->group(function () {
             return view('catalogue.catalogue');
         })->name('catalogue');
 
+        // Route::get('')
+
         // Books: users may only view index & show
         Route::get('books', [BookController::class, 'index'])->name('books.index');
         Route::get('books/{book}', [BookController::class, 'show'])->name('books.show');
