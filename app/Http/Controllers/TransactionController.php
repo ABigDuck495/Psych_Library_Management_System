@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\User;
 use App\Models\Thesis;
+use App\Models\Penalty;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -90,6 +91,20 @@ class TransactionController extends Controller
         return view('transactions.overdue', compact('transactions'));
     }
 
+    public function penaltiesIndex()
+    {
+        $penalties = Penalty::with(['user', 'transaction.book', 'transaction.thesis'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('penalties.index', compact('penalties'));
+    }
+
+    public function payPenalty(Penalty $penalty)
+    {
+        $penalty->delete();
+        return redirect()->back()->with('success', 'Penalty paid successfully.');
+    }
     public function create(){
         return view('transactions.create');
     }

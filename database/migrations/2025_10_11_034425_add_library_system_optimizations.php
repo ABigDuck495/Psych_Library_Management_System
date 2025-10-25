@@ -54,18 +54,18 @@ return new class extends Migration
             DB::unprepared('
                 DROP EVENT IF EXISTS update_overdue_transactions_daily;
             ');
-            DB::unprepared('
-                CREATE EVENT update_overdue_transactions_daily
-                ON SCHEDULE EVERY 1 DAY
-                STARTS CURRENT_DATE + INTERVAL 1 DAY
-                DO
-                  UPDATE transactions
-                  SET transaction_status = "overdue"
-                  WHERE return_date IS NULL
-                    AND due_date < NOW()
-                    AND transaction_status != "returned"
-                    AND transaction_status != "overdue";
-            ');
+            // DB::unprepared('
+            //     CREATE EVENT update_overdue_transactions_daily
+            //     ON SCHEDULE EVERY 1 DAY
+            //     STARTS CURRENT_DATE + INTERVAL 1 DAY
+            //     DO
+            //       UPDATE transactions
+            //       SET transaction_status = "overdue"
+            //       WHERE return_date IS NULL
+            //         AND due_date < NOW()
+            //         AND transaction_status != "returned"
+            //         AND transaction_status != "overdue";
+            // ');
         }
     }
 
