@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('penalties', function (Blueprint $table) {
             $table->id();
-            $table->integer('transaction_id');
             $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('cascade');
-            $table->integer('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->decimal('amount', 8, 2);
-
+            $table->reason = $table->text('reason')->nullable();
             $table->timestamps();
+
+            //indexes
+            $table->index('transaction_id');
+            $table->index('user_id');
         });
     }
 
