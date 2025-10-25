@@ -89,11 +89,7 @@ Route::middleware(['auth'])->group(function () {
         // Transactions: librarians manage transactions
         Route::resource('transactions', TransactionController::class);
 
-        // Request actions and renew
-        Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');
-        Route::post('/theses/{thesis}/request', [TransactionController::class, 'requestThesis'])->name('transactions.request-thesis');
-        Route::patch('/transactions/{transaction}/renew', [TransactionController::class, 'renew'])->name('transactions.renew');
-
+        
         // Librarian interface
         Route::get('/librarian/interface', [LibrarianInterfaceController::class, 'index'])->name('librarianInterface.index');
     });
@@ -104,6 +100,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/catalogue', function () {
             return view('catalogue.catalogue');
         })->name('catalogue');
+
+        // Request actions and renew
+        Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');
+        Route::post('/theses/{thesis}/request', [TransactionController::class, 'requestThesis'])->name('transactions.request-thesis');
+        Route::patch('/transactions/{transaction}/renew', [TransactionController::class, 'renew'])->name('transactions.renew');
 
         // Route::get('')
 

@@ -22,7 +22,7 @@ class TransactionController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $query = Transaction::with(['user', 'copy.book']);
+        $query = Transaction::with(['user', 'copy.thesis']);
 
         // Filter by status
         if ($request->has('status') && $request->status) {
@@ -135,6 +135,11 @@ class TransactionController extends Controller
         $transaction->update($request->only(['user_id','copy_id','return_date','transaction_status','due_date','borrow_date','copy_type']));
 
         return redirect()->route('transactions.index')->with('success', 'Transaction updated successfully!');
+    }
+
+    public function show(Transaction $transaction){
+        $transaction->load(['user', 'copy']);
+        return view('transactions.show', compact('transaction'));
     }
     public function requestBook(Request $request, Book $book)
     {

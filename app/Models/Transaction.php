@@ -36,11 +36,14 @@ class Transaction extends Model
     }
     public function bookCopy()
     {
-        // legacy accessor: only valid when copy_type is BookCopy::class
-        if ($this->copy_type === BookCopy::class) {
-            return $this->belongsTo(BookCopy::class, 'copy_id');
-        }
-        return null;
+        return $this->belongsTo(BookCopy::class, 'copy_id')
+            ->where('copy_type', BookCopy::class);
+    }
+
+    public function thesisCopy()
+    {
+        return $this->belongsTo(ThesisCopy::class, 'copy_id')
+            ->where('copy_type', ThesisCopy::class);
     }
     public function copy()
     {
