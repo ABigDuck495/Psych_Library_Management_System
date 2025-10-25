@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\BookCopy;
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Penalty;
+use App\Models\BookCopy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Carbon\Carbon;
+
 
 class Transaction extends Model
 {
@@ -35,18 +37,25 @@ class Transaction extends Model
 
     public function bookCopy()
     {
-        if ($this->copy_type === BookCopy::class) {
-            return $this->belongsTo(BookCopy::class, 'copy_id');
-        }
-        return null;
+        return $this->belongsTo(BookCopy::class, 'copy_id')
+            ->where('copy_type', BookCopy::class);
+    }
+
+    public function thesisCopy()
+    {
+        return $this->belongsTo(ThesisCopy::class, 'copy_id')
+            ->where('copy_type', ThesisCopy::class);
     }
 
     public function copy()
     {
         return $this->morphTo(null, 'copy_type', 'copy_id');
     }
-
-    // Scopes
+    public function penalty()
+    {
+        return $this->hasOne(Penalty::class);
+    }
+    // Query scopes using the transaction_status column
     public function scopeRequested($query)
     {
         return $query->where('transaction_status', 'requested');
@@ -90,11 +99,27 @@ class Transaction extends Model
     {
         return $this->transaction_status === 'overdue' && is_null($this->return_date) && $this->due_date->isPast();
     }
+    public function getOverdueDays(){
+        if (!$this->isOverdue()) {
+            return 0;
+        }
 
+        return Carbon::now()->diffInDays(Carbon::parse($this->due_date));
+    }
+    public function markAsOverdue(){
+        $this->transaction_status = 'overdue';
+        $this->save();
+    }
+    public function calculatePenaltyAmount(){
+        $overdueDays = $this->getOverdueDays();
+        $penaltyRate = config('library.daily_penalty_rate', 50);
+        return $overdueDays * $penaltyRate;
+    }
     public function markAsReturned()
     {
         $this->return_date = now();
         $this->transaction_status = 'returned';
         $this->save();
     }
+
 }

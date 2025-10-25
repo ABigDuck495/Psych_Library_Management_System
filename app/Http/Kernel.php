@@ -2,6 +2,9 @@
 
 namespace App\Http;
 
+use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel

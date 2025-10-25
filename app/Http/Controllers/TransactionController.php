@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use App\Models\User;
 use App\Models\Thesis;
+use App\Models\Penalty;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class TransactionController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $query = Transaction::with(['user', 'copy.book']);
+        $query = Transaction::with(['user', 'copy.thesis']);
 
         // Filter by status
         if ($request->has('status') && $request->status) {
@@ -90,6 +91,20 @@ class TransactionController extends Controller
         return view('transactions.overdue', compact('transactions'));
     }
 
+    public function penaltiesIndex()
+    {
+        $penalties = Penalty::with(['user', 'transaction.book', 'transaction.thesis'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('penalties.index', compact('penalties'));
+    }
+
+    public function payPenalty(Penalty $penalty)
+    {
+        $penalty->delete();
+        return redirect()->back()->with('success', 'Penalty paid successfully.');
+    }
     public function create(){
         return view('transactions.create');
     }
@@ -120,6 +135,11 @@ class TransactionController extends Controller
         $transaction->update($request->only(['user_id','copy_id','return_date','transaction_status','due_date','borrow_date','copy_type']));
 
         return redirect()->route('transactions.index')->with('success', 'Transaction updated successfully!');
+    }
+
+    public function show(Transaction $transaction){
+        $transaction->load(['user', 'copy']);
+        return view('transactions.show', compact('transaction'));
     }
     public function requestBook(Request $request, Book $book)
     {
