@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -39,7 +39,7 @@
 <body class="dashboard-bg min-h-screen">
     <div class="flex">
         <!-- Sidebar Navigation -->
-        <div class="sidebar w-64 min-h-screen p-6 text-white">
+        <div class="sidebar w-64 min-h-screen p-6 text-white flex flex-col">
             <!-- Logo and App Name -->
             <div class="flex items-center mb-10">
                 <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3">
@@ -117,6 +117,8 @@
                             <i class="fas fa-exchange-alt mr-3"></i>
                             Transactions
                         </a>
+                    </li>
+                </ul>
             </div>
             
             <!-- Logout Button -->
@@ -132,7 +134,7 @@
         </div>
         
         <!-- Main Content -->
-        <div class="flex-1 p-8">
+        <div class="flex-1 p-8 overflow-y-auto">
             <!-- Header -->
             <div class="flex justify-between items-center mb-8">
                 <div>
@@ -150,7 +152,6 @@
                         <i class="fas fa-envelope text-xl"></i>
                         <span class="absolute top-0 right-0 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">2</span>
                     </button>
-                    
                 </div>
             </div>
             
@@ -160,52 +161,53 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Total Books</p>
-                            <h3 class="text-2xl font-bold mt-2">1,267</h3>
+                            <h3 class="text-2xl font-bold mt-2">{{ $totalBooks ?? 0 }}</h3>
                         </div>
                         <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
                             <i class="fas fa-book text-blue-600 text-xl"></i>
                         </div>
                     </div>
-                    <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 12% from last month</p>
+                    <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> {{ $booksChange ?? '0%' }} from last month</p>
                 </div>
+                
                 
                 <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Active Users</p>
-                            <h3 class="text-2xl font-bold mt-2">586</h3>
+                            <h3 class="text-2xl font-bold mt-2">{{ $activeUsers ?? 0 }}</h3>
                         </div>
                         <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
                             <i class="fas fa-users text-green-600 text-xl"></i>
                         </div>
                     </div>
-                    <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 8% from last month</p>
+                    <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> {{ $usersChange ?? '0%' }} from last month</p>
                 </div>
                 
                 <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Borrowed Items</p>
-                            <h3 class="text-2xl font-bold mt-2">142</h3>
+                            <h3 class="text-2xl font-bold mt-2">{{ $borrowedItems ?? 0 }}</h3>
                         </div>
                         <div class="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center">
                             <i class="fas fa-exchange-alt text-orange-600 text-xl"></i>
                         </div>
                     </div>
-                    <p class="text-red-500 text-sm mt-4"><i class="fas fa-arrow-down mr-1"></i> 3% from last month</p>
+                    <p class="text-red-500 text-sm mt-4"><i class="fas fa-arrow-down mr-1"></i> {{ $borrowedChange ?? '0%' }} from last month</p>
                 </div>
                 
                 <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Theses</p>
-                            <h3 class="text-2xl font-bold mt-2">324</h3>
+                            <h3 class="text-2xl font-bold mt-2">{{ $totalTheses ?? 0 }}</h3>
                         </div>
                         <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
                             <i class="fas fa-file-alt text-purple-600 text-xl"></i>
                         </div>
                     </div>
-                    <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 5% from last month</p>
+                    <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> {{ $thesesChange ?? '0%' }} from last month</p>
                 </div>
             </div>
             
@@ -305,51 +307,45 @@
             
             <!-- Recent Activity Section -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Recent Transactions -->
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-xl font-bold text-gray-800">Recent Transactions</h2>
-                        <a href="{{ route('transactions.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</a>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-book text-blue-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm">Introduction to Psychology</p>
-                                    <p class="text-gray-500 text-xs">Borrowed by John Doe</p>
-                                </div>
-                            </div>
-                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Due Today</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-file-alt text-green-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm">Cognitive Behavioral Therapy</p>
-                                    <p class="text-gray-500 text-xs">Returned by Jane Smith</p>
-                                </div>
-                            </div>
-                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Returned</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center mr-3">
-                                    <i class="fas fa-clock text-orange-600 text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-sm">Research Methods</p>
-                                    <p class="text-gray-500 text-xs">Requested by Mike Johnson</p>
-                                </div>
-                            </div>
-                            <span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full">Pending</span>
-                        </div>
-                    </div>
+    <!-- Recent Transactions -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-gray-800">Pending Transactions</h2>
+            <a href="{{ route('transactions.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</a>
+        </div>
+        <div class="space-y-4">
+    @forelse($recentTransactions as $transaction)
+        <div class="flex items-center justify-between p-3 rounded-lg 
+            @if($transaction->status == 'Due Today') bg-blue-50 
+            @elseif($transaction->status == 'Returned') bg-green-50 
+            @else bg-orange-50 @endif">
+
+            <div class="flex items-center">
+                <div class="w-8 h-8 
+                    @if($transaction->type == 'book') bg-blue-100 
+                    @elseif($transaction->type == 'thesis') bg-green-100 
+                    @else bg-orange-100 @endif 
+                    rounded-full flex items-center justify-center mr-3">
+                    <i class="fas 
+                        @if($transaction->type == 'book') fa-book text-blue-600 
+                        @elseif($transaction->type == 'thesis') fa-file-alt text-green-600 
+                        @else fa-clock text-orange-600 @endif"></i>
                 </div>
+                <span>{{ $transaction->user->name ?? 'Unknown User' }} - {{ $transaction->copy->title ?? 'Unknown Title' }}</span>
+            </div>
+
+            <div class="text-sm font-medium text-gray-600">
+                {{ $transaction->status }}
+            </div>
+        </div>
+    @empty
+        <div class="text-center text-gray-500 py-4">
+            No Pending Transactions
+        </div>
+    @endforelse
+</div>
+
+    </div>
                 
                 <!-- Quick Actions -->
                 <div class="bg-white rounded-xl shadow-sm p-6">

@@ -76,7 +76,7 @@
                 <h2 class="text-sm uppercase tracking-wider text-blue-200 mb-4">Main Navigation</h2>
                 <ul class="space-y-2">
                     <li>
-                        <a href="{{ route('index') }}" class="flex items-center p-3 rounded-lg active-nav">
+                   
                             <i class="fas fa-home mr-3"></i>
                             Dashboard
                         </a>
@@ -149,61 +149,56 @@
                 </div>
             </div>
             
-            <!-- Quick Stats -->
+              <!-- Quick Stats -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Total Books</p>
-                            <h3 class="text-2xl font-bold mt-2">1,248</h3>
+                            <h3 class="text-2xl font-bold mt-2">{{ $totalBooks }}</h3>
                         </div>
                         <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
                             <i class="fas fa-book text-blue-600 text-xl"></i>
                         </div>
                     </div>
-                    <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 12% from last month</p>
                 </div>
                 
                 <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-gray-500 text-sm">Active Users</p>
-                            <h3 class="text-2xl font-bold mt-2">586</h3>
+                            <p class="text-gray-500 text-sm">Pending Transactions</p>
+                            <h3 class="text-2xl font-bold mt-2">{{ $pendingBorrowings }}</h3>
                         </div>
-                        <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
-                            <i class="fas fa-users text-green-600 text-xl"></i>
+                        <div class="w-12 h-12 rounded-lg bg-yellow-100 flex items-center justify-center">
+                            <i class="fas fa-hourglass-half text-yellow-600 text-xl"></i>
                         </div>
                     </div>
-                    <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 8% from last month</p>
                 </div>
                 
                 <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Borrowed Items</p>
-                            <h3 class="text-2xl font-bold mt-2">142</h3>
+                            <h3 class="text-2xl font-bold mt-2">{{ $borrowedBooks }}</h3>
                         </div>
                         <div class="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center">
                             <i class="fas fa-exchange-alt text-orange-600 text-xl"></i>
                         </div>
                     </div>
-                    <p class="text-red-500 text-sm mt-4"><i class="fas fa-arrow-down mr-1"></i> 3% from last month</p>
                 </div>
                 
                 <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-gray-500 text-sm">Theses</p>
-                            <h3 class="text-2xl font-bold mt-2">324</h3>
+                            <h3 class="text-2xl font-bold mt-2">{{ $totalTheses }}</h3>
                         </div>
                         <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
                             <i class="fas fa-file-alt text-purple-600 text-xl"></i>
                         </div>
                     </div>
-                    <p class="text-green-500 text-sm mt-4"><i class="fas fa-arrow-up mr-1"></i> 5% from last month</p>
                 </div>
             </div>
-            
             <!-- Management Quick Access -->
             <div class="mb-10">
                 <div class="flex items-center justify-between mb-6">
