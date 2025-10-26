@@ -15,6 +15,7 @@ return new class extends Migration
             $table->timestamp('borrow_date')->useCurrent();
             $table->timestamp('due_date');
             $table->timestamp('return_date')->nullable();
+            $table->string('copy_type');
             $table->enum('transaction_status', ['requested','borrowed', 'returned', 'overdue'])->default('borrowed');
             $table->timestamps();
 
