@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Book;
-use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -12,6 +10,9 @@ class BookCopy extends Model
     use HasFactory;
 
     protected $primaryKey = 'copy_id';
+    protected $table = 'book_copies';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'book_id',
@@ -26,19 +27,29 @@ class BookCopy extends Model
     {
         return $this->belongsTo(Book::class);
     }
+
     public function transactions()
     {
         return $this->hasMany(Transaction::class, 'copy_id');
     }
-    public function currrentTransaction()
+
+    public function currentTransaction()
     {
-        return $this->hasOne(Transaction::class, 'copy_id')->whereNull('return_date')->latest();
+        return $this->hasOne(Transaction::class, 'copy_id')
+                    ->whereNull('return_date')
+                    ->latest();
     }
+
     public function isAvailable(): bool
     {
         return $this->is_available;
     }
-    public function getBorrowHistory(){
-        return $this->transactions()->with('user')->orderBy('borrow_date', 'desc')->get();
+
+    public function getBorrowHistory()
+    {
+        return $this->transactions()
+            ->with('user')
+            ->orderBy('borrow_date', 'desc')
+            ->get();
     }
 }
