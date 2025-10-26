@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('penalties', function (Blueprint $table) {
             $table->id();
-            $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('transaction_id')->references('id')->on('transactions')->onDelete('cascade');
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->decimal('amount', 8, 2);
             $table->reason = $table->text('reason')->nullable();
             $table->timestamps();

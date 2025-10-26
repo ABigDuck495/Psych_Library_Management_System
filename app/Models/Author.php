@@ -10,9 +10,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Author extends Model
 {
     use HasFactory;
+
     protected $fillable = ['first_name', 'last_name'];
     protected $table = 'authors';
-    
+
+    // Relationships
     public function books()
     {
         return $this->belongsToMany(Book::class, 'book_authors');
@@ -23,38 +25,30 @@ class Author extends Model
         return $this->belongsToMany(Thesis::class, 'thesis_authors');
     }
 
-    public function getFullNameAttribute()
+    // Accessors
+    public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
     }
-    // public function books()
-    // {
-    //     return $this->belongsToMany(Book::class);
-    // }
-    // public function thesis()
-    // {
-    //     return $this->belongsToMany(Thesis::class);
-    // }
-    // public function getFullNameAttribute(): string
-    // {
-    //     return $this->first_name . ' ' . $this->last_name;
-    // }
+
     public function getBookCountAttribute(): int
     {
         return $this->books()->count();
     }
+
     public function getThesisCountAttribute(): int
     {
         return $this->theses()->count();
     }
 
+    // Scopes
     public function scopeWithBooks($query)
     {
         return $query->whereHas('books');
     }
-    public function scopeWithThesis($query)
-    {
-        return $query->whereHas('thesis');
-    }
 
+    public function scopeWithTheses($query)
+    {
+        return $query->whereHas('theses');
+    }
 }

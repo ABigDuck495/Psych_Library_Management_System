@@ -15,17 +15,19 @@ class ThesisCopyController extends Controller
         return view('thesis_copies.create', compact('authors'));
     }
     public function store(Request $request){
-        $request->validate([
-            'thesis_id' => 'required|integer',
-            'status' => 'required|string|max:255',
-        ]);
+    $request->validate([
+        'thesis_id' => 'required|integer|exists:theses,id',
+        'is_available' => 'required|boolean',
+    ]);
 
-        // Assuming ThesisCopy is a model representing a copy of a thesis
-        ThesisCopy::create($request->all());
+    ThesisCopy::create([
+        'thesis_id' => $request->thesis_id,
+        'is_available' => $request->is_available
+    ]);
 
-        return redirect()->route('thesis_copies.index')
-                         ->with('success', 'Thesis copy created successfully.');
-    }
+    return redirect()->route('thesis_copies.index')
+                     ->with('success', 'Thesis copy created successfully.');
+}
     public function availableCopies($thesisId){
         $availableCopiesCount = ThesisCopy::where('thesis_id', $thesisId)
                                         ->where('is_available', true)
