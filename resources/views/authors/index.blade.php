@@ -208,6 +208,10 @@
 
             <!-- Authors Table -->
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <a href="{{ route('export.authors', 'all') }}">Export All Authors</a>
+            <a href="{{ route('export.authors', 'books') }}">Export Book Authors</a>
+            <a href="{{ route('export.authors', 'theses') }}">Export Thesis Authors</a>
+            <a href="{{ route('export.authors', 'prolific') }}">Export Prolific Authors</a>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">

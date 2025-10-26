@@ -350,18 +350,10 @@
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Major/Department</label>
-                            <p class="text-gray-800 font-medium">{{ $user->major_department ?? 'Not Specified' }}</p>
+                            <p class="text-gray-800 font-medium">{{ $user->department ?? 'Not Specified' }}</p>
                         </div>
                         
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 mb-1">Year Level</label>
-                            <p class="text-gray-800 font-medium">{{ $user->year_level ?? 'Not Specified' }}</p>
-                        </div>
                         
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 mb-1">Academic Standing</label>
-                            <span class="status-badge bg-green-100 text-green-800">{{ $user->academic_standing ?? 'Good Standing' }}</span>
-                        </div>
                     </div>
                 </div>
                 @elseif(isset($user->user_type) && $user->user_type === 'employee')

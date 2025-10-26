@@ -10,7 +10,11 @@
     </div>
 </div>
 
-<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <a href="{{ route('export.penalties', 'all') }}">Export All Penalties</a>
+    <a href="{{ route('export.penalties', 'unpaid') }}">Export Unpaid Penalties</a>
+    <a href="{{ route('export.penalties', 'recent') }}">Export Recent Penalties</a>
+    <a href="{{ route('export.penalties', 'high-value') }}">Export High Value Penalties</a>
     <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">

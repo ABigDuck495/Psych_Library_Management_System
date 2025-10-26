@@ -225,6 +225,11 @@
 
             <!-- Books Table -->
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <a href="{{ route('export.books') }}">Export All Books</a>
+                //lagyan nalang to ng slider thing idk 
+                <a href="{{ route('export.books', ['year_published' => 2024]) }}">Export 2024 Books</a>
+                <a href="{{ route('export.books', ['year_published' => 2023]) }}">Export 2023 Books</a>
+                <a href="{{ route('export.books', ['author' => 'John Doe']) }}">Export Books by Author</a>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">

@@ -9,6 +9,9 @@ use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+// use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class UserController extends Controller
 {
@@ -121,7 +124,14 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::findOrFail($id);
-        return view('users.show', compact('user'));
+        if($user->user_type === 'student'){
+            $details = $user->student;
+        }else if($user->user_type === 'employee'){
+            $details = $user->employee;
+        }else{
+            $detils = null;
+        }
+        return view('users.show', compact('user', 'details'));
     }
 
     // Edit method (like edit.php)

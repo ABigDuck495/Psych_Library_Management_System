@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ReportExportController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
@@ -65,6 +66,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('users', UserController::class);
         Route::resource('authors', AuthorController::class);
         
+        //export users
+        Route::get('/export/users/{query}', [ReportExportController::class, 'exportUser'])->name('users.export');
+        
         Route::patch('/users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
         Route::patch('/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
 
@@ -89,7 +93,18 @@ Route::middleware(['auth'])->group(function () {
         // Transactions: librarians manage transactions
         Route::resource('transactions', TransactionController::class);
 
-        
+        //export books
+        Route::get('/export/books', [ReportExportController::class, 'exportBook'])->name('export.books');
+        //thesis
+        Route::get('/export/theses', [ReportExportController::class, 'exportThesis'])->name('export.theses');
+        //transaction
+        Route::get('/export/transactions/{query}', [ReportExportController::class, 'exportTransaction'])->name('export.transactions');
+        //penalty
+        Route::get('/export/penalties/{query}', [ReportExportController::class, 'exportPenalty'])->name('export.penalties');
+        //author
+        Route::get('/export/authors/{query}', [ReportExportController::class, 'exportAuthor'])->name('export.authors');
+
+
         // Librarian interface
         Route::get('/librarian/interface', [LibrarianInterfaceController::class, 'index'])->name('librarianInterface.index');
     });

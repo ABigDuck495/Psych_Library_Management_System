@@ -224,6 +224,15 @@
             </div>
 
             <!-- Users Table -->
+            <a href="{{ route('export.users', 'rawr') }}">Export All Users</a>
+            <a href="{{ route('export.users', 'user') }}">Export Regular Users</a>
+            <a href="{{ route('export.users', 'librarian') }}">Export Librarians</a>
+            <a href="{{ route('export.users', 'admin') }}">Export Admins</a>
+            <a href="{{ route('export.users', 'super-admin') }}">Export Super Admins</a>
+            <a href="{{ route('export.users', 'active') }}">Export Active Users</a>
+            <a href="{{ route('export.users', 'inactive') }}">Export Inactive Users</a>
+            <a href="{{ route('export.users', 'student') }}">Export Students</a>
+            <a href="{{ route('export.users', 'employee') }}">Export Employees</a>
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">

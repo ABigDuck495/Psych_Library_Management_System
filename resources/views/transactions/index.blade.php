@@ -295,6 +295,12 @@
             <!-- Transactions Table -->
             @if($transactions->count() > 0)
                 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <a href="{{ route('export.transactions', 'all') }}">Export All Transactions</a>
+                    <a href="{{ route('export.transactions', 'overdue') }}">Export Overdue Transactions</a>
+                    <a href="{{ route('export.transactions', 'borrowed') }}">Export Borrowed Items</a>
+                    <a href="{{ route('export.transactions', 'returned') }}">Export Returned Items</a>
+                    <a href="{{ route('export.transactions', 'requested') }}">Export Requested Items</a>
+                    <a href="{{ route('export.transactions', 'active') }}">Export Active Transactions</a>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">

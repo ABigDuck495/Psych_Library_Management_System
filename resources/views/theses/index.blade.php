@@ -232,6 +232,12 @@
 
             <!-- Theses Table -->
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <a href="{{ route('export.theses') }}">Export All Theses</a>
+                //same here lagyan nalang
+                <a href="{{ route('export.theses', ['year_published' => 2024]) }}">Export 2024 Theses</a>
+                <a href="{{ route('export.theses', ['department' => 'AB Psychology']) }}">Export AB Psychology Theses</a>
+                <a href="{{ route('export.theses', ['department' => 'BS Psychology']) }}">Export BS Psychology Theses</a>
+                <a href="{{ route('export.theses', ['department' => ['AB Psychology', 'BS Psychology']]) }}">Export All Psychology Theses</a>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
