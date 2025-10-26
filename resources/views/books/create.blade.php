@@ -331,246 +331,169 @@
                             </div>
 
                             <!-- Description Field -->
-                            <div>
-                                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Description
-                                </label>
-                                <textarea 
-                                    id="description" 
-                                    name="description" 
-                                    rows="4"
-                                    class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
-                                    placeholder="Enter book description"
-                                >{{ old('description') }}</textarea>
-                                @error('description')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
+<div>
+    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+        Description
+    </label>
+    <textarea 
+        id="description" 
+        name="description" 
+        rows="4"
+        class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
+        placeholder="Enter book description"
+    >{{ old('description') }}</textarea>
+    @error('description')
+        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+</div>
+</div>
+</div>
 
-                    <!-- Author Information Section -->
-                    <div class="border-t border-gray-200 pt-6 mb-6">
-                        <div class="flex items-center mb-6">
-                            <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mr-3">
-                                <i class="fas fa-user-edit text-purple-600"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold text-gray-800">Author Information</h3>
-                                <p class="text-gray-600 text-sm">Select authors for this book</p>
-                            </div>
-                        </div>
+<!-- Author Information Section -->
+<div class="border-t border-gray-200 pt-6 mb-6">
+    <div class="flex items-center mb-6">
+        <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mr-3">
+            <i class="fas fa-user-edit text-purple-600"></i>
+        </div>
+        <div>
+            <h3 class="text-lg font-bold text-gray-800">Author Information</h3>
+            <p class="text-gray-600 text-sm">Add authors for this book</p>
+        </div>
+    </div>
 
-                        <!-- Authors Selection -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div>
-                                <label for="author_ids" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Authors <span class="text-red-500">*</span>
-                                </label>
-                                <select 
-                                    id="author_ids" 
-                                    name="author_ids[]" 
-                                    multiple 
-                                    class="form-input multi-select block w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
-                                    required
-                                >
-                                    @foreach($authors as $author)
-                                        <option value="{{ $author->id }}"
-                                            {{ in_array($author->id, old('author_ids', [])) ? 'selected' : '' }}>
-                                            {{ $author->full_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <div class="mt-2 text-sm text-gray-500">
-                                    <i class="fas fa-info-circle mr-1"></i>
-                                    Hold Ctrl (or Cmd on Mac) to select multiple authors
-                                </div>
-                                @error('author_ids')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Add New Author Button -->
-                            <div class="flex items-end">
-                                <a href="{{ route('authors.create', ['return_to' => url()->current()]) }}" 
-                                   class="inline-flex items-center px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition w-full">
-                                    <i class="fas fa-user-plus mr-2 text-green-600"></i>
-                                    <div class="text-left">
-                                        <div class="font-medium">Add New Author</div>
-                                        <div class="text-xs text-gray-500">Can't find an author? Add a new one</div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Selected Authors Preview -->
-                    <div id="selectedAuthors" class="bg-gray-50 rounded-lg p-4 mb-6 hidden">
-                        <h4 class="text-sm font-medium text-gray-700 mb-3">Selected Authors:</h4>
-                        <div id="selectedAuthorsList" class="flex flex-wrap gap-2"></div>
-                    </div>
-
-                    <!-- Form Actions -->
-                    <div class="flex items-center justify-between pt-6 mt-6 border-t border-gray-200">
-                        <div>
-                            <a href="{{ route('books.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
-                                <i class="fas fa-arrow-left mr-2"></i>
-                                Back to Books
-                            </a>
-                        </div>
-                        <div class="flex space-x-3">
-                            <button 
-                                type="button" 
-                                onclick="resetForm()" 
-                                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition"
-                            >
-                                <i class="fas fa-redo mr-2"></i>
-                                Reset Form
-                            </button>
-                            <button 
-                                type="submit" 
-                                class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
-                            >
-                                <i class="fas fa-save mr-2"></i>
-                                Save Book
-                            </button>
-                        </div>
-                    </div>
-                </form>
+    <!-- Dynamic Author Fields -->
+    <div id="authorsContainer" class="space-y-4">
+        <!-- First Author by default -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 author-row">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
+                <input type="text" name="authors[0][first_name]" placeholder="First Name" required
+                    class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
             </div>
-
-            <!-- Quick Tips -->
-            <div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-lightbulb text-blue-500 text-xl mt-1"></i>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-lg font-medium text-blue-800">Quick Tips</h3>
-                        <div class="mt-2 text-blue-700 text-sm">
-                            <ul class="list-disc list-inside space-y-1">
-                                <li>Ensure all required fields (marked with *) are filled</li>
-                                <li>Select at least one author for the book</li>
-                                <li>Publication year must be between 1900 and current year</li>
-                                <li>Number of copies determines available inventory</li>
-                                <li>Use the "Add New Author" button if an author is missing</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
+                <input type="text" name="authors[0][last_name]" placeholder="Last Name" required
+                    class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
             </div>
         </div>
     </div>
 
-    <script>
-        // Form reset function
-        function resetForm() {
-            document.getElementById('bookForm').reset();
-            updateSelectedAuthors();
-            showTemporaryMessage('Form has been reset', 'blue');
-        }
+    <!-- Add Author Button -->
+    <div class="mt-4">
+        <button type="button" id="addAuthorBtn"
+            class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+            <i class="fas fa-plus mr-2"></i> Add Author
+        </button>
+    </div>
+</div>
 
-        // Update selected authors preview
-        function updateSelectedAuthors() {
-            const select = document.getElementById('author_ids');
-            const selectedOptions = Array.from(select.selectedOptions);
-            const preview = document.getElementById('selectedAuthors');
-            const previewList = document.getElementById('selectedAuthorsList');
-            
-            previewList.innerHTML = '';
-            
-            if (selectedOptions.length > 0) {
-                selectedOptions.forEach(option => {
-                    const badge = document.createElement('div');
-                    badge.className = 'bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-full flex items-center';
-                    badge.innerHTML = `
-                        ${option.text}
-                        <button type="button" onclick="deselectAuthor('${option.value}')" class="ml-2 text-blue-600 hover:text-blue-800">
-                            <i class="fas fa-times text-xs"></i>
-                        </button>
-                    `;
-                    previewList.appendChild(badge);
-                });
-                preview.classList.remove('hidden');
-            } else {
-                preview.classList.add('hidden');
-            }
-        }
+<!-- JavaScript for dynamic authors -->
+<script>
+    let authorIndex = 1; // start from 1 because first author is 0
+    const addAuthorBtn = document.getElementById('addAuthorBtn');
+    const authorsContainer = document.getElementById('authorsContainer');
 
-        // Deselect author
-        function deselectAuthor(authorId) {
-            const select = document.getElementById('author_ids');
-            const option = Array.from(select.options).find(opt => opt.value === authorId);
-            if (option) {
-                option.selected = false;
-                updateSelectedAuthors();
-            }
-        }
+    addAuthorBtn.addEventListener('click', () => {
+        const authorRow = document.createElement('div');
+        authorRow.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-2', 'gap-4', 'author-row', 'mt-2');
 
-        // Show temporary message
-        function showTemporaryMessage(message, type = 'blue') {
-            const existingMessage = document.getElementById('temporaryMessage');
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-
-            const messageDiv = document.createElement('div');
-            messageDiv.id = 'temporaryMessage';
-            const bgColor = type === 'red' ? 'red' : 'blue';
-            messageDiv.className = `fixed top-4 right-4 bg-${bgColor}-100 border border-${bgColor}-400 text-${bgColor}-700 px-4 py-3 rounded-lg shadow-lg z-50`;
-            messageDiv.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    <span>${message}</span>
+        authorRow.innerHTML = `
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
+                <input type="text" name="authors[${authorIndex}][first_name]" placeholder="First Name" required
+                    class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
+                <div class="flex">
+                    <input type="text" name="authors[${authorIndex}][last_name]" placeholder="Last Name" required
+                        class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+                    <button type="button" class="ml-2 px-3 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 remove-author-btn transition">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
-            `;
+            </div>
+        `;
+        authorsContainer.appendChild(authorRow);
 
-            document.body.appendChild(messageDiv);
-
-            setTimeout(() => {
-                if (document.getElementById('temporaryMessage')) {
-                    document.getElementById('temporaryMessage').remove();
-                }
-            }, 3000);
-        }
-
-        // Form validation
-        document.getElementById('bookForm').addEventListener('submit', function(e) {
-            const title = document.getElementById('title').value.trim();
-            const yearPublished = document.getElementById('year_published').value;
-            const category = document.getElementById('category_id').value;
-            const authors = document.getElementById('author_ids');
-            const selectedAuthors = Array.from(authors.selectedOptions).length;
-            
-            if (!title || !yearPublished || !category || selectedAuthors === 0) {
-                e.preventDefault();
-                showTemporaryMessage('Please fill in all required fields', 'red');
-                return false;
-            }
-            
-            // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
-            submitBtn.disabled = true;
-            
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }, 3000);
+        // Add remove functionality
+        authorRow.querySelector('.remove-author-btn').addEventListener('click', () => {
+            authorRow.remove();
         });
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set up authors selection listener
-            document.getElementById('author_ids').addEventListener('change', updateSelectedAuthors);
-            
-            // Initialize selected authors preview
-            updateSelectedAuthors();
-            
-            // Auto-focus title field
-            document.getElementById('title').focus();
-        });
-    </script>
+        authorIndex++;
+    });
+</script>
+
+<!-- Form Actions -->
+<div class="flex items-center justify-between pt-6 mt-6 border-t border-gray-200">
+    <div>
+        <a href="{{ route('books.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Books
+        </a>
+    </div>
+    <div class="flex space-x-3">
+        <button 
+            type="button" 
+            onclick="resetForm()" 
+            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition"
+        >
+            <i class="fas fa-redo mr-2"></i>
+            Reset Form
+        </button>
+        <button 
+            type="submit" 
+            class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+        >
+            <i class="fas fa-save mr-2"></i>
+            Save Book
+        </button>
+    </div>
+</div>
+
+<!-- Quick Tips -->
+<div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
+    <div class="flex items-start">
+        <div class="flex-shrink-0">
+            <i class="fas fa-lightbulb text-blue-500 text-xl mt-1"></i>
+        </div>
+        <div class="ml-4">
+            <h3 class="text-lg font-medium text-blue-800">Quick Tips</h3>
+            <div class="mt-2 text-blue-700 text-sm">
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Ensure all required fields (marked with *) are filled</li>
+                    <li>Add at least one author for the book</li>
+                    <li>Publication year must be between 1900 and current year</li>
+                    <li>Number of copies determines available inventory</li>
+                    <li>Use the "Add Author" button if an author is missing</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Form reset function
+    function resetForm() {
+        document.getElementById('bookForm').reset();
+        showTemporaryMessage('Form has been reset', 'blue');
+    }
+
+    // Show temporary message
+    function showTemporaryMessage(message, type = 'blue') {
+        const existingMessage = document.getElementById('temporaryMessage');
+        if (existingMessage) existingMessage.remove();
+
+        const messageDiv = document.createElement('div');
+        messageDiv.id = 'temporaryMessage';
+        const bgColor = type === 'red' ? 'red' : 'blue';
+        messageDiv.className = `fixed top-4 right-4 bg-${bgColor}-100 border border-${bgColor}-400 text-${bgColor}-700 px-4 py-3 rounded-lg shadow-lg z-50`;
+        messageDiv.innerHTML = `<div class="flex items-center"><i class="fas fa-info-circle mr-2"></i><span>${message}</span></div>`;
+
+        document.body.appendChild(messageDiv);
+        setTimeout(() => { messageDiv.remove(); }, 3000);
+    }
+</script>
 </body>
 </html>

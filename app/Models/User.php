@@ -76,30 +76,22 @@ class User extends Authenticatable
     }
     public function hasPendingRequestForBook($bookId)
     {
-        // Check transactions for copies that belong to the given book id
         return $this->transactions()
                     ->whereIn('transaction_status', ['requested', 'pending'])
-                    ->where(function ($q) use ($bookId) {
-                        $q->whereHas('bookCopy', function ($qb) use ($bookId) {
-                            $qb->where('book_id', $bookId);
-                        })
-                        // also check polymorphic copy relation in case Transaction.copy() is used
-                        ->orWhereHas('copy', function ($qc) use ($bookId) {
-                            // if the related copy has book_id attribute
-                            $qc->where('book_id', $bookId);
-                        });
-                    })->exists();
+                    ->whereHas('bookCopy', function ($qb) use ($bookId) {
+                        $qb->where('book_id', $bookId);
+                    })
+                    ->exists();
     }
 
     public function hasPendingRequestForThesis($thesisId)
     {
         return $this->transactions()
                     ->whereIn('transaction_status', ['requested', 'pending'])
-                    ->where(function ($q) use ($thesisId) {
-                        $q->whereHas('copy', function ($qc) use ($thesisId) {
-                            $qc->where('thesis_id', $thesisId);
-                        });
-                    })->exists();
+                    ->whereHas('thesisCopy', function ($qb) use ($thesisId) {
+                        $qb->where('thesis_id', $thesisId);
+                    })
+                    ->exists();
     }
     public function scopeStudents($query)
     {

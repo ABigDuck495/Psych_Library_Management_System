@@ -118,6 +118,11 @@ Route::middleware(['auth'])->group(function () {
 
         // Simple user-facing interface
         Route::get('/user/userInterface', [UserInterfaceController::class, 'index'])->name('userInterface.index');
+        Route::get('/my-borrowed-books', [UserInterfaceController::class, 'myBorrowedBooks'])
+        ->name('userInterface.borrowedBooks');
+        Route::get('/borrowing-history', [UserInterfaceController::class, 'borrowingHistory'])
+        ->name('userInterface.borrowingHistory');
+
     });
 });
 

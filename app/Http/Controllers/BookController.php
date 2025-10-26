@@ -38,42 +38,39 @@ class BookController extends Controller
     }
 
      public function store(Request $request)
-    {
-        // Validate the book data
-        $validated = $request->validate([
-            'title' => 'required',
-            'year_published' => 'required|digits:4',
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable',
-            // 'publisher' => 'nullable',
-            // 'isbn' => 'nullable|unique:books',
-            // 'pages' => 'nullable|integer',
-            'author_ids' => 'required|array',
-            'author_ids.*' => 'exists:authors,id',
-            'copies_count' => 'required|integer'
+{
+    // Validate the request
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'copies_count' => 'nullable|integer|min:1',
+        'authors' => 'required|array|min:1',
+        'year_published' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
+        'category_id' => 'required|exists:categories,id',
+        'authors.*.first_name' => 'required|string|max:255',
+        'authors.*.last_name' => 'required|string|max:255',
+    ]);
+
+    // Create the book first
+    $copiesCount = $validated['copies_count'] ?? 1;
+    $book = Book::create([
+        'title' => $validated['title'],
+        'copies_count' => $copiesCount,
+         'year_published' => $validated['year_published'],
+         'category_id' => $validated['category_id'],
+        // Add other book fields here if needed
+    ]);
+
+    // Now loop through authors and attach them
+    foreach ($validated['authors'] as $authorData) {
+        $author = Author::firstOrCreate([
+            'first_name' => $authorData['first_name'],
+            'last_name' => $authorData['last_name'],
         ]);
 
-        // Create the book
-        $authorIds = $validated['author_ids'] ?? [];
-        unset($validated['author_ids']);
+        $book->authors()->attach($author->id);
+    }
 
-        $copiesCount = $validated['copies_count'] ?? $request->input('copies_count', 1);
-
-        $book = Book::create($validated);
-
-        // Link book to authors
-        $book->authors()->sync($authorIds);
-
-        // Create book copies (use correct column name 'is_available')
-        for ($i = 0; $i < (int)$copiesCount; $i++) {
-            BookCopy::create([
-                'book_id' => $book->id,
-                'is_available' => true
-            ]);
-        }
-
-        return redirect()->route('books.index')
-                        ->with('success', 'Book and ' . $copiesCount . ' copies created successfully!');
+    return redirect()->route('books.index')->with('success', 'Book created successfully!');
 }
 
     public function show(Book $book)

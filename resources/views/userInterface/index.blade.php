@@ -101,13 +101,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
+                        <a href="{{ route('userInterface.borrowedBooks') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
                             <i class="fas fa-book mr-3"></i>
                             My Borrowed Items
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
+                        <a href="{{ route('userInterface.borrowingHistory') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
                             <i class="fas fa-history mr-3"></i>
                             Borrowing History
                         </a>
@@ -183,51 +183,56 @@
 
             <!-- Quick Stats -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-500 text-sm">Currently Borrowed</p>
-                            <h3 class="text-2xl font-bold mt-2">3 Items</h3>
-                        </div>
-                        <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
-                            <i class="fas fa-book text-blue-600 text-xl"></i>
-                        </div>
-                    </div>
-                    <p class="text-green-500 text-sm mt-4">
-                        <i class="fas fa-arrow-down mr-1"></i> 1 item due soon
-                    </p>
-                </div>
-                
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-500 text-sm">Favorites</p>
-                            <h3 class="text-2xl font-bold mt-2">7 Items</h3>
-                        </div>
-                        <div class="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center">
-                            <i class="fas fa-heart text-red-600 text-xl"></i>
-                        </div>
-                    </div>
-                    <p class="text-blue-500 text-sm mt-4">
-                        <i class="fas fa-eye mr-1"></i> Recently viewed
-                    </p>
-                </div>
-                
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-500 text-sm">Reading History</p>
-                            <h3 class="text-2xl font-bold mt-2">24 Items</h3>
-                        </div>
-                        <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
-                            <i class="fas fa-history text-green-600 text-xl"></i>
-                        </div>
-                    </div>
-                    <p class="text-gray-500 text-sm mt-4">
-                        <i class="fas fa-chart-line mr-1"></i> 5 this month
-                    </p>
-                </div>
+
+    <!-- Pending Requests -->
+    <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-gray-500 text-sm">Pending Requests</p>
+                <h3 class="text-2xl font-bold mt-2">{{ $pendingCount ?? 0 }}</h3>
             </div>
+            <div class="w-12 h-12 rounded-lg bg-yellow-100 flex items-center justify-center">
+                <i class="fas fa-clock text-yellow-600 text-xl"></i>
+            </div>
+        </div>
+        <p class="text-yellow-500 text-sm mt-4">
+            <i class="fas fa-info-circle mr-1"></i> Requests awaiting approval
+        </p>
+    </div>
+
+    <!-- Currently Borrowed -->
+    <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-gray-500 text-sm">Currently Borrowed</p>
+                <h3 class="text-2xl font-bold mt-2">{{ $borrowedCount ?? 0 }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                <i class="fas fa-book text-blue-600 text-xl"></i>
+            </div>
+        </div>
+        <p class="text-blue-500 text-sm mt-4">
+            <i class="fas fa-info-circle mr-1"></i> Books & theses you currently have
+        </p>
+    </div>
+
+    <!-- Overdue Items -->
+    <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+        <div class="flex justify-between items-start">
+            <div>
+                <p class="text-gray-500 text-sm">Overdue</p>
+                <h3 class="text-2xl font-bold mt-2">{{ $overdueCount ?? 0 }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center">
+                <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+            </div>
+        </div>
+        <p class="text-red-500 text-sm mt-4">
+            <i class="fas fa-info-circle mr-1"></i> Items past their due date
+        </p>
+    </div>
+
+</div>
 
             <!-- Success Message -->
             @if (session('success'))
