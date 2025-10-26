@@ -6,6 +6,7 @@
     <title>Books Management - Psych Library</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -48,59 +49,50 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
         }
-        
-        .sidebar {
-            background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%);
-        }
-        
-        .active-nav {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-left: 4px solid white;
-        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div class="flex">
         <!-- Sidebar Navigation -->
-        <div class="sidebar w-64 min-h-screen p-6 text-white">
+        <div class="sidebar">
             <!-- Logo and App Name -->
-            <div class="flex items-center mb-10">
-                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3">
-                    <i class="fas fa-book text-blue-800 text-lg"></i>
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-book text-green-800 text-lg"></i>
                 </div>
-                <h1 class="text-xl font-bold">Psych Library</h1>
+                <h1 class="logo-text">Psych Library</h1>
             </div>
             
             <!-- User Profile Section -->
-            <div class="bg-white/10 rounded-xl p-4 mb-8">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
-                        <i class="fas fa-user text-blue-600 text-xl"></i>
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user text-green-600 text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-semibold">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</h3>
-                        <p class="text-blue-200 text-sm capitalize">{{ Auth::user()->role }}</p>
+                        <h3 class="user-name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</h3>
+                        <p class="user-role">{{ Auth::user()->role }}</p>
                     </div>
                 </div>
-                <div class="space-y-2 text-sm">
-                    <div class="flex justify-between">
-                        <span class="text-blue-200">University ID:</span>
-                        <span>{{ Auth::user()->university_id }}</span>
+                <div class="user-details">
+                    <div class="user-detail">
+                        <span class="detail-label">University ID:</span>
+                        <span class="detail-value">{{ Auth::user()->university_id }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-blue-200">Status:</span>
-                        <span class="text-green-300">{{ Auth::user()->account_status }}</span>
+                    <div class="user-detail">
+                        <span class="detail-label">Status:</span>
+                        <span class="status-active">{{ Auth::user()->account_status }}</span>
                     </div>
                 </div>
             </div>
             
             <!-- Navigation Menu -->
-            <div class="mb-8">
-                <h2 class="text-sm uppercase tracking-wider text-blue-200 mb-4">Main Navigation</h2>
-                <ul class="space-y-2">
+            <div class="nav-section">
+                <h2 class="section-title">Main Navigation</h2>
+                <ul class="nav-menu">
                     <li>
-                        
-                            <i class="fas fa-home mr-3"></i>
+                        <a href="{{ route('adminInterface.index') }}" class="nav-item hover:bg-green-700 transition">
+                            <i class="fas fa-home nav-icon"></i>
                             Dashboard
                         </a>
                     </li>
@@ -108,36 +100,36 @@
             </div>
             
             <!-- Management Sections -->
-            <div class="mb-8">
-                <h2 class="text-sm uppercase tracking-wider text-blue-200 mb-4">Management</h2>
-                <ul class="space-y-2">
+            <div class="nav-section">
+                <h2 class="section-title">Management</h2>
+                <ul class="nav-menu">
                     <li>
-                        <a href="{{ route('users.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
-                            <i class="fas fa-users mr-3"></i>
+                        <a href="{{ route('users.index') }}" class="nav-item hover:bg-green-700 transition">
+                            <i class="fas fa-users nav-icon"></i>
                             User Management
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('books.index') }}" class="flex items-center p-3 rounded-lg active-nav">
-                            <i class="fas fa-book-open mr-3"></i>
+                        <a href="{{ route('books.index') }}" class="nav-item active">
+                            <i class="fas fa-book-open nav-icon"></i>
                             Book Management
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('theses.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
-                            <i class="fas fa-file-alt mr-3"></i>
+                        <a href="{{ route('theses.index') }}" class="nav-item hover:bg-green-700 transition">
+                            <i class="fas fa-file-alt nav-icon"></i>
                             Thesis Management
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('authors.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
-                            <i class="fas fa-user-edit mr-3"></i>
+                        <a href="{{ route('authors.index') }}" class="nav-item hover:bg-green-700 transition">
+                            <i class="fas fa-user-edit nav-icon"></i>
                             Author Management
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('transactions.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
-                            <i class="fas fa-exchange-alt mr-3"></i>
+                        <a href="{{ route('transactions.index') }}" class="nav-item hover:bg-green-700 transition">
+                            <i class="fas fa-exchange-alt nav-icon"></i>
                             Transactions
                         </a>
                     </li>
@@ -145,11 +137,11 @@
             </div>
             
             <!-- Logout Button -->
-            <div class="mt-auto pt-6 border-t border-blue-400">
+            <div class="logout-section">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="flex items-center w-full p-3 rounded-lg hover:bg-blue-700 transition text-left">
-                        <i class="fas fa-sign-out-alt mr-3"></i>
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt nav-icon"></i>
                         Logout
                     </button>
                 </form>
@@ -349,7 +341,7 @@
                 </div>
             </div>
 
-           
+            <!-- Pagination would go here -->
 
     <script>
         // Toggle description visibility
@@ -404,45 +396,5 @@
             searchInput.addEventListener('input', filterBooks);
         });
     </script>
-
-    <!-- Custom Pagination Styles -->
-    <style>
-        .pagination {
-            display: flex;
-            justify-content: center;
-            list-style: none;
-            padding: 0;
-        }
-        
-        .pagination li {
-            margin: 0 4px;
-        }
-        
-        .pagination li a, 
-        .pagination li span {
-            display: inline-block;
-            padding: 8px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            color: #374151;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        
-        .pagination li a:hover {
-            background-color: #f3f4f6;
-        }
-        
-        .pagination li.active span {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-        
-        .pagination li.disabled span {
-            color: #9ca3af;
-            background-color: #f9fafb;
-        }
-    </style>
 </body>
 </html>

@@ -68,7 +68,7 @@
                 <h2 class="section-title">Main Navigation</h2>
                 <ul class="nav-menu">
                     <li>
-                        <a href="#" class="nav-item active">
+                        <a href="{{ route('adminInterface.index') }}" class="nav-item active">
                             <i class="fas fa-home nav-icon"></i>
                             Dashboard
                         </a>
