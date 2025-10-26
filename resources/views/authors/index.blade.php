@@ -6,6 +6,7 @@
     <title>Authors Management - Psych Library</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -13,76 +14,70 @@
             font-family: 'Inter', sans-serif;
         }
         
-        .card-hover {
+        .table-row-hover:hover {
+            background-color: #f8fafc;
+        }
+        
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .add-author-btn {
             transition: all 0.3s ease;
         }
         
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-        
-        .dashboard-bg {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-        }
-        
-        .sidebar {
-            background: linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%);
-        }
-        
-        .active-nav {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-left: 4px solid white;
-        }
-        
-        .highlight {
-            background-color: #fef3c7;
-            padding: 2px 4px;
-            border-radius: 4px;
+        .add-author-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
         }
     </style>
 </head>
-<body class="dashboard-bg min-h-screen">
+<body class="bg-gray-50 min-h-screen">
     <div class="flex">
         <!-- Sidebar Navigation -->
-        <div class="sidebar w-64 min-h-screen p-6 text-white">
+        <div class="sidebar">
             <!-- Logo and App Name -->
-            <div class="flex items-center mb-10">
-                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center mr-3">
-                    <i class="fas fa-book text-blue-800 text-lg"></i>
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-book text-green-800 text-lg"></i>
                 </div>
-                <h1 class="text-xl font-bold">Psych Library</h1>
+                <h1 class="logo-text">Psych Library</h1>
             </div>
             
             <!-- User Profile Section -->
-            <div class="bg-white/10 rounded-xl p-4 mb-8">
-                <div class="flex items-center mb-4">
-                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mr-3">
-                        <i class="fas fa-user text-blue-600 text-xl"></i>
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user text-green-600 text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-semibold">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</h3>
-                        <p class="text-blue-200 text-sm capitalize">{{ Auth::user()->role }}</p>
+                        <h3 class="user-name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</h3>
+                        <p class="user-role">{{ Auth::user()->role }}</p>
                     </div>
                 </div>
-                <div class="space-y-2 text-sm">
-                    <div class="flex justify-between">
-                        <span class="text-blue-200">University ID:</span>
-                        <span>{{ Auth::user()->university_id }}</span>
+                <div class="user-details">
+                    <div class="user-detail">
+                        <span class="detail-label">University ID:</span>
+                        <span class="detail-value">{{ Auth::user()->university_id }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-blue-200">Status:</span>
-                        <span class="text-green-300">{{ Auth::user()->account_status }}</span>
+                    <div class="user-detail">
+                        <span class="detail-label">Status:</span>
+                        <span class="status-active">{{ Auth::user()->account_status }}</span>
                     </div>
                 </div>
             </div>
             
             <!-- Navigation Menu -->
-            <div class="mb-8">
-                <h2 class="text-sm uppercase tracking-wider text-blue-200 mb-4">Main Navigation</h2>
-                <ul class="space-y-2">
+            <div class="nav-section">
+                <h2 class="section-title">Main Navigation</h2>
+                <ul class="nav-menu">
                     <li>
-                            <i class="fas fa-home mr-3"></i>
+                        <a href="{{ route('adminInterface.index') }}" class="nav-item hover:bg-green-700 transition">
+                            <i class="fas fa-home nav-icon"></i>
                             Dashboard
                         </a>
                     </li>
@@ -90,36 +85,36 @@
             </div>
             
             <!-- Management Sections -->
-            <div class="mb-8">
-                <h2 class="text-sm uppercase tracking-wider text-blue-200 mb-4">Management</h2>
-                <ul class="space-y-2">
+            <div class="nav-section">
+                <h2 class="section-title">Management</h2>
+                <ul class="nav-menu">
                     <li>
-                        <a href="{{ route('users.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
-                            <i class="fas fa-users mr-3"></i>
+                        <a href="{{ route('users.index') }}" class="nav-item hover:bg-green-700 transition">
+                            <i class="fas fa-users nav-icon"></i>
                             User Management
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('books.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
-                            <i class="fas fa-book-open mr-3"></i>
+                        <a href="{{ route('books.index') }}" class="nav-item hover:bg-green-700 transition">
+                            <i class="fas fa-book-open nav-icon"></i>
                             Book Management
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('theses.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
-                            <i class="fas fa-file-alt mr-3"></i>
+                        <a href="{{ route('theses.index') }}" class="nav-item hover:bg-green-700 transition">
+                            <i class="fas fa-file-alt nav-icon"></i>
                             Thesis Management
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('authors.index') }}" class="flex items-center p-3 rounded-lg active-nav">
-                            <i class="fas fa-user-edit mr-3"></i>
+                        <a href="{{ route('authors.index') }}" class="nav-item active">
+                            <i class="fas fa-user-edit nav-icon"></i>
                             Author Management
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('transactions.index') }}" class="flex items-center p-3 rounded-lg hover:bg-blue-700 transition">
-                            <i class="fas fa-exchange-alt mr-3"></i>
+                        <a href="{{ route('transactions.index') }}" class="nav-item hover:bg-green-700 transition">
+                            <i class="fas fa-exchange-alt nav-icon"></i>
                             Transactions
                         </a>
                     </li>
@@ -127,11 +122,11 @@
             </div>
             
             <!-- Logout Button -->
-            <div class="mt-auto pt-6 border-t border-blue-400">
+            <div class="logout-section">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="flex items-center w-full p-3 rounded-lg hover:bg-blue-700 transition text-left">
-                        <i class="fas fa-sign-out-alt mr-3"></i>
+                    <button type="submit" class="logout-btn">
+                        <i class="fas fa-sign-out-alt nav-icon"></i>
                         Logout
                     </button>
                 </form>
@@ -139,234 +134,191 @@
         </div>
         
         <!-- Main Content -->
-        <div id="mainContent" data-authors-count="{{ $authors->count() }}" class="flex-1 p-8">
-            <!-- Header -->
+        <div class="flex-1 p-8">
+            <!-- Header Section -->
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-800">Author Management</h1>
-                    <p class="text-gray-600 mt-2">Manage all authors in the library system</p>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <!-- Notifications -->
-                    <button class="relative p-2 text-gray-600 hover:text-blue-600 transition">
-                        <i class="fas fa-bell text-xl"></i>
-                        <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
-                    </button>
-                    
-                    <!-- Messages -->
-                    <button class="relative p-2 text-gray-600 hover:text-blue-600 transition">
-                        <i class="fas fa-envelope text-xl"></i>
-                        <span class="absolute top-0 right-0 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">2</span>
-                    </button>
+                
+                <div>
+                    <a href="{{ route('authors.create') }}" class="add-author-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
+                        <i class="fas fa-plus-circle mr-2"></i>
+                        Add New Author
+                    </a>
                 </div>
             </div>
-            
+
             <!-- Success Message -->
             @if(session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                    <div class="flex justify-between items-center">
-                        <span>{{ session('success') }}</span>
-                        <button onclick="this.parentElement.parentElement.style.display='none'" class="text-green-700 hover:text-green-900">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    {{ session('success') }}
                 </div>
             @endif
-            
-            <!-- Search and Add Author Section -->
-            <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div class="w-full md:w-1/2">
+
+            <!-- Search and Filter Section -->
+            <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Search -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Search Authors</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
-                            <input 
-                                type="text" 
-                                id="searchInput" 
-                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
-                                placeholder="Search authors by name..."
-                            >
+                            <input type="text" id="searchInput" placeholder="Search by name..." 
+                                   class="pl-10 w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                     </div>
+                    
+                    <!-- First Name Filter -->
                     <div>
-                        <a href="{{ route('authors.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
-                            <i class="fas fa-plus mr-2"></i>
-                            Add New Author
-                        </a>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <select id="firstNameFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">All First Names</option>
+                            @foreach($authors->pluck('first_name')->unique()->sort() as $firstName)
+                                <option value="{{ $firstName }}">{{ $firstName }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <!-- Last Name Filter -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <select id="lastNameFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">All Last Names</option>
+                            @foreach($authors->pluck('last_name')->unique()->sort() as $lastName)
+                                <option value="{{ $lastName }}">{{ $lastName }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex items-end space-x-2">
+                        <button id="filterButton" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex-1 transition">
+                            Apply Filters
+                        </button>
+                        <button id="resetButton" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition">
+                            Reset
+                        </button>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Authors Table -->
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800">Authors List</h2>
-                    <p class="text-gray-600 text-sm mt-1" id="authorCount">Showing {{ $authors->count() }} authors</p>
-                </div>
-                
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="authorsTableBody" class="bg-white divide-y divide-gray-200">
-                            @foreach ($authors as $author)
-                                <tr class="hover:bg-gray-50 transition">
+                        <tbody class="bg-white divide-y divide-gray-200" id="authorsTableBody">
+                            @forelse ($authors as $author)
+                                <tr class="table-row-hover author-row" 
+                                    data-firstname="{{ strtolower($author->first_name) }}"
+                                    data-lastname="{{ strtolower($author->last_name) }}"
+                                    data-fullname="{{ strtolower($author->first_name . ' ' . $author->last_name) }}">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $author->id }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 author-first-name">{{ $author->first_name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 author-last-name">{{ $author->last_name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $author->first_name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $author->last_name }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('authors.edit', $author->id) }}" class="text-blue-600 hover:text-blue-900 transition">
-                                                <i class="fas fa-edit mr-1"></i> Edit
+                                            <a href="{{ route('authors.edit', $author->id) }}" 
+                                               class="text-yellow-600 hover:text-yellow-900 action-btn" 
+                                               title="Edit">
+                                                <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="{{ route('authors.destroy', $author->id) }}" method="POST" class="inline" onsubmit="return confirmDelete()">
+                                            
+                                            <a href="{{ route('authors.show', $author->id) }}" 
+                                               class="text-blue-600 hover:text-blue-900 action-btn" 
+                                               title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            <form action="{{ route('authors.destroy', $author->id) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900 transition">
-                                                    <i class="fas fa-trash mr-1"></i> Delete
+                                                <button type="submit" 
+                                                        onclick="return confirm('Are you sure you want to delete this author?');"
+                                                        class="text-red-600 hover:text-red-900 action-btn" 
+                                                        title="Delete">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-6 py-12 text-center">
+                                        <div class="flex flex-col items-center justify-center text-gray-400">
+                                            <i class="fas fa-user-edit text-5xl mb-4"></i>
+                                            <h3 class="text-lg font-medium mb-2">No authors found</h3>
+                                            <p class="mb-4">Get started by adding your first author</p>
+                                            <div class="flex space-x-3">
+                                                <a href="{{ route('authors.create') }}" class="add-author-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
+                                                    <i class="fas fa-plus-circle mr-2"></i>
+                                                    Add New Author
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-                
-                <!-- Empty State -->
-                <div id="emptyState" class="hidden p-12 text-center">
-                    <div class="mx-auto w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                        <i class="fas fa-user-edit text-gray-400 text-2xl"></i>
-                    </div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">No authors found</h3>
-                    <p class="text-gray-500 mb-6">Try adjusting your search or add a new author.</p>
-                    <a href="{{ route('authors.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium inline-flex items-center transition">
-                        <i class="fas fa-plus mr-2"></i>
-                        Add New Author
-                    </a>
-                </div>
             </div>
+
+            <!-- Pagination would go here -->
         </div>
     </div>
 
     <script>
-        // Fuzzy search function
-        function fuzzySearch(query, text) {
-            query = query.toLowerCase();
-            text = text.toLowerCase();
-            
-            let queryIndex = 0;
-            let textIndex = 0;
-            
-            while (textIndex < text.length) {
-                if (text[textIndex] === query[queryIndex]) {
-                    queryIndex++;
-                    if (queryIndex === query.length) {
-                        return true;
-                    }
-                }
-                textIndex++;
-            }
-            
-            return false;
-        }
-
-        // Highlight matching text
-        function highlightText(text, query) {
-            if (!query) return text;
-            
-            const regex = new RegExp(`(${query})`, 'gi');
-            return text.replace(regex, '<span class="highlight">$1</span>');
-        }
-
-        // Search functionality
-        function handleSearch() {
-            const searchInput = document.getElementById('searchInput');
-            const query = searchInput.value.trim();
-            const tableBody = document.getElementById('authorsTableBody');
-            const rows = tableBody.getElementsByTagName('tr');
-            const emptyState = document.getElementById('emptyState');
-            const authorCount = document.getElementById('authorCount');
-            
-            let visibleCount = 0;
-            
-            if (query === '') {
-                // Show all rows
-                for (let row of rows) {
-                    row.style.display = '';
-                    // Remove any existing highlights
-                    const firstNameCell = row.querySelector('.author-first-name');
-                    const lastNameCell = row.querySelector('.author-last-name');
-                    
-                    if (firstNameCell && lastNameCell) {
-                        firstNameCell.innerHTML = firstNameCell.textContent;
-                        lastNameCell.innerHTML = lastNameCell.textContent;
-                    }
-                }
-                visibleCount = rows.length;
-            } else {
-                // Filter rows based on search
-                for (let row of rows) {
-                    const firstNameCell = row.querySelector('.author-first-name');
-                    const lastNameCell = row.querySelector('.author-last-name');
-                    
-                    if (firstNameCell && lastNameCell) {
-                        const firstName = firstNameCell.textContent;
-                        const lastName = lastNameCell.textContent;
-                        const fullName = `${firstName} ${lastName}`.toLowerCase();
-                        
-                        if (fuzzySearch(query, fullName)) {
-                            row.style.display = '';
-                            visibleCount++;
-                            
-                            // Highlight matching text
-                            firstNameCell.innerHTML = highlightText(firstName, query);
-                            lastNameCell.innerHTML = highlightText(lastName, query);
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    }
-                }
-            }
-            
-            // Update author count and show/hide empty state
-            authorCount.textContent = `Showing ${visibleCount} authors`;
-            
-            if (visibleCount === 0) {
-                emptyState.classList.remove('hidden');
-                tableBody.parentElement.classList.add('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                tableBody.parentElement.classList.remove('hidden');
-            }
-        }
-
-        // Delete confirmation
-        function confirmDelete() {
-            return confirm('Are you sure you want to delete this author?');
-        }
-
-        // Initialize page
+        // Filter functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Set up search input event listener
             const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', handleSearch);
-            
-            // Check if we should show empty state initially (read from data-attribute to avoid Blade in JS)
-            const mainContent = document.getElementById('mainContent');
-            const authorsCount = parseInt(mainContent?.dataset?.authorsCount || 0, 10);
-            if (authorsCount === 0) {
-                document.getElementById('emptyState').classList.remove('hidden');
-                document.getElementById('authorsTableBody').parentElement.classList.add('hidden');
+            const firstNameFilter = document.getElementById('firstNameFilter');
+            const lastNameFilter = document.getElementById('lastNameFilter');
+            const filterButton = document.getElementById('filterButton');
+            const resetButton = document.getElementById('resetButton');
+            const authorRows = document.querySelectorAll('.author-row');
+
+            function filterAuthors() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const firstNameValue = firstNameFilter.value.toLowerCase();
+                const lastNameValue = lastNameFilter.value.toLowerCase();
+
+                authorRows.forEach(row => {
+                    const firstname = row.getAttribute('data-firstname');
+                    const lastname = row.getAttribute('data-lastname');
+                    const fullname = row.getAttribute('data-fullname');
+
+                    const matchesSearch = fullname.includes(searchTerm);
+                    const matchesFirstName = !firstNameValue || firstname.includes(firstNameValue);
+                    const matchesLastName = !lastNameValue || lastname.includes(lastNameValue);
+
+                    row.style.display = (matchesSearch && matchesFirstName && matchesLastName) ? '' : 'none';
+                });
             }
+
+            filterButton.addEventListener('click', filterAuthors);
+            
+            resetButton.addEventListener('click', function() {
+                searchInput.value = '';
+                firstNameFilter.value = '';
+                lastNameFilter.value = '';
+                authorRows.forEach(row => row.style.display = '');
+            });
+
+            // Real-time search
+            searchInput.addEventListener('input', filterAuthors);
         });
     </script>
 </body>
