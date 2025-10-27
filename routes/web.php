@@ -64,7 +64,6 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin,super-admin'])->group(function () {
         // Full CRUD for users and authors
         Route::resource('users', UserController::class);
-        Route::resource('authors', AuthorController::class);
         
         //export users
         Route::get('/export/users/{query}', [ReportExportController::class, 'exportUser'])->name('export.users');
@@ -86,9 +85,10 @@ Route::middleware(['auth'])->group(function () {
 
     // ========== LIBRARIAN, ADMIN & SUPER-ADMIN ROUTES ==========
     Route::middleware(['role:librarian,admin,super-admin'])->group(function () {
-        // Full CRUD for books and theses (create, edit, delete, etc.)
+        // Full CRUD for books theses and authors (create, edit, delete, etc.)
         Route::resource('books', BookController::class)->except(['index', 'show']);
         Route::resource('theses', ThesisController::class)->except(['index', 'show']);
+        Route::resource('authors', AuthorController::class);
 
         // Transactions: librarians manage transactions
         Route::resource('transactions', TransactionController::class);
