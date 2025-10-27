@@ -19,12 +19,21 @@ class AuthServiceProvider extends ServiceProvider
     /**
      * Register any authentication / authorization services.
      */
-    public function boot(): void
+    public function boot()
     {
         $this->registerPolicies();
 
+        Gate::define('view-profile', function ($user, $profileUser = null) {
+            // Users can always view their own profile
+            if ($profileUser && $user->id === $profileUser->id) {
+                return true;
+            }
+            // Admins can view any profile
+            return $user->role === 'admin' || $user->role === 'super-admin';
+        });
+
         Gate::define('manage-users', function ($user) {
-            return in_array($user->role, ['admin', 'super-admin']);
+            return $user->role === 'admin' || $user->role === 'super-admin';
         });
     }
 }

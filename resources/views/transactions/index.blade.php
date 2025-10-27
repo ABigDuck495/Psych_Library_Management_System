@@ -218,7 +218,7 @@
                         <i class="fas fa-clock mr-2"></i>
                         View Requested Books
                     </a>
-                    <a href="{{ route('transactions.overdue') }}" class="action-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
+                    <a href="{{ route('export.transactions', 'overdue') }}" class="action-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
                         <i class="fas fa-exclamation-triangle mr-2"></i>
                         Overdue Report
                     </a>
