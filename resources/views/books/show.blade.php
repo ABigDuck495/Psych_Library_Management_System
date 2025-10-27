@@ -18,11 +18,11 @@
 
         <!-- Book Details Card -->
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Book Information -->
-                <div>
+                <div class="lg:col-span-2">
                     <h3 class="text-xl font-semibold text-gray-800 mb-4">Book Information</h3>
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-600">Authors</label>
                             <p class="mt-1 text-gray-800">
@@ -42,6 +42,10 @@
                             <p class="mt-1 text-gray-800 font-semibold">
                                 {{ $book->availableCopies()->count() }}
                             </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600">Description</label>
+                            <p class="mt-1 text-gray-800 leading-relaxed">{{ $book->description }}</p>
                         </div>
                     </div>
                 </div>

@@ -43,7 +43,7 @@
 @endpush
 
 @section('content')
-<div class="flex-1 p-8">
+<div class="p-8">
     <!-- Header Section -->
     <div class="flex justify-between items-center mb-8">
         <div>
@@ -66,7 +66,7 @@
         </div>
     @endif
 
-    <!-- Export Buttons - Updated to match Authors Management style -->
+    <!-- Export Buttons -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
         <div class="flex flex-wrap gap-4">
             <a href="{{ route('export.books') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
@@ -81,7 +81,6 @@
                 <i class="fas fa-download mr-2"></i>
                 Export 2023 Books
             </a>
-            <!-- You can add more export buttons here as needed -->
         </div>
     </div>
 
@@ -105,10 +104,28 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
                 <select id="categoryFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">All Categories</option>
-                    <option value="Psychology">Psychology</option>
-                    <option value="Research">Research</option>
-                    <option value="Academic">Academic</option>
-                    <option value="Textbook">Textbook</option>
+                    <option value="Agriculture">Agriculture</option>
+                    <option value="Auxiliary Siences of History">Auxiliary Siences of History</option>
+                    <option value="Bibliography, Library Science, General Information Resources">Bibliography, Library Science, General Information Resources</option>
+                    <option value="Education">Education</option>
+                    <option value="Fine Arts">Fine Arts</option>
+                    <option value="General Works">General Works</option>
+                    <option value="Geography, Anthropology, Recreation">Geography, Anthropology, Recreation</option>
+                    <option value="History of the Americas (Local and Latin America)">History of the Americas (Local and Latin America)</option>
+                    <option value="History of the Americas (United States)">History of the Americas (United States)</option>
+                    <option value="Language and Literature">Language and Literature</option>
+                    <option value="Law">Law</option>
+                    <option value="Medicine">Medicine</option>
+                    <option value="Military Science">Military Science</option>
+                    <option value="Music">Music</option>
+                    <option value="Naval Science">Naval Science</option>
+                    <option value="Philosophy, Psychology, Religion">Philosophy, Psychology, Religion</option>
+                    <option value="Political Science">Political Science</option>
+                    <option value="Science">Science</option>
+                    <option value="Social Sciences">Social Sciences</option>
+                    <option value="Technology">Technology</option>
+                    <option value="World Sciences">World Sciences</option>
+
                 </select>
             </div>
             
@@ -160,17 +177,12 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $book->id }}</td>
                             <td class="px-6 py-4 text-sm font-medium text-gray-900 max-w-xs">{{ $book->title }}</td>
                             <td class="px-6 py-4 text-sm text-gray-500 max-w-md">
-                                <div class="description-container">
-                                    <div class="description-preview" id="preview-{{ $book->id }}">
-                                        {{ $book->description }}
-                                    </div>
-                                    @if(strlen($book->description) > 150)
-                                        <button class="text-blue-600 text-xs mt-1 hover:text-blue-800 focus:outline-none show-more-btn" 
-                                                data-book-id="{{ $book->id }}">
-                                            Show more
-                                        </button>
-                                    @endif
-                                </div>
+                                <div class="description-preview">{{ $book->description }}</div>
+                                <a href="{{ route('books.show', $book->id) }}" 
+                                   class="text-blue-600 text-xs mt-1 hover:text-blue-800 focus:outline-none inline-flex items-center">
+                                    Show more
+                                    <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                                </a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <span class="bg-blue-100 text-blue-800 category-badge">
@@ -251,32 +263,11 @@
         </div>
     </div>
 
-    <!-- Pagination would go here -->
 </div>
 @endsection
 
 @push('scripts')
 <script>
-    // Toggle description visibility with improved functionality
-    function toggleDescription(bookId) {
-        const previewElement = document.getElementById(`preview-${bookId}`);
-        const button = document.querySelector(`.show-more-btn[data-book-id="${bookId}"]`);
-        
-        if (previewElement && button) {
-            if (previewElement.classList.contains('description-preview')) {
-                // Show full description
-                previewElement.classList.remove('description-preview');
-                previewElement.style.webkitLineClamp = 'unset';
-                button.textContent = 'Show less';
-            } else {
-                // Show preview
-                previewElement.classList.add('description-preview');
-                previewElement.style.webkitLineClamp = '3';
-                button.textContent = 'Show more';
-            }
-        }
-    }
-
     // Filter functionality
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('searchInput');
@@ -285,14 +276,6 @@
         const filterButton = document.getElementById('filterButton');
         const resetButton = document.getElementById('resetButton');
         const bookRows = document.querySelectorAll('.book-row');
-
-        // Add event listeners to all show more buttons
-        document.querySelectorAll('.show-more-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const bookId = this.getAttribute('data-book-id');
-                toggleDescription(bookId);
-            });
-        });
 
         function filterBooks() {
             const searchTerm = searchInput.value.toLowerCase();
