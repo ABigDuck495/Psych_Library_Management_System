@@ -366,17 +366,17 @@
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Department</label>
-                            <p class="text-gray-800 font-medium">{{ $user->department ?? 'Not Specified' }}</p>
+                            <p class="text-gray-800 font-medium">{{ $user->employee->department ?? 'Not Specified' }}</p>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Position Title</label>
-                            <p class="text-gray-800 font-medium">{{ $user->position_title ?? 'Not Specified' }}</p>
+                            <p class="text-gray-800 font-medium">{{ $user->employee->position_title ?? 'Not Specified' }}</p>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-500 mb-1">Employee ID</label>
-                            <p class="text-gray-800 font-medium">{{ $user->employee_id ?? 'Not Specified' }}</p>
+                            <p class="text-gray-800 font-medium">{{ $user->university_id ?? 'Not Specified' }}</p>
                         </div>
                         
                         <div>
