@@ -38,59 +38,56 @@ class ThesisController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'title' => 'required|string|max:500',
-        'abstract' => 'required|string',
-        'year_published' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
-        'department' => 'required|string',
-        'authors' => 'required|array|min:1',
-        'authors.*.first_name' => 'required|string|max:255',
-        'authors.*.last_name' => 'required|string|max:255',
-        'authors.*.middle_name' => 'nullable|string|max:255',
-        'authors.*.appellation' => 'nullable|string|max:50',
-        'authors.*.extension' => 'nullable|string|max:50',
-        'copies_count' => 'required|integer|min:1'
-    ]);
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:500',
+            'abstract' => 'required|string',
+            'year_published' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
+            'department' => 'required|string',
+            'authors' => 'required|array|min:1',
+            'authors.*.first_name' => 'required|string|max:255',
+            'authors.*.last_name' => 'required|string|max:255',
+            'copies_count' => 'required|integer|min:1'
+        ]);
 
-    DB::transaction(function () use ($validated) {
-        $copiesCount = $validated['copies_count'];
-        $authorsData = $validated['authors'];
-        
-        // Remove non-thesis fields
-        $thesisData = collect($validated)->except(['copies_count', 'authors'])->toArray();
+        DB::transaction(function () use ($validated) {
+            // Extract copies_count and authors before creating thesis
+            $copiesCount = $validated['copies_count'];
+            $authorsData = $validated['authors'];
+            
+            // Remove non-thesis fields from validated data
+            $thesisData = collect($validated)
+                ->except(['copies_count', 'authors'])
+                ->toArray();
 
-        // Create thesis
-        $thesis = Thesis::create($thesisData);
+            // Create the thesis
+            $thesis = Thesis::create($thesisData);
 
-        // Create or find authors
-        foreach ($authorsData as $authorData) {
-            $author = Author::firstOrCreate([
-                'first_name'   => $authorData['first_name'],
-                'last_name'    => $authorData['last_name'],
-                'middle_name'  => $authorData['middle_name'] ?? null,
-                'appellation'  => $authorData['appellation'] ?? null,
-                'extension'    => $authorData['extension'] ?? null,
-            ]);
-            $thesis->authors()->attach($author->id);
-        }
+            // Create authors dynamically
+            foreach ($authorsData as $authorData) {
+                $author = Author::firstOrCreate([
+                    'first_name' => $authorData['first_name'],
+                    'last_name' => $authorData['last_name'],
+                ]);
+                $thesis->authors()->attach($author->id);
+            }
 
-        // Create thesis copies
-        for ($i = 0; $i < $copiesCount; $i++) {
-            ThesisCopy::create([
-                'thesis_id' => $thesis->id,
-                'is_available' => true
-            ]);
-        }
-    });
+            // Create thesis copies with the thesis_id
+            for ($i = 0; $i < $copiesCount; $i++) {
+                ThesisCopy::create([
+                    'thesis_id' => $thesis->id,  
+                    'is_available' => true
+                ]);
+            }
+        });
 
-    return redirect()->route('theses.index')->with('success', 'Thesis added successfully.');
-}
+        return redirect()->route('theses.index')->with('success', 'Thesis added successfully.');
+    }
 
 
     public function show(Thesis $thesis)
     {
-        $thesis->load('authors');
+        $thesis->load('authors', 'copies');
         return view('theses.show', compact('thesis'));
     }
 
@@ -120,7 +117,7 @@ class ThesisController extends Controller
 
             // Sync authors
             if (!empty($validated['author_ids'])) {
-                $thesis->syncAuthors($validated['author_ids']);
+                $thesis->authors()->sync($validated['author_ids']);
             }
 
             // Update copies
@@ -130,13 +127,24 @@ class ThesisController extends Controller
 
                 if ($desired > $existing) {
                     for ($i = 0; $i < ($desired - $existing); $i++) {
-                        ThesisCopy::create(['thesis_id' => $thesis->id, 'is_available' => true]);
+                        ThesisCopy::create([
+                            'thesis_id' => $thesis->id, 
+                            'is_available' => true
+                        ]);
                     }
                 } elseif ($desired < $existing) {
-                    ThesisCopy::where('thesis_id', $thesis->id)
-                              ->where('is_available', true)
-                              ->limit($existing - $desired)
-                              ->delete();
+                    // Only delete available copies that aren't currently borrowed
+                    $availableCopies = $thesis->copies()
+                        ->where('is_available', true)
+                        ->whereDoesntHave('transactions', function($query) {
+                            $query->whereIn('transaction_status', ['requested', 'approved', 'borrowed']);
+                        })
+                        ->limit($existing - $desired)
+                        ->get();
+
+                    foreach ($availableCopies as $copy) {
+                        $copy->delete();
+                    }
                 }
             }
         });
@@ -147,7 +155,11 @@ class ThesisController extends Controller
     public function destroy(Thesis $thesis)
     {
         DB::transaction(function () use ($thesis) {
+            // Delete copies first
             $thesis->copies()->delete();
+            // Detach authors
+            $thesis->authors()->detach();
+            // Delete thesis
             $thesis->delete();
         });
 
@@ -159,35 +171,5 @@ class ThesisController extends Controller
         return ThesisCopy::where('thesis_id', $thesisId)
             ->where('is_available', true)
             ->count();
-    }
-
-    public function request(Request $request, Thesis $thesis)
-    {
-        $user = auth()->user();
-        if (!$user) {
-            return view('auth.login');
-        }
-
-        $availableCopy = $thesis->getNextAvailableCopy();
-        if (!$availableCopy) {
-            return redirect()->back()->with('error', 'No available copies found for this thesis.');
-        }
-
-        DB::transaction(function () use ($user, $availableCopy) {
-            Transaction::create([
-                'user_id' => $user->id,
-                'copy_id' => $availableCopy->id,
-                'copy_type' => get_class($availableCopy),
-                'borrow_date' => now(),
-                'due_date' => now()->addDays(7),
-                'return_date' => null,
-                'transaction_status' => 'requested',
-            ]);
-
-            $availableCopy->is_available = false;
-            $availableCopy->save();
-        });
-
-        return redirect()->route('theses.index')->with('success', 'Thesis request submitted successfully. Please wait for approval.');
     }
 }

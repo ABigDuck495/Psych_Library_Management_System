@@ -6,9 +6,9 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Penalty;
 use App\Models\BookCopy;
+use App\Models\ThesisCopy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
 
 class Transaction extends Model
 {
@@ -16,52 +16,47 @@ class Transaction extends Model
 
     protected $fillable = [
         'user_id',
-        'copy_id',
-        'borrow_date',
-        'return_date',
-        'due_date',
+        'borrowable_id',
+        'borrowable_type',
         'transaction_status',
-        'copy_type'
+        'borrow_date',
+        'due_date',
+        'return_date',
     ];
 
     protected $casts = [
         'borrow_date' => 'datetime',
-        'return_date' => 'datetime',
         'due_date' => 'datetime',
+        'return_date' => 'datetime',
     ];
 
+    // Fixed: Added proper foreign key
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function bookCopy()
+    // Fixed: Correct polymorphic relationship
+    public function borrowable()
     {
-        return $this->belongsTo(BookCopy::class, 'copy_id');
+        return $this->morphTo();
     }
 
-    public function thesisCopy()
-    {
-        return $this->belongsTo(ThesisCopy::class, 'copy_id');
-    }
-
-    public function copy()
-    {
-        return $this->morphTo(null, 'copy_type', 'copy_id');
-    }
+    // Fixed: Added proper foreign key
     public function penalty()
     {
-        return $this->hasOne(Penalty::class);
+        return $this->hasOne(Penalty::class, 'transaction_id');
     }
-    // Query scopes using the transaction_status column
+
+    // Query Scopes
     public function scopeRequested($query)
     {
         return $query->where('transaction_status', 'requested');
     }
 
-    public function scopePending($query)
+    public function scopeApproved($query)
     {
-        return $query->where('transaction_status', 'pending');
+        return $query->where('transaction_status', 'approved');
     }
 
     public function scopeBorrowed($query)
@@ -84,43 +79,91 @@ class Transaction extends Model
     ->orWhere('transaction_status', 'overdue');
 }
 
-    // Other helper methods
-    public function calculatePenalty()
+    public function scopeForUser($query, $userId)
     {
-        if ($this->transaction_status !== 'overdue' || $this->return_date) {
-            return 0;
-        }
-        $daysOverdue = now()->diffInDays($this->due_date);
-        $penaltyRate = config('library.daily_penalty_rate', 50);
-
-        return $daysOverdue * $penaltyRate;
+        return $query->where('user_id', $userId);
     }
 
+    public function scopePending($query)
+    {
+        return $query->where('transaction_status', 'requested');
+    }
+
+    // Helper Methods
     public function isOverdue(): bool
     {
-        return $this->transaction_status === 'overdue' && is_null($this->return_date) && $this->due_date->isPast();
+        return $this->transaction_status === 'borrowed' && 
+               is_null($this->return_date) && 
+               $this->due_date->isPast();
     }
-    public function getOverdueDays(){
+
+    public function getOverdueDays(): int
+    {
         if (!$this->isOverdue()) {
             return 0;
         }
+        return Carbon::now()->diffInDays($this->due_date);
+    }
 
-        return Carbon::now()->diffInDays(Carbon::parse($this->due_date));
-    }
-    public function markAsOverdue(){
-        $this->transaction_status = 'overdue';
-        $this->save();
-    }
-    public function calculatePenaltyAmount(){
+    public function calculatePenaltyAmount(): float
+    {
         $overdueDays = $this->getOverdueDays();
-        $penaltyRate = config('library.daily_penalty_rate', 50);
+        $penaltyRate = config('library.daily_penalty_rate', 20);
         return $overdueDays * $penaltyRate;
     }
-    public function markAsReturned()
+
+    public function markAsOverdue()
     {
-        $this->return_date = now();
-        $this->transaction_status = 'returned';
-        $this->save();
+        $this->update(['transaction_status' => 'overdue']);
     }
 
+    // Fixed: Added proper polymorphic handling
+    public function markAsReturned()
+    {
+        $this->update([
+            'return_date' => now(),
+            'transaction_status' => 'returned',
+        ]);
+
+        if ($this->borrowable) {
+            $this->borrowable->markAsAvailable();
+        }
+    }
+
+    public function markAsBorrowed()
+    {
+        $this->update(['transaction_status' => 'borrowed']);
+        
+        if ($this->borrowable) {
+            $this->borrowable->markAsUnavailable();
+        }
+    }
+
+    public function markAsApproved()
+    {
+        $this->update(['transaction_status' => 'borrowed']);
+    }
+
+    // Accessors
+    public function getItemTitleAttribute()
+    {
+        return $this->borrowable ? $this->borrowable->item_title : 'Unknown Item';
+    }
+
+    public function getItemTypeAttribute()
+    {
+        return $this->borrowable ? $this->borrowable->item_type : 'Unknown';
+    }
+
+    public function getIsActiveAttribute()
+    {
+        return in_array($this->transaction_status, ['requested', 'approved', 'borrowed']);
+    }
+
+    public function getCanBeRenewedAttribute()
+    {
+        return $this->transaction_status === 'borrowed' && 
+               !$this->isOverdue() &&
+               $this->due_date->diffInDays(now()) < 3;
+    }
 }
