@@ -255,7 +255,6 @@
                                     <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
                                     <option value="librarian" {{ old('role') == 'librarian' ? 'selected' : '' }}>Librarian</option>
                                     <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                                    <option value="super-admin" {{ old('role') == 'super-admin' ? 'selected' : '' }}>Super Admin</option>
                                 </select>
                             </div>
 

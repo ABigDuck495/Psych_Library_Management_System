@@ -143,8 +143,9 @@ class TransactionController extends Controller
         if (!in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian'])) {
             abort(403, 'Unauthorized action.');
         }
+        $users = User::all();
 
-        return view('transactions.create');
+        return view('transactions.create', compact('users'));    
     }
 
     public function store(Request $request)
@@ -237,6 +238,12 @@ class TransactionController extends Controller
         }]);
 
         return view('transactions.show', compact('transaction'));
+    }
+    public function destroy(Transaction $transaction)
+    {
+        $transaction->delete();
+
+        return redirect()->route('transactions.index')->with('success', 'Transaction deleted.');
     }
 
     public function requestBook(Request $request, Book $book)

@@ -73,6 +73,10 @@ class User extends Authenticatable
     {
         return $this->user_type === 'employee';
     }
+    public function isLibrarian()
+    {
+        return $this->role === 'librarian';
+    }
 
     // Fixed: Added proper foreign key and status condition
     public function activeTransactions()

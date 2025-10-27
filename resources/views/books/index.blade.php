@@ -225,28 +225,31 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
+                                    @if(in_array(auth()->user()->role, ['admin', 'librarian']))
                                     <a href="{{ route('books.edit', $book->id) }}" 
-                                       class="text-yellow-600 hover:text-yellow-900 action-btn" 
-                                       title="Edit">
-                                        <i class="fas fa-edit"></i>
+                                    class="text-yellow-600 hover:text-yellow-900 action-btn" 
+                                    title="Edit">
+                                    <i class="fas fa-edit"></i>
                                     </a>
-                                    
+                                    @endif
                                     <a href="{{ route('books.show', $book->id) }}" 
                                        class="text-blue-600 hover:text-blue-900 action-btn" 
                                        title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
+                                    @if (in_array(auth()->user()->role, ['admin', 'librarian']))
 
-                                    <form action="{{ route('books.destroy', $book->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                onclick="return confirm('Are you sure you want to delete this book?');"
-                                                class="text-red-600 hover:text-red-900 action-btn" 
-                                                title="Delete">
+                                        <form action="{{ route('books.destroy', $book->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                            onclick="return confirm('Are you sure you want to delete this book?');"
+                                            class="text-red-600 hover:text-red-900 action-btn" 
+                                            title="Delete">
                                             <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

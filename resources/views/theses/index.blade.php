@@ -316,28 +316,30 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('theses.edit', $thesis->id) }}" 
-                                               class="text-yellow-600 hover:text-yellow-900 action-btn" 
-                                               title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            
+                                            @if(in_array(auth()->user()->role, ['admin', 'librarian']))
+                                                <a href="{{ route('theses.edit', $thesis->id) }}" 
+                                                class="text-yellow-600 hover:text-yellow-900 action-btn" 
+                                                title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            @endif
                                             <a href="{{ route('theses.show', $thesis->id) }}" 
                                                class="text-blue-600 hover:text-blue-900 action-btn" 
                                                title="View">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-
-                                            <form action="{{ route('theses.destroy', $thesis->id) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" 
-                                                        onclick="return confirm('Are you sure you want to delete this thesis?');"
-                                                        class="text-red-600 hover:text-red-900 action-btn" 
-                                                        title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            @if(in_array(auth()->user()->role, ['admin', 'librarian']))
+                                                <form action="{{ route('theses.destroy', $thesis->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            onclick="return confirm('Are you sure you want to delete this thesis?');"
+                                                            class="text-red-600 hover:text-red-900 action-btn" 
+                                                            title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
