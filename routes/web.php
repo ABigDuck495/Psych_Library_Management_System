@@ -10,12 +10,12 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ReportExportController;
+use App\Http\Controllers\Admin\LoginAttemptController;
 
 //Role Based Access Control Controllers
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserInterfaceController;
 use App\Http\Controllers\AdminInterfaceController;
-use App\Http\Controllers\Admin\LoginAttemptController;
 use App\Http\Controllers\LibrarianInterfaceController;
 
 // Login routes
@@ -56,10 +56,14 @@ Route::get('/whoami', function () {
     }
     return 'Not logged in';
 });
-
 Route::middleware(['auth', 'role:user'])->get('/test', function () {
     return 'Access granted to user role!';
 });
+
+Route::get('/users/self/edit', [UserController::class, 'editSelf'])
+    ->middleware('auth')
+    ->name('users.editSelf');
+
 
 Route::middleware(['auth'])->group(function () {
     // ========== ADMIN & SUPER-ADMIN ROUTES (Most Specific) ==========
@@ -144,6 +148,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/borrowing-history', [UserInterfaceController::class, 'borrowingHistory'])
         ->name('userInterface.borrowingHistory');
 
+        //profile edit
+        // Route::get('/users/self/edit', [UserController::class, 'editSelf'])->name('users.editSelf');
     });
 });
 

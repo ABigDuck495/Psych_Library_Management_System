@@ -17,7 +17,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('can:manage-users')->except(['index', 'show']);
+        $this->middleware('can:manage-users')->except(['index', 'show','editSelf']);
     }
 
     public function index()
@@ -140,11 +140,26 @@ class UserController extends Controller
         return view('users.show', compact('user', 'details'));
     }
 
-    public function edit($id)
+   public function edit($id)
     {
+        $authUser = auth()->user();
+        
+        // Allow access if user is admin OR editing their own profile
+        if ($authUser->role !== 'admin' && $authUser->id != (int)$id) {
+            abort(403);
+        }
+
         $user = User::with(['student', 'employee'])->findOrFail($id);
         return view('users.edit', compact('user'));
     }
+
+    public function editSelf()
+    {
+        $authUser = auth()->user();
+        // This will call edit() with the user's own ID, which now passes the check
+        return $this->edit($authUser->id);
+    }
+
 
     public function update(Request $request, $id)
     {

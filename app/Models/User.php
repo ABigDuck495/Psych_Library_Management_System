@@ -47,6 +47,7 @@ class User extends Authenticatable
     {
         return $this->hasOne(Employee::class, 'id', 'id');
     }
+    
 
     // Fixed: Added proper foreign key
     public function transactions()
