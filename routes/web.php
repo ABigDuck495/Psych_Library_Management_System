@@ -67,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('authors', AuthorController::class);
         
         //export users
-        Route::get('/export/users/{query}', [ReportExportController::class, 'exportUser'])->name('users.export');
+        Route::get('/export/users/{query}', [ReportExportController::class, 'exportUser'])->name('export.users');
         
         Route::patch('/users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
         Route::patch('/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('users.deactivate');
