@@ -146,15 +146,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
                                     <a href="{{ route('authors.edit', $author->id) }}" 
-                                       class="text-yellow-600 hover:text-yellow-900 action-btn" 
+                                       class="text-yellow-600 hover:text-yellow-900 action-btn p-2 text-lg inline-flex items-center justify-center" 
                                        title="Edit">
                                         <i class="fas fa-edit"></i>
-                                    </a>
-                                    
-                                    <a href="{{ route('authors.show', $author->id) }}" 
-                                       class="text-blue-600 hover:text-blue-900 action-btn" 
-                                       title="View">
-                                        <i class="fas fa-eye"></i>
                                     </a>
 
                                     <form action="{{ route('authors.destroy', $author->id) }}" method="POST" class="inline">
@@ -162,7 +156,7 @@
                                         @method('DELETE')
                                         <button type="submit" 
                                                 onclick="return confirm('Are you sure you want to delete this author?');"
-                                                class="text-red-600 hover:text-red-900 action-btn" 
+                                                class="text-red-600 hover:text-red-900 action-btn p-2 text-lg inline-flex items-center justify-center" 
                                                 title="Delete">
                                             <i class="fas fa-trash"></i>
                                         </button>
