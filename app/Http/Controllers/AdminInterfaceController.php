@@ -19,24 +19,32 @@ class AdminInterfaceController extends Controller
 
     public function index()
     {
+        // Fetch recent 5 transactions with related user info
+        $recentTransactions = Transaction::with([
+        'bookCopy.book', // Load related book title
+        'thesisCopy.thesis', // Load related thesis title
+    ])
+    ->latest()
+    ->take(5)
+    ->get();
 
-        $recentTransactions = Transaction::latest()->take(5)->get();
         $totalBooks = Book::count();
         $totalTheses = Thesis::count();
         $activeUsers = User::where('account_status', 'active')->count();
 
+        // Stats
         $borrowedBooks = Transaction::borrowed()->count();
-        $pendingBorrowings = Transaction::pending()->count();
-        $overdueBooks = Transaction::overdue()->count();
+        $pendingRequests = Transaction::where('transaction_status', 'requested')->count(); 
+        $overdueItems = Transaction::overdue()->count();
 
         return view('adminInterface.index', compact(
             'totalBooks',
             'totalTheses',
             'activeUsers',
             'borrowedBooks',
-            'pendingBorrowings',
-            'overdueBooks',
-            'recentTransactions' 
+            'pendingRequests',
+            'overdueItems',
+            'recentTransactions'
         ));
     }
 }

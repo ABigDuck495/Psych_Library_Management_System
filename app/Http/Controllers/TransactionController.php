@@ -280,4 +280,21 @@ class TransactionController extends Controller
 
         return redirect()->back()->with('success', 'Transaction marked as overdue.');
     }
+
+    public function bookCopy()
+    {
+        return $this->belongsTo(BookCopy::class, 'copy_id', 'id');
+    }
+
+    // 🔹 Thesis Copy Relation
+    public function thesisCopy()
+    {
+        return $this->belongsTo(ThesisCopy::class, 'copy_id', 'id');
+    }
+
+    // 🔹 User Relation
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

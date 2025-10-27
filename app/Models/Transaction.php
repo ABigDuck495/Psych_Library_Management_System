@@ -37,14 +37,12 @@ class Transaction extends Model
 
     public function bookCopy()
     {
-        return $this->belongsTo(BookCopy::class, 'copy_id')
-            ->where('copy_type', BookCopy::class);
+        return $this->belongsTo(BookCopy::class, 'copy_id');
     }
 
     public function thesisCopy()
     {
-        return $this->belongsTo(ThesisCopy::class, 'copy_id')
-            ->where('copy_type', ThesisCopy::class);
+        return $this->belongsTo(ThesisCopy::class, 'copy_id');
     }
 
     public function copy()
@@ -77,11 +75,14 @@ class Transaction extends Model
     }
 
     public function scopeOverdue($query)
-    {
-        return $query->where('transaction_status', 'borrowed')
-                     ->where('due_date', '<', Carbon::now())
-                     ->whereNull('return_date');
-    }
+{
+    return $query->where(function ($q) {
+        $q->where('transaction_status', 'borrowed')
+          ->where('due_date', '<', Carbon::now())
+          ->whereNull('return_date');
+    })
+    ->orWhere('transaction_status', 'overdue');
+}
 
     // Other helper methods
     public function calculatePenalty()

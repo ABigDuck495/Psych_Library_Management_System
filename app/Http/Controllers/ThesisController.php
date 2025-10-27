@@ -47,35 +47,38 @@ class ThesisController extends Controller
         'authors' => 'required|array|min:1',
         'authors.*.first_name' => 'required|string|max:255',
         'authors.*.last_name' => 'required|string|max:255',
+        'authors.*.middle_name' => 'nullable|string|max:255',
+        'authors.*.appellation' => 'nullable|string|max:50',
+        'authors.*.extension' => 'nullable|string|max:50',
         'copies_count' => 'required|integer|min:1'
     ]);
 
     DB::transaction(function () use ($validated) {
-        // Extract copies_count and authors before creating thesis
         $copiesCount = $validated['copies_count'];
         $authorsData = $validated['authors'];
         
-        // Remove non-thesis fields from validated data
-        $thesisData = collect($validated)
-            ->except(['copies_count', 'authors'])
-            ->toArray();
+        // Remove non-thesis fields
+        $thesisData = collect($validated)->except(['copies_count', 'authors'])->toArray();
 
-        // Create the thesis
+        // Create thesis
         $thesis = Thesis::create($thesisData);
 
-        // Create authors dynamically
+        // Create or find authors
         foreach ($authorsData as $authorData) {
             $author = Author::firstOrCreate([
-                'first_name' => $authorData['first_name'],
-                'last_name' => $authorData['last_name'],
+                'first_name'   => $authorData['first_name'],
+                'last_name'    => $authorData['last_name'],
+                'middle_name'  => $authorData['middle_name'] ?? null,
+                'appellation'  => $authorData['appellation'] ?? null,
+                'extension'    => $authorData['extension'] ?? null,
             ]);
             $thesis->authors()->attach($author->id);
         }
 
-        // Create thesis copies with the thesis_id
+        // Create thesis copies
         for ($i = 0; $i < $copiesCount; $i++) {
             ThesisCopy::create([
-                'thesis_id' => $thesis->id,  
+                'thesis_id' => $thesis->id,
                 'is_available' => true
             ]);
         }
@@ -83,6 +86,7 @@ class ThesisController extends Controller
 
     return redirect()->route('theses.index')->with('success', 'Thesis added successfully.');
 }
+
 
     public function show(Thesis $thesis)
     {

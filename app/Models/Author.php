@@ -11,7 +11,14 @@ class Author extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['first_name', 'last_name'];
+    protected $fillable = 
+    [
+        'first_name', 
+        'last_name',
+        'middle_name',
+        'appellation',
+        'extension',
+    ];
     protected $table = 'authors';
 
     // Relationships
@@ -28,7 +35,15 @@ class Author extends Model
     // Accessors
     public function getFullNameAttribute(): string
     {
-        return "{$this->first_name} {$this->last_name}";
+        $parts = array_filter([
+            $this->appellation,
+            $this->first_name,
+            $this->middle_name,
+            $this->last_name,
+            $this->extension,
+        ]);
+
+        return implode(' ', $parts);
     }
 
     public function getBookCountAttribute(): int

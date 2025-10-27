@@ -362,21 +362,40 @@
     </div>
 
     <!-- Dynamic Author Fields -->
-    <div id="authorsContainer" class="space-y-4">
-        <!-- First Author by default -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 author-row">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
-                <input type="text" name="authors[0][first_name]" placeholder="First Name" required
-                    class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
-                <input type="text" name="authors[0][last_name]" placeholder="Last Name" required
-                    class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-            </div>
+    <div id="authorsContainer" class="space-y-6">
+    <!-- First Author -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 author-row border p-4 rounded-lg bg-gray-50">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Appellation</label>
+            <input type="text" name="authors[0][appellation]" placeholder="e.g., Dr., Prof."
+                class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
+            <input type="text" name="authors[0][first_name]" placeholder="First Name" required
+                class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
+            <input type="text" name="authors[0][middle_name]" placeholder="Middle Name"
+                class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
+            <input type="text" name="authors[0][last_name]" placeholder="Last Name" required
+                class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Extension</label>
+            <input type="text" name="authors[0][extension]" placeholder="e.g., Jr., III"
+                class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
         </div>
     </div>
+</div>
 
     <!-- Add Author Button -->
     <div class="mt-4">
@@ -395,25 +414,43 @@
 
     addAuthorBtn.addEventListener('click', () => {
         const authorRow = document.createElement('div');
-        authorRow.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-2', 'gap-4', 'author-row', 'mt-2');
+        authorRow.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-2', 'gap-6', 'author-row', 'mt-2');
 
         authorRow.innerHTML = `
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
-                <input type="text" name="authors[${authorIndex}][first_name]" placeholder="First Name" required
-                    class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
-                <div class="flex">
-                    <input type="text" name="authors[${authorIndex}][last_name]" placeholder="Last Name" required
-                        class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-                    <button type="button" class="ml-2 px-3 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 remove-author-btn transition">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `;
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 author-row border p-4 rounded-lg bg-gray-50 mt-2">
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Appellation</label>
+        <input type="text" name="authors[${authorIndex}][appellation]" placeholder="e.g., Dr., Prof."
+            class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
+        <input type="text" name="authors[${authorIndex}][first_name]" placeholder="First Name" required
+            class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
+        <input type="text" name="authors[${authorIndex}][middle_name]" placeholder="Middle Name"
+            class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
+        <input type="text" name="authors[${authorIndex}][last_name]" placeholder="Last Name" required
+            class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Extension</label>
+        <div class="flex">
+            <input type="text" name="authors[${authorIndex}][extension]" placeholder="e.g., Jr., III"
+                class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
+            <button type="button" class="ml-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 remove-author-btn transition">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
+`;
+
         authorsContainer.appendChild(authorRow);
 
         // Add remove functionality

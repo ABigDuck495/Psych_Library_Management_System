@@ -49,6 +49,9 @@ class BookController extends Controller
             'category_id' => 'required|exists:categories,id',
             'authors.*.first_name' => 'required|string|max:255',
             'authors.*.last_name' => 'required|string|max:255',
+            'authors.*.middle_name' => 'nullable|string|max:255',
+            'authors.*.appellation' => 'nullable|string|max:255',
+            'authors.*.extension' => 'nullable|string|max:255',
         ]);
 
         // ✅ Set number of copies (default to 1 if empty)
@@ -75,6 +78,9 @@ class BookController extends Controller
             $author = Author::firstOrCreate([
                 'first_name' => $authorData['first_name'],
                 'last_name' => $authorData['last_name'],
+                'middle_name'  => $authorData['middle_name'] ?? null,
+                'appellation'  => $authorData['appellation'] ?? null,
+                'extension'    => $authorData['extension'] ?? null,
             ]);
             $book->authors()->attach($author->id);
         }
@@ -96,29 +102,47 @@ class BookController extends Controller
         return view('books.update', compact('book', 'categories', 'authors', 'copies_count'));
     }
 
-    public function update(Request $request, Book $book)
+     public function update(Request $request, Book $book)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'year_published' => 'required|integer|min:1900|max:' . date('Y'),
             'category_id' => 'required|exists:categories,id',
-            'author_ids' => 'sometimes|array',
-            'author_ids.*' => 'exists:authors,id',
+            'authors' => 'sometimes|array|min:1',
+            'authors.*.first_name' => 'required_with:authors|string|max:255',
+            'authors.*.last_name' => 'required_with:authors|string|max:255',
+            'authors.*.middle_name' => 'nullable|string|max:255',
+            'authors.*.appellation' => 'nullable|string|max:255',
+            'authors.*.extension' => 'nullable|string|max:255',
             'copies_count' => 'sometimes|integer|min:1'
         ]);
 
-        // Update basic fields
-        $book->update(
-            collect($validated)->only(['title', 'description', 'year_published', 'category_id'])->toArray()
-        );
+        // ✅ Update book fields
+        $book->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'year_published' => $validated['year_published'],
+            'category_id' => $validated['category_id'],
+        ]);
 
-        // Sync authors if provided
-        if ($request->has('author_ids')) {
-            $book->authors()->sync($validated['author_ids'] ?? []);
+        // ✅ Update or attach authors if provided
+        if (isset($validated['authors'])) {
+            $authorIds = [];
+            foreach ($validated['authors'] as $authorData) {
+                $author = Author::firstOrCreate([
+                    'first_name'   => $authorData['first_name'],
+                    'last_name'    => $authorData['last_name'],
+                    'middle_name'  => $authorData['middle_name'] ?? null,
+                    'appellation'  => $authorData['appellation'] ?? null,
+                    'extension'    => $authorData['extension'] ?? null,
+                ]);
+                $authorIds[] = $author->id;
+            }
+            $book->authors()->sync($authorIds);
         }
 
-        // If copies_count provided, add copies if the requested count is greater than existing
+        // ✅ If copies_count provided, add extra copies if needed
         if ($request->filled('copies_count')) {
             $desired = (int)$request->input('copies_count');
             $existing = $book->copies()->count();
@@ -127,7 +151,7 @@ class BookController extends Controller
                 for ($i = 0; $i < $toCreate; $i++) {
                     BookCopy::create([
                         'book_id' => $book->id,
-                        'is_available' => true
+                        'is_available' => true,
                     ]);
                 }
             }
@@ -135,6 +159,7 @@ class BookController extends Controller
 
         return redirect()->route('books.index')->with('success', 'Book updated successfully!');
     }
+
 
     public function destroy(Book $book)
     {

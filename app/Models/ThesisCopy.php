@@ -16,9 +16,10 @@ class ThesisCopy extends Model
 
     // Relationships
     public function thesis()
-    {
-        return $this->belongsTo(Thesis::class);
-    }
+{
+    return $this->belongsTo(Thesis::class, 'thesis_id');
+}
+
 
     public function transactions()
     {
