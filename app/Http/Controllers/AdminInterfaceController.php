@@ -21,12 +21,17 @@ class AdminInterfaceController extends Controller
     {
         // Fetch recent 5 transactions with related user info
         $recentTransactions = Transaction::with([
-        'bookCopy.book', // Load related book title
-        'thesisCopy.thesis', // Load related thesis title
-    ])
-    ->latest()
-    ->take(5)
-    ->get();
+    'borrowable' => function ($morphTo) {
+        $morphTo->morphWith([
+            \App\Models\BookCopy::class => ['book'],
+            \App\Models\ThesisCopy::class => ['thesis'],
+        ]);
+    },
+])
+->latest()
+->take(5)
+->get();
+
 
         $totalBooks = Book::count();
         $totalTheses = Thesis::count();
