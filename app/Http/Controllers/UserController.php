@@ -71,7 +71,16 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'phone_number' => 'nullable|string|max:20',
             'university_id' => 'nullable|string|max:50',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',      // at least one lowercase letter
+                'regex:/[A-Z]/',      // at least one uppercase letter
+                'regex:/[0-9]/',      // at least one digit
+                'regex:/[@$!%*#?&]/', // at least one special character
+            ],
+            'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.',
             'role' => 'required|string',
             'user_type' => 'required|string',
             'account_status' => 'required|string',
