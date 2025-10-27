@@ -90,6 +90,9 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('theses', ThesisController::class)->except(['index', 'show']);
         Route::resource('authors', AuthorController::class);
 
+        //user index and show
+        Route::resource('users', UserController::class)->only(['index', 'show']);
+
         // Transactions: librarians manage transactions
         Route::resource('transactions', TransactionController::class);
 

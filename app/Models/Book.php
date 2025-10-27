@@ -6,50 +6,75 @@ use App\Models\BookCopy;
 use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Book extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['title', 'description', 'year_published', 'category_id'];
     
+    // Fixed: Added proper foreign key
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
-    // public function authors(){
-    //     return $this->belongsToMany(Author::class, 'book_authors', 'book_id', 'author_id');
-    // }
+
+    // Fixed: Added proper table and foreign keys
     public function authors()
     {
-        return $this->belongsToMany(Author::class, 'book_authors');
+        return $this->belongsToMany(Author::class, 'book_authors', 'book_id', 'author_id');
     }
-    public function copies(){
-        return $this->hasMany(BookCopy::class);
+
+    // Fixed: Added foreign key
+    public function copies()
+    {
+        return $this->hasMany(BookCopy::class, 'book_id');
     }
-    public function availableCopies(){
-        return $this->hasMany(BookCopy::class)->where('is_available', true);
+
+    // Fixed: Added foreign key and condition
+    public function availableCopies()
+    {
+        return $this->hasMany(BookCopy::class, 'book_id')->where('is_available', true);
     }
-    /**
-     * Return next available BookCopy model for this book or null.
-     */
+
+    // Fixed: Correct polymorphic relationship
+    public function transactions()
+    {
+        return $this->hasManyThrough(
+            Transaction::class, 
+            BookCopy::class, 
+            'book_id', // Foreign key on book_copies table
+            'borrowable_id', // Foreign key on transactions table
+            'id', // Local key on books table
+            'id' // Local key on book_copies table
+        )->where('borrowable_type', BookCopy::class);
+    }
+
     public function getNextAvailableCopy()
     {
-        return $this->copies()->where('is_available', true)->first();
+        return $this->copies()->available()->first();
     }
-    /**
-     * Whether the book currently has at least one available copy.
-     */
+
     public function canBeRequested()
     {
-        return $this->copies()->where('is_available', true)->exists();
+        return $this->copies()->available()->exists();
     }
-    public function hasUserRequested($userId){
-        return $this->copies()->whereHas('transactions', function($q) use ($userId) {
-            $q->where('user_id', $userId);
-        })->exists();
+
+    public function availableCopiesCount()
+    {
+        return $this->copies()->available()->count();
     }
-    public function transactions(){
-        return $this->hasManyThrough(Transaction::class, BookCopy::class, 'book_id', 'copy_id', 'id', 'id');
+
+    // Fixed: Added proper status check
+    public function hasUserRequested($userId)
+    {
+        return $this->transactions()
+                    ->where('user_id', $userId)
+                    ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
+                    ->exists();
     }
+
     public function scopeSearch($query, $term)
     {
         $term = "%$term%";
@@ -62,18 +87,21 @@ class Book extends Model
               });
         });
     }
+
     public function getAuthorNamesAttribute(): string
     {
         return $this->authors->map(function ($author) {
             return $author->first_name . ' ' . $author->last_name;
         })->join(', ');
     }
+
     public function scopeByCategory($query, $categoryId)
     {
         if ($categoryId) {
             $query->where('category_id', $categoryId);
         }
     }
+
     public function scopeByAuthor($query, $authorId)
     {
         if ($authorId) {
@@ -82,6 +110,7 @@ class Book extends Model
             });
         }
     }
+
     public function scopeAvailable($query)
     {
         return $query->whereHas('copies', function($q) {

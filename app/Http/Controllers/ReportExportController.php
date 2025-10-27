@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\User;
-use App\Models\Thesis;
 use App\Models\Author;
+use App\Models\Thesis;
 use App\Models\Penalty;
+use App\Models\BookCopy;
+use App\Models\ThesisCopy;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -225,7 +227,7 @@ class ReportExportController extends Controller
         $sheet->setCellValue('B1', 'User');
         $sheet->setCellValue('C1', 'University ID');
         $sheet->setCellValue('D1', 'Item Type');
-        $sheet->setCellValue('E1', 'Copy ID');
+        $sheet->setCellValue('E1', 'Item Title');
         $sheet->setCellValue('F1', 'Borrow Date');
         $sheet->setCellValue('G1', 'Due Date');
         $sheet->setCellValue('H1', 'Return Date');
@@ -233,21 +235,26 @@ class ReportExportController extends Controller
         $sheet->setCellValue('J1', 'Days Overdue');
         $sheet->setCellValue('K1', 'Created At');
 
-        // Query based on parameter
-        $transactionQuery = Transaction::with(['user', 'bookCopy.book', 'thesisCopy.thesis']);
+        // Query based on parameter with polymorphic relationships
+        $transactionQuery = Transaction::with(['user', 'borrowable' => function ($morphTo) {
+            $morphTo->morphWith([
+                BookCopy::class => ['book'],
+                ThesisCopy::class => ['thesis'],
+            ]);
+        }]);
 
         switch($query) {
             case 'overdue':
-                $transactions = $transactionQuery->where('transaction_status', 'overdue')->get();
+                $transactions = $transactionQuery->overdue()->get();
                 break;
             case 'borrowed':
-                $transactions = $transactionQuery->where('transaction_status', 'borrowed')->get();
+                $transactions = $transactionQuery->borrowed()->get();
                 break;
             case 'returned':
-                $transactions = $transactionQuery->where('transaction_status', 'returned')->get();
+                $transactions = $transactionQuery->returned()->get();
                 break;
             case 'requested':
-                $transactions = $transactionQuery->where('transaction_status', 'requested')->get();
+                $transactions = $transactionQuery->requested()->get();
                 break;
             case 'active':
                 $transactions = $transactionQuery->whereIn('transaction_status', ['borrowed', 'requested'])->get();
@@ -257,20 +264,21 @@ class ReportExportController extends Controller
         }
 
         if($transactions->isEmpty()) {
-            return redirect()->back()->with('error', 'No transactions found for the specified criteria.');
+            return redirect()->route('transactions.index')->with('error', 'No transactions found for the specified criteria.');
         }
 
         // Data rows
         $row = 2;
         foreach($transactions as $transaction) {
-            // Determine item type and title
-            $itemType = $transaction->copy_type;
-            $itemTitle = 'N/A';
+            $itemType = 'Unknown';
+            $itemTitle = 'Unknown';
             
-            if ($transaction->bookCopy && $transaction->bookCopy->book) {
-                $itemTitle = $transaction->bookCopy->book->title;
-            } elseif ($transaction->thesisCopy && $transaction->thesisCopy->thesis) {
-                $itemTitle = $transaction->thesisCopy->thesis->title;
+            if ($transaction->borrowable_type === 'App\Models\BookCopy' && $transaction->borrowable && $transaction->borrowable->book) {
+                $itemType = 'Book';
+                $itemTitle = $transaction->borrowable->book->title;
+            } elseif ($transaction->borrowable_type === 'App\Models\ThesisCopy' && $transaction->borrowable && $transaction->borrowable->thesis) {
+                $itemType = 'Thesis';
+                $itemTitle = $transaction->borrowable->thesis->title;
             }
 
             // Calculate overdue days
@@ -283,8 +291,8 @@ class ReportExportController extends Controller
             $sheet->setCellValue('A'.$row, $transaction->id);
             $sheet->setCellValue('B'.$row, $transaction->user->first_name . ' ' . $transaction->user->last_name);
             $sheet->setCellValue('C'.$row, $transaction->user->university_id);
-            $sheet->setCellValue('D'.$row, $itemType . ' - ' . $itemTitle);
-            $sheet->setCellValue('E'.$row, $transaction->copy_id);
+            $sheet->setCellValue('D'.$row, $itemType);
+            $sheet->setCellValue('E'.$row, $itemTitle);
             $sheet->setCellValue('F'.$row, $transaction->borrow_date->format('Y-m-d H:i:s'));
             $sheet->setCellValue('G'.$row, $transaction->due_date->format('Y-m-d H:i:s'));
             $sheet->setCellValue('H'.$row, $transaction->return_date ? $transaction->return_date->format('Y-m-d H:i:s') : 'Not Returned');

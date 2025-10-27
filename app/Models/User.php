@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Student;
 use App\Models\Employee;
 use App\Models\Transaction;
@@ -12,14 +11,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'university_id',
         'first_name',
@@ -43,43 +36,68 @@ class User extends Authenticatable
         'registration_date' => 'datetime',
         'last_login_date' => 'datetime',
     ];
-    public function student(){
-        return $this->hasOne(Student::class, 'id', 'id');
+
+    // Fixed: Added proper foreign keys
+    public function student()
+    {
+        return $this->hasOne(Student::class, 'user_id', 'id');
     }
-    public function employee(){
-        return $this->hasOne(Employee::class, 'id', 'id');
+
+    public function employee()
+    {
+        return $this->hasOne(Employee::class, 'user_id', 'id');
     }
-    public function transactions(){
-        return $this->hasMany(Transaction::class);
+
+    // Fixed: Added proper foreign key
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'user_id');
     }
+
     public function getfullNameAttribute(): string
     {
         return $this->first_name . ' ' . $this->last_name;
     }
+
     public function isAdmin(): bool
     {
         return in_array($this->role, ['admin', 'super-admin']);
     }
+
     public function isStudent()
     {
         return $this->user_type === 'student';
     }
+
     public function isEmployee()
     {
         return $this->user_type === 'employee';
     }
-    public function activeTransactions(){
-        return $this->hasMany(Transaction::class)->where('transaction_status', 'borrowed');
+    public function isLibrarian()
+    {
+        return $this->role === 'librarian';
     }
-    public function overdueTransactions(){
-        return $this->hasMany(Transaction::class)->where('transaction_status', 'overdue');
+
+    // Fixed: Added proper foreign key and status condition
+    public function activeTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'user_id')->where('transaction_status', 'borrowed');
     }
+
+    public function overdueTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'user_id')->where('transaction_status', 'overdue');
+    }
+
+    // Fixed: Added proper polymorphic relationships
     public function hasPendingRequestForBook($bookId)
     {
         return $this->transactions()
-                    ->whereIn('transaction_status', ['requested', 'pending'])
-                    ->whereHas('bookCopy', function ($qb) use ($bookId) {
-                        $qb->where('book_id', $bookId);
+                    ->whereIn('transaction_status', ['requested', 'approved'])
+                    ->whereHasMorph('borrowable', [BookCopy::class], function ($query) use ($bookId) {
+                        $query->whereHas('book', function ($q) use ($bookId) {
+                            $q->where('id', $bookId);
+                        });
                     })
                     ->exists();
     }
@@ -87,12 +105,15 @@ class User extends Authenticatable
     public function hasPendingRequestForThesis($thesisId)
     {
         return $this->transactions()
-                    ->whereIn('transaction_status', ['requested', 'pending'])
-                    ->whereHas('thesisCopy', function ($qb) use ($thesisId) {
-                        $qb->where('thesis_id', $thesisId);
+                    ->whereIn('transaction_status', ['requested', 'approved'])
+                    ->whereHasMorph('borrowable', [ThesisCopy::class], function ($query) use ($thesisId) {
+                        $query->whereHas('thesis', function ($q) use ($thesisId) {
+                            $q->where('id', $thesisId);
+                        });
                     })
                     ->exists();
     }
+
     public function scopeStudents($query)
     {
         return $query->where('user_type', 'student');
@@ -107,5 +128,4 @@ class User extends Authenticatable
     {
         return $query->where('account_status', 'Active');
     }
-
 }

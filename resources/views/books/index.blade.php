@@ -73,14 +73,23 @@
                 <i class="fas fa-download mr-2"></i>
                 Export All Books
             </a>
-            <a href="{{ route('export.books', ['year_published' => 2024]) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                <i class="fas fa-download mr-2"></i>
-                Export 2024 Books
-            </a>
-            <a href="{{ route('export.books', ['year_published' => 2023]) }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                <i class="fas fa-download mr-2"></i>
-                Export 2023 Books
-            </a>
+                <form action="{{ route('export.books') }}" method="GET" class="px-6 py-4 flex items-center space-x-2">
+                    <label for="exportYear" class="text-sm text-gray-600">Year:</label>
+                    <select id="exportYear" name="year_published" class="border border-gray-300 rounded-lg px-3 py-2">
+                        <option value="">All Years</option>
+                        @php $currentYear = date('Y'); @endphp
+                        @for($y = $currentYear; $y >= 1900; $y--)
+                        <option value="{{ $y }}">{{ $y }}</option>
+                        @endfor
+                    </select>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Export Books</button>
+                </form>
+                @if (session('error'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        {{ session('error') }}
+                    </div>
+                @endif
         </div>
     </div>
 
@@ -216,28 +225,31 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
+                                    @if(in_array(auth()->user()->role, ['admin', 'librarian']))
                                     <a href="{{ route('books.edit', $book->id) }}" 
-                                       class="text-yellow-600 hover:text-yellow-900 action-btn" 
-                                       title="Edit">
-                                        <i class="fas fa-edit"></i>
+                                    class="text-yellow-600 hover:text-yellow-900 action-btn" 
+                                    title="Edit">
+                                    <i class="fas fa-edit"></i>
                                     </a>
-                                    
+                                    @endif
                                     <a href="{{ route('books.show', $book->id) }}" 
                                        class="text-blue-600 hover:text-blue-900 action-btn" 
                                        title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
+                                    @if (in_array(auth()->user()->role, ['admin', 'librarian']))
 
-                                    <form action="{{ route('books.destroy', $book->id) }}" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                onclick="return confirm('Are you sure you want to delete this book?');"
-                                                class="text-red-600 hover:text-red-900 action-btn" 
-                                                title="Delete">
+                                        <form action="{{ route('books.destroy', $book->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                            onclick="return confirm('Are you sure you want to delete this book?');"
+                                            class="text-red-600 hover:text-red-900 action-btn" 
+                                            title="Delete">
                                             <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

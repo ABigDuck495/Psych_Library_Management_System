@@ -233,11 +233,26 @@
             <!-- Theses Table -->
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <a href="{{ route('export.theses') }}">Export All Theses</a>
-                //same here lagyan nalang
-                <a href="{{ route('export.theses', ['year_published' => 2024]) }}">Export 2024 Theses</a>
+                <form action="{{ route('export.theses') }}" method="GET" class="px-6 py-4 flex items-center space-x-2">
+                    <label for="exportYear" class="text-sm text-gray-600">Year:</label>
+                    <select id="exportYear" name="year_published" class="border border-gray-300 rounded-lg px-3 py-2">
+                        <option value="">All Years</option>
+                        @php $currentYear = date('Y'); @endphp
+                        @for($y = $currentYear; $y >= 1900; $y--)
+                        <option value="{{ $y }}">{{ $y }}</option>
+                        @endfor
+                    </select>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Export Theses</button>
+                </form>
                 <a href="{{ route('export.theses', ['department' => 'AB Psychology']) }}">Export AB Psychology Theses</a>
                 <a href="{{ route('export.theses', ['department' => 'BS Psychology']) }}">Export BS Psychology Theses</a>
                 <a href="{{ route('export.theses', ['department' => ['AB Psychology', 'BS Psychology']]) }}">Export All Psychology Theses</a>
+                @if (session('error'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        {{ session('error') }}
+                    </div>
+                @endif
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -301,28 +316,30 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('theses.edit', $thesis->id) }}" 
-                                               class="text-yellow-600 hover:text-yellow-900 action-btn" 
-                                               title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            
+                                            @if(in_array(auth()->user()->role, ['admin', 'librarian']))
+                                                <a href="{{ route('theses.edit', $thesis->id) }}" 
+                                                class="text-yellow-600 hover:text-yellow-900 action-btn" 
+                                                title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            @endif
                                             <a href="{{ route('theses.show', $thesis->id) }}" 
                                                class="text-blue-600 hover:text-blue-900 action-btn" 
                                                title="View">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-
-                                            <form action="{{ route('theses.destroy', $thesis->id) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" 
-                                                        onclick="return confirm('Are you sure you want to delete this thesis?');"
-                                                        class="text-red-600 hover:text-red-900 action-btn" 
-                                                        title="Delete">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            @if(in_array(auth()->user()->role, ['admin', 'librarian']))
+                                                <form action="{{ route('theses.destroy', $thesis->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            onclick="return confirm('Are you sure you want to delete this thesis?');"
+                                                            class="text-red-600 hover:text-red-900 action-btn" 
+                                                            title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
