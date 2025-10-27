@@ -87,6 +87,15 @@ class Book extends Model
               });
         });
     }
+    public function hasAvailableCopies()
+    {
+        return $this->copies()->where('is_available', true)->exists();
+    }
+    public static function availableBooks(){
+        return self::whereHas('copies', function($q) {
+            $q->where('is_available', true);
+        })->get();
+    }
 
     public function getAuthorNamesAttribute(): string
     {

@@ -97,6 +97,11 @@ class Thesis extends Model
 
         return $this->authors()->sync($authorIds);
     }
+    public static function availableTheses(){
+        return self::whereHas('copies', function($q) {
+            $q->where('is_available', true);
+        })->get();
+    }
 
     // Fixed: Added proper scope
     public function availableCopies()

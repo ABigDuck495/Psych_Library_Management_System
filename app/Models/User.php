@@ -40,12 +40,12 @@ class User extends Authenticatable
     // Fixed: Added proper foreign keys
     public function student()
     {
-        return $this->hasOne(Student::class, 'user_id', 'id');
+        return $this->hasOne(Student::class, 'id', 'id');
     }
 
     public function employee()
     {
-        return $this->hasOne(Employee::class, 'user_id', 'id');
+        return $this->hasOne(Employee::class, 'id', 'id');
     }
 
     // Fixed: Added proper foreign key

@@ -1,25 +1,27 @@
 <?php
 
-use App\Http\Controllers\ReportExportController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ThesisController;
-use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ReportExportController;
 
 //Role Based Access Control Controllers
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserInterfaceController;
 use App\Http\Controllers\AdminInterfaceController;
+use App\Http\Controllers\Admin\LoginAttemptController;
 use App\Http\Controllers\LibrarianInterfaceController;
 
 // Login routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
-Route::post('/logout', [\App\Http\Controllers\Auth\LogoutController::class, 'logout'])->name('logout');
+Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 // Register routes
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -64,7 +66,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin,super-admin'])->group(function () {
         // Full CRUD for users and authors
         Route::resource('users', UserController::class);
-        
+        Route::get('admin/login-attempts', [LoginAttemptController::class, 'index'])->name('admin.login-attempts');
+        Route::post('admin/login-attempts/cleanup', [App\Http\Controllers\Admin\LoginAttemptController::class, 'cleanup'])->name('admin.login-attempts.cleanup');
         //export users
         Route::get('/export/users/{query}', [ReportExportController::class, 'exportUser'])->name('export.users');
         
