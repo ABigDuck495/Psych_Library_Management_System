@@ -73,14 +73,23 @@
                 <i class="fas fa-download mr-2"></i>
                 Export All Books
             </a>
-            <a href="{{ route('export.books', ['year_published' => 2024]) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                <i class="fas fa-download mr-2"></i>
-                Export 2024 Books
-            </a>
-            <a href="{{ route('export.books', ['year_published' => 2023]) }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                <i class="fas fa-download mr-2"></i>
-                Export 2023 Books
-            </a>
+                <form action="{{ route('export.books') }}" method="GET" class="px-6 py-4 flex items-center space-x-2">
+                    <label for="exportYear" class="text-sm text-gray-600">Year:</label>
+                    <select id="exportYear" name="year_published" class="border border-gray-300 rounded-lg px-3 py-2">
+                        <option value="">All Years</option>
+                        @php $currentYear = date('Y'); @endphp
+                        @for($y = $currentYear; $y >= 1900; $y--)
+                        <option value="{{ $y }}">{{ $y }}</option>
+                        @endfor
+                    </select>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Export Books</button>
+                </form>
+                @if (session('error'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        {{ session('error') }}
+                    </div>
+                @endif
         </div>
     </div>
 

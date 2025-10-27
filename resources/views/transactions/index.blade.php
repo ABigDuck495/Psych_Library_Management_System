@@ -317,127 +317,108 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($transactions as $transaction)
-                                <tr class="table-row-hover">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $transaction->id }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $transaction->user->first_name }} {{ $transaction->user->last_name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="book-title text-sm text-gray-900" title="@php
-                                            $copy = $transaction->copy;
-                                            $title = 'N/A';
-                                            if ($copy) {
-                                                if (isset($copy->book) && $copy->book) {
-                                                    $title = $copy->book->title;
-                                                } elseif (isset($copy->thesis) && $copy->thesis) {
-                                                    $title = $copy->thesis->title;
-                                                }
-                                            }
-                                            echo $title;
-                                        @endphp">
-                                            @php
-                                                $copy = $transaction->copy;
-                                                $title = 'N/A';
-                                                if ($copy) {
-                                                    if (isset($copy->book) && $copy->book) {
-                                                        $title = $copy->book->title;
-                                                    } elseif (isset($copy->thesis) && $copy->thesis) {
-                                                        $title = $copy->thesis->title;
-                                                    }
-                                                }
-                                            @endphp
-                                            {{ $title }}
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($transaction->transaction_status === 'requested')
-                                            <span class="status-badge bg-orange-100 text-orange-800">Requested</span>
-                                        @elseif($transaction->transaction_status === 'borrowed')
-                                            <span class="status-badge bg-blue-100 text-blue-800">Borrowed</span>
-                                        @elseif($transaction->transaction_status === 'returned')
-                                            <span class="status-badge bg-green-100 text-green-800">Returned</span>
-                                        @elseif($transaction->transaction_status === 'overdue')
-                                            <span class="status-badge bg-red-100 text-red-800">Overdue</span>
-                                        @else
-                                            <span class="status-badge bg-gray-100 text-gray-800">Unknown</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $transaction->borrow_date ? $transaction->borrow_date->format('M d, Y') : 'N/A' }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $transaction->due_date ? $transaction->due_date->format('M d, Y') : 'N/A' }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $transaction->return_date ? $transaction->return_date->format('M d, Y') : 'N/A' }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div class="flex space-x-2">
-                                            <a href="{{ route('transactions.show', $transaction) }}" class="text-blue-600 hover:text-blue-900 action-btn" title="View">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            
-                                            @if(in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian']))
-                                                @if($transaction->transaction_status === 'requested')
-                                                    <form action="{{ route('transactions.approve-request', $transaction) }}" method="POST" class="inline">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="text-green-600 hover:text-green-900 action-btn" title="Approve">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
-
-                                                @if($transaction->transaction_status === 'borrowed')
-                                                    <form action="{{ route('transactions.return', $transaction) }}" method="POST" class="inline">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="text-indigo-600 hover:text-indigo-900 action-btn" title="Return">
-                                                            <i class="fas fa-undo"></i>
-                                                        </button>
-                                                    </form>
-                                                    
-                                                    <form action="{{ route('transactions.mark-overdue', $transaction) }}" method="POST" class="inline">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="text-red-600 hover:text-red-900 action-btn" title="Mark Overdue">
-                                                            <i class="fas fa-exclamation-triangle"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
-
-                                                <a href="{{ route('transactions.edit', $transaction) }}" class="text-yellow-600 hover:text-yellow-900 action-btn" title="Edit">
-                                                    <i class="fas fa-edit"></i>
+                                    <tr class="table-row-hover">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $transaction->id }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $transaction->user->first_name }} {{ $transaction->user->last_name }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="book-title text-sm text-gray-900" title="{{ $transaction->item_title ?? 'N/A' }}">
+                                                {{ $transaction->item_title ?? 'N/A' }}
+                                            </div>
+                                            <div class="text-xs text-gray-500">
+                                                {{ $transaction->borrowable_type === 'App\Models\BookCopy' ? 'Book' : 'Thesis' }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if($transaction->transaction_status === 'requested')
+                                                <span class="status-badge bg-orange-100 text-orange-800">Requested</span>
+                                            @elseif($transaction->transaction_status === 'borrowed')
+                                                <span class="status-badge bg-blue-100 text-blue-800">Borrowed</span>
+                                            @elseif($transaction->transaction_status === 'returned')
+                                                <span class="status-badge bg-green-100 text-green-800">Returned</span>
+                                            @elseif($transaction->transaction_status === 'overdue')
+                                                <span class="status-badge bg-red-100 text-red-800">Overdue</span>
+                                            @else
+                                                <span class="status-badge bg-gray-100 text-gray-800">Unknown</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $transaction->borrow_date ? $transaction->borrow_date->format('M d, Y') : 'N/A' }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $transaction->due_date ? $transaction->due_date->format('M d, Y') : 'N/A' }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            {{ $transaction->return_date ? $transaction->return_date->format('M d, Y') : 'N/A' }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div class="flex space-x-2">
+                                                <a href="{{ route('transactions.show', $transaction) }}" class="text-blue-600 hover:text-blue-900 action-btn" title="View">
+                                                    <i class="fas fa-eye"></i>
                                                 </a>
                                                 
-                                                <form action="{{ route('transactions.destroy', $transaction) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" onclick="return confirm('Delete this transaction?')" class="text-red-600 hover:text-red-900 action-btn" title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @else
-                                                @if($transaction->transaction_status === 'borrowed')
-                                                    <form action="{{ route('transactions.return', $transaction) }}" method="POST" class="inline">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="text-indigo-600 hover:text-indigo-900 action-btn" title="Return">
-                                                            <i class="fas fa-undo"></i>
-                                                        </button>
-                                                    </form>
+                                                @if(in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian']))
+                                                    @if($transaction->transaction_status === 'requested')
+                                                        <form action="{{ route('transactions.approve-request', $transaction) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="text-green-600 hover:text-green-900 action-btn" title="Approve">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+
+                                                    @if($transaction->transaction_status === 'borrowed')
+                                                        <form action="{{ route('transactions.return', $transaction) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="text-indigo-600 hover:text-indigo-900 action-btn" title="Return">
+                                                                <i class="fas fa-undo"></i>
+                                                            </button>
+                                                        </form>
+                                                        
+                                                        <form action="{{ route('transactions.mark-overdue', $transaction) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="text-red-600 hover:text-red-900 action-btn" title="Mark Overdue">
+                                                                <i class="fas fa-exclamation-triangle"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+
+                                                    <a href="{{ route('transactions.edit', $transaction) }}" class="text-yellow-600 hover:text-yellow-900 action-btn" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
                                                     
-                                                    <form action="{{ route('transactions.renew', $transaction) }}" method="POST" class="inline">
+                                                    <form action="{{ route('transactions.destroy', $transaction) }}" method="POST" class="inline">
                                                         @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="text-green-600 hover:text-green-900 action-btn" title="Renew">
-                                                            <i class="fas fa-sync"></i>
+                                                        @method('DELETE')
+                                                        <button type="submit" onclick="return confirm('Delete this transaction?')" class="text-red-600 hover:text-red-900 action-btn" title="Delete">
+                                                            <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
+                                                @else
+                                                    @if($transaction->transaction_status === 'borrowed')
+                                                        <form action="{{ route('transactions.return', $transaction) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="text-indigo-600 hover:text-indigo-900 action-btn" title="Return">
+                                                                <i class="fas fa-undo"></i>
+                                                            </button>
+                                                        </form>
+                                                        
+                                                        <form action="{{ route('transactions.renew', $transaction) }}" method="POST" class="inline">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <button type="submit" class="text-green-600 hover:text-green-900 action-btn" title="Renew">
+                                                                <i class="fas fa-sync"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
                                                 @endif
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
                             </tbody>
                         </table>
                     </div>

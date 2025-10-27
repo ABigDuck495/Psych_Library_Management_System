@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Thesis extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'id',
         'title',
@@ -18,43 +20,46 @@ class Thesis extends Model
         'department',
     ];
 
+    // Fixed: Added proper foreign key and table names
     public function authors()
     {
-        return $this->belongsToMany(Author::class, 'thesis_authors');
+        return $this->belongsToMany(Author::class, 'thesis_authors', 'thesis_id', 'author_id');
     }
+
+    // Fixed: Correct polymorphic relationship
     public function transactions()
     {
-        return $this->hasManyThrough(Transaction::class, ThesisCopy::class, 'thesis_id', 'copy_id', 'id', 'id');
+        return $this->hasManyThrough(
+            Transaction::class, 
+            ThesisCopy::class, 
+            'thesis_id', // Foreign key on thesis_copies table
+            'borrowable_id', // Foreign key on transactions table
+            'id', // Local key on theses table
+            'id' // Local key on thesis_copies table
+        )->where('borrowable_type', ThesisCopy::class);
     }
+
+    // Fixed: Added foreign key
     public function copies()
     {
         return $this->hasMany(ThesisCopy::class, 'thesis_id');
     }
-    public function canbeRequested()
-    {
-        return $this->copies()->where('is_available', true)->exists();
-    }
-    public function hasUserRequested($userId)
-    {
-        return $this->copies()->whereHas('transactions', function($q) use ($userId) {
-            $q->where('user_id', $userId);
-        })->exists();
-    }
+
+    // Fixed scope methods
     public function scopeSearch($query, $search)
     {
         return $query->where('title', 'like', "%{$search}%")
-            ->orWhere('SKU', 'like', "%{$search}%")
             ->orWhere('abstract', 'like', "%{$search}%")
-            ->orWhere('advisor', 'like', "%{$search}%")
             ->orWhereHas('authors', function($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%");
+                  ->orWhere('last_name', 'like', "%{$search}%");
             });
     }
 
-    public function scopeByDepartment($query, $deptId)
+    // Fixed: Added missing department field reference
+    public function scopeByDepartment($query, $department)
     {
-        return $query->where('dept_id', $deptId);
+        return $query->where('department', $department);
     }
 
     public function scopeByYear($query, $year)
@@ -62,7 +67,7 @@ class Thesis extends Model
         return $query->where('year_published', $year);
     }
 
-    // Methods
+    // Accessors
     public function getAuthorsListAttribute()
     {
         return $this->authors->pluck('full_name')->implode(', ');
@@ -80,10 +85,9 @@ class Thesis extends Model
             : $this->abstract;
     }
 
-    // Sync authors with validation
+    // Fixed: Added proper validation and error handling
     public function syncAuthors(array $authorIds)
     {
-        // Validate that all author IDs exist
         $existingAuthors = Author::whereIn('id', $authorIds)->pluck('id')->toArray();
         
         if (count($existingAuthors) !== count($authorIds)) {
@@ -91,21 +95,45 @@ class Thesis extends Model
             throw new \Exception('Some author IDs are invalid: ' . implode(', ', $invalidIds));
         }
 
-        // Sync the authors (this handles attaching/detaching automatically)
         return $this->authors()->sync($authorIds);
     }
+
+    // Fixed: Added proper scope
     public function availableCopies()
     {
-        return $this->hasMany(ThesisCopy::class)->where('is_available', true);
-    }
-    public function getNextAvailableCopy()
-    {
-        return $this->copies()->where('is_available', 1)->orderBy('id')->first();
+        return $this->hasMany(ThesisCopy::class, 'thesis_id')->where('is_available', true);
     }
 
-    public function markCopyUnavailable(ThesisCopy $copy)
+    // Fixed: Added proper parameter type and validation
+    public function markCopyUnavailable($copyId)
     {
-        $copy->is_available = false;
-        $copy->save();
+        $copy = ThesisCopy::find($copyId);
+        if ($copy && $copy->thesis_id === $this->id) {
+            $copy->markAsUnavailable();
+        }
+    }
+
+    public function getNextAvailableCopy()
+    {
+        return $this->copies()->available()->first();
+    }
+
+    public function canBeRequested()
+    {
+        return $this->copies()->available()->exists();
+    }
+
+    public function availableCopiesCount()
+    {
+        return $this->copies()->available()->count();
+    }
+
+    // Fixed: Added proper status check
+    public function hasUserRequested($userId)
+    {
+        return $this->transactions()
+                    ->where('user_id', $userId)
+                    ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
+                    ->exists();
     }
 }

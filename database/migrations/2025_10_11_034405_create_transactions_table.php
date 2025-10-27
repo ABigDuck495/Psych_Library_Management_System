@@ -6,31 +6,40 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('copy_id')->constrained('book_copies', 'copy_id');
-            $table->timestamp('borrow_date')->useCurrent();
-            $table->timestamp('due_date');
-            $table->timestamp('return_date')->nullable();
-            $table->string('copy_type');
-            $table->enum('transaction_status', ['requested','borrowed', 'returned', 'overdue'])->default('borrowed');
+            
+            // User who borrowed the item
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            
+            // Polymorphic relationship for the borrowed item
+            $table->unsignedBigInteger('borrowable_id');
+            $table->string('borrowable_type'); // App\Models\BookCopy or App\Models\ThesisCopy
+            
+            // Transaction details
+            $table->enum('transaction_status', [
+                'requested',  
+                'borrowed', 
+                'returned', 
+                'overdue', 
+                'cancelled'
+            ])->default('requested');
+            $table->dateTime('borrow_date');
+            $table->dateTime('due_date');
+            $table->dateTime('return_date')->nullable();
             $table->timestamps();
-
-            // Performance indexes
-            $table->index('user_id');
-            $table->index('copy_id');
+            
+            // Indexes for performance
+            $table->index(['borrowable_type', 'borrowable_id']);
             $table->index('transaction_status');
             $table->index('due_date');
-            $table->index('return_date');
-            $table->index(['transaction_status', 'due_date']);
-            $table->index(['user_id', 'transaction_status']);
+            $table->index('user_id');
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('transactions');
     }

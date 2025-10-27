@@ -9,47 +9,53 @@ class BookCopy extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'copy_id';
-    protected $table = 'book_copies';
-    public $incrementing = true;
-    protected $keyType = 'int';
-
     protected $fillable = [
         'book_id',
-        'is_available',
+        'is_available'
     ];
 
-    protected $casts = [
-        'is_available' => 'boolean',
-    ];
-
+    // Fixed: Added proper foreign key
     public function book()
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Book::class, 'book_id');
     }
 
+    // Fixed: Correct polymorphic relationship
     public function transactions()
     {
-        return $this->hasMany(Transaction::class, 'copy_id');
+        return $this->morphMany(Transaction::class, 'borrowable');
     }
 
-    public function currentTransaction()
+    // Scopes
+    public function scopeAvailable($query)
     {
-        return $this->hasOne(Transaction::class, 'copy_id')
-                    ->whereNull('return_date')
-                    ->latest();
+        return $query->where('is_available', true);
     }
 
-    public function isAvailable(): bool
+    // Helpers
+    public function isAvailable()
     {
         return $this->is_available;
     }
 
-    public function getBorrowHistory()
+    public function markAsUnavailable()
     {
-        return $this->transactions()
-            ->with('user')
-            ->orderBy('borrow_date', 'desc')
-            ->get();
+        $this->update(['is_available' => false]);
+    }
+
+    public function markAsAvailable()
+    {
+        $this->update(['is_available' => true]);
+    }
+
+    // Accessors
+    public function getItemTitleAttribute()
+    {
+        return $this->book ? $this->book->title : 'Unknown Book';
+    }
+
+    public function getItemTypeAttribute()
+    {
+        return 'Book';
     }
 }

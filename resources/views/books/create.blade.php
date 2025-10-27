@@ -131,8 +131,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-calendar-alt text-gray-400"></i>
                             </div>
-                            <input 
-                                type="number" 
+                            <select  
                                 id="year_published" 
                                 name="year_published" 
                                 value="{{ old('year_published') }}" 
@@ -142,6 +141,12 @@
                                 placeholder="Enter publication year"
                                 required
                             >
+                                @for($year = date('Y'); $year >= 1900; $year--)
+                                    <option value="{{ $year }}" {{ old('year_published') == $year ? 'selected' : '' }}>
+                                        {{ $year }}
+                                    </option>
+                                @endfor
+                            </select>
                         </div>
                         @error('year_published')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

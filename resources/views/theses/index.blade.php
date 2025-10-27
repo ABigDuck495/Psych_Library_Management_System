@@ -233,11 +233,26 @@
             <!-- Theses Table -->
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <a href="{{ route('export.theses') }}">Export All Theses</a>
-                //same here lagyan nalang
-                <a href="{{ route('export.theses', ['year_published' => 2024]) }}">Export 2024 Theses</a>
+                <form action="{{ route('export.theses') }}" method="GET" class="px-6 py-4 flex items-center space-x-2">
+                    <label for="exportYear" class="text-sm text-gray-600">Year:</label>
+                    <select id="exportYear" name="year_published" class="border border-gray-300 rounded-lg px-3 py-2">
+                        <option value="">All Years</option>
+                        @php $currentYear = date('Y'); @endphp
+                        @for($y = $currentYear; $y >= 1900; $y--)
+                        <option value="{{ $y }}">{{ $y }}</option>
+                        @endfor
+                    </select>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Export Theses</button>
+                </form>
                 <a href="{{ route('export.theses', ['department' => 'AB Psychology']) }}">Export AB Psychology Theses</a>
                 <a href="{{ route('export.theses', ['department' => 'BS Psychology']) }}">Export BS Psychology Theses</a>
                 <a href="{{ route('export.theses', ['department' => ['AB Psychology', 'BS Psychology']]) }}">Export All Psychology Theses</a>
+                @if (session('error'))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        {{ session('error') }}
+                    </div>
+                @endif
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">

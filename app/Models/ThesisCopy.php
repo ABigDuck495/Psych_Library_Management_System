@@ -14,15 +14,16 @@ class ThesisCopy extends Model
         'is_available'
     ];
 
-    // Relationships
+    // Fixed: Added proper foreign key
     public function thesis()
     {
-        return $this->belongsTo(Thesis::class);
+        return $this->belongsTo(Thesis::class, 'thesis_id');
     }
 
+    // Fixed: Correct polymorphic relationship
     public function transactions()
     {
-        return $this->hasMany(Transaction::class, 'copy_id');
+        return $this->morphMany(Transaction::class, 'borrowable');
     }
 
     // Scopes
@@ -45,5 +46,16 @@ class ThesisCopy extends Model
     public function markAsAvailable()
     {
         $this->update(['is_available' => true]);
+    }
+
+    // Accessors
+    public function getItemTitleAttribute()
+    {
+        return $this->thesis ? $this->thesis->title : 'Unknown Thesis';
+    }
+
+    public function getItemTypeAttribute()
+    {
+        return 'Thesis';
     }
 }

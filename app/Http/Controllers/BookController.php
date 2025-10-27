@@ -9,18 +9,18 @@ use App\Models\Category;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
     public function __construct()
     {
-        // Require authentication for all book routes (viewing, creating, etc.)
         $this->middleware('auth');
     }
+
     public function index()
     {
-        $books = Book::with(['authors', 'category'])->get();
+        $books = Book::with(['authors', 'category', 'copies'])->paginate(10);
         return view('books.index', compact('books'));
     }
 
@@ -37,9 +37,8 @@ class BookController extends Controller
         return view('books.create', compact('categories', 'authors'));
     }
 
-      public function store(Request $request)
+    public function store(Request $request)
     {
-        // ✅ Validate form data
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -51,33 +50,34 @@ class BookController extends Controller
             'authors.*.last_name' => 'required|string|max:255',
         ]);
 
-        // ✅ Set number of copies (default to 1 if empty)
-        $copiesCount = $validated['copies_count'] ?? 1;
+        DB::transaction(function () use ($validated) {
+            $copiesCount = $validated['copies_count'] ?? 1;
 
-        // ✅ Create the book
-        $book = Book::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'year_published' => $validated['year_published'],
-            'category_id' => $validated['category_id'],
-        ]);
-
-        // ✅ Create the specified number of book copies
-        for ($i = 0; $i < $copiesCount; $i++) {
-            BookCopy::create([
-                'book_id' => $book->id,
-                'is_available' => true,
+            // Create the book
+            $book = Book::create([
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'year_published' => $validated['year_published'],
+                'category_id' => $validated['category_id'],
             ]);
-        }
 
-        // ✅ Attach authors
-        foreach ($validated['authors'] as $authorData) {
-            $author = Author::firstOrCreate([
-                'first_name' => $authorData['first_name'],
-                'last_name' => $authorData['last_name'],
-            ]);
-            $book->authors()->attach($author->id);
-        }
+            // Create book copies
+            for ($i = 0; $i < $copiesCount; $i++) {
+                BookCopy::create([
+                    'book_id' => $book->id,
+                    'is_available' => true,
+                ]);
+            }
+
+            // Attach authors
+            foreach ($validated['authors'] as $authorData) {
+                $author = Author::firstOrCreate([
+                    'first_name' => $authorData['first_name'],
+                    'last_name' => $authorData['last_name'],
+                ]);
+                $book->authors()->attach($author->id);
+            }
+        });
 
         return redirect()->route('books.index')->with('success', 'Book created successfully!');
     }
@@ -87,7 +87,7 @@ class BookController extends Controller
         $book->load(['authors', 'category', 'copies']);
         return view('books.show', compact('book'));
     }
-// 
+
     public function edit(Book $book)
     {
         $categories = Category::pluck('category_name', 'id');
@@ -108,95 +108,84 @@ class BookController extends Controller
             'copies_count' => 'sometimes|integer|min:1'
         ]);
 
-        // Update basic fields
-        $book->update(
-            collect($validated)->only(['title', 'description', 'year_published', 'category_id'])->toArray()
-        );
+        DB::transaction(function () use ($validated, $book, $request) {
+            // Update basic fields
+            $book->update(
+                collect($validated)->only(['title', 'description', 'year_published', 'category_id'])->toArray()
+            );
 
-        // Sync authors if provided
-        if ($request->has('author_ids')) {
-            $book->authors()->sync($validated['author_ids'] ?? []);
-        }
+            // Sync authors if provided
+            if ($request->has('author_ids')) {
+                $book->authors()->sync($validated['author_ids'] ?? []);
+            }
 
-        // If copies_count provided, add copies if the requested count is greater than existing
-        if ($request->filled('copies_count')) {
-            $desired = (int)$request->input('copies_count');
-            $existing = $book->copies()->count();
-            if ($desired > $existing) {
-                $toCreate = $desired - $existing;
-                for ($i = 0; $i < $toCreate; $i++) {
-                    BookCopy::create([
-                        'book_id' => $book->id,
-                        'is_available' => true
-                    ]);
+            // Update copies count
+            if ($request->filled('copies_count')) {
+                $desired = (int)$request->input('copies_count');
+                $existing = $book->copies()->count();
+
+                if ($desired > $existing) {
+                    for ($i = 0; $i < ($desired - $existing); $i++) {
+                        BookCopy::create([
+                            'book_id' => $book->id,
+                            'is_available' => true
+                        ]);
+                    }
+                } elseif ($desired < $existing) {
+                    // Only delete available copies that aren't currently borrowed
+                    $availableCopies = $book->copies()
+                        ->where('is_available', true)
+                        ->whereDoesntHave('transactions', function($query) {
+                            $query->whereIn('transaction_status', ['requested', 'approved', 'borrowed']);
+                        })
+                        ->limit($existing - $desired)
+                        ->get();
+
+                    foreach ($availableCopies as $copy) {
+                        $copy->delete();
+                    }
                 }
             }
-        }
+        });
 
         return redirect()->route('books.index')->with('success', 'Book updated successfully!');
     }
 
     public function destroy(Book $book)
     {
-        $book->authors()->detach();
-        $book->delete();
+        DB::transaction(function () use ($book) {
+            // Delete copies first
+            $book->copies()->delete();
+            // Detach authors
+            $book->authors()->detach();
+            // Delete book
+            $book->delete();
+        });
 
         return redirect()->route('books.index')->with('success', 'Book deleted successfully!');
     }
+
     public function canBeRequested(Book $book)
     {
-        $availableCopies = $book->copies()->where('is_available', true)->count();
-        return $availableCopies > 0;
+        return $book->copies()->where('is_available', true)->exists();
     }
-    public function availableCopies($thesisId){
-        // Return number of available copies for a given book id
-        $availableCopiesCount = BookCopy::where('book_id', $thesisId)
-                                        ->where('is_available', true)
-                                        ->count();
-        return $availableCopiesCount;
+
+    public function availableCopies($bookId)
+    {
+        return BookCopy::where('book_id', $bookId)
+                      ->where('is_available', true)
+                      ->count();
     }
-    /**
-     * Fallback view used in several places in the app to add inventory.
-     * Some older views expect 'catalogue.addInventory' or 'books.addInventory'.
-     * Provide categories and authors so those blades won't error.
-     */
+
     public function addInventory()
     {
         $categories = Category::pluck('category_name', 'id');
         $authors = Author::all();
 
-        // Prefer catalogue.addInventory if it exists, otherwise fall back to books.create
         if (view()->exists('catalogue.addInventory')) {
             return view('catalogue.addInventory', compact('categories', 'authors'));
         }
 
         return view('books.create', compact('categories', 'authors'));
-    }
-    public function request(Request $request, Book $book){
-        $user = auth()->user();
-        if(!$user){
-            return view('auth.login');
-        }
-
-        $availableCopy = $book->getNextAvailableCopy();
-        if(!$availableCopy){
-            return redirect()->back()->with('error', 'No available copies found for this book.');
-        }
-
-        $transaction = Transaction::create([
-            'user_id' => $user->id,
-            'copy_id' => $availableCopy->id,
-            'copy_type' => get_class($availableCopy),
-            'borrow_date' => now(),
-            'due_date' => now()->addDays(7),
-            'return_date' => null,
-            'transaction_status' => 'requested',
-        ]);
-
-        // mark copy unavailable so others can't request it
-        $availableCopy->is_available = false;
-        $availableCopy->save();
-
-        return redirect()->back()->with('success', 'Book request submitted successfully. Please wait for approval.');
     }
 }

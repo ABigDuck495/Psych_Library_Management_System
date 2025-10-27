@@ -225,13 +225,6 @@
             </div>
 
             <!-- Users Table -->
-             <!-- Error Message -->
-            @if (session('error'))
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
-                    {{ session('error') }}
-                </div>
-            @endif
             <a href="{{ route('export.users', 'rawr') }}">Export All Users</a>
             <a href="{{ route('export.users', 'user') }}">Export Regular Users</a>
             <a href="{{ route('export.users', 'librarian') }}">Export Librarians</a>
@@ -241,6 +234,13 @@
             <a href="{{ route('export.users', 'inactive') }}">Export Inactive Users</a>
             <a href="{{ route('export.users', 'student') }}">Export Students</a>
             <a href="{{ route('export.users', 'employee') }}">Export Employees</a>
+            <!-- Error Message -->
+           @if (session('error'))
+               <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                   <i class="fas fa-exclamation-circle mr-2"></i>
+                   {{ session('error') }}
+               </div>
+           @endif
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
