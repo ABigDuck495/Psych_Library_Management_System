@@ -27,155 +27,284 @@
         .dashboard-bg {
             background: linear-gradient(135deg, #f0fdf4 0%, #fbfbfbff 100%);
         }
+
+        /* Fixed sidebar with scroll */
+        .sidebar-container {
+            width: 280px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 1rem;
+        }
+
+        .logout-section {
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        /* Main content adjustment */
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .sidebar-container {
+                width: 100%;
+                height: auto;
+                position: relative;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+
+            .sidebar-container.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1001;
+                background: white;
+                border: none;
+                border-radius: 0.5rem;
+                padding: 0.75rem;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+                color: #14532d;
+            }
+        }
+
+        /* Scrollbar styling for sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
     </style>
     
     @stack('styles')
 </head>
 <body class="dashboard-bg min-h-screen">
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn hidden md:hidden" id="mobileMenuBtn">
+        <i class="fas fa-bars text-lg"></i>
+    </button>
+
     <div class="flex">
         <!-- Sidebar Navigation -->
-        <div class="sidebar">
-            <!-- Logo and App Name -->
-            <div class="sidebar-logo">
-                <div class="logo-icon">
-                    <i class="fas fa-book text-green-800 text-lg"></i>
+        <div class="sidebar-container" id="sidebarContainer">
+            <div class="sidebar">
+                <!-- Logo and App Name -->
+                <div class="sidebar-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-book text-green-800 text-lg"></i>
+                    </div>
+                    <h1 class="logo-text">Psych Library</h1>
                 </div>
-                <h1 class="logo-text">Psych Library</h1>
-            </div>
-            
-            <!-- User Profile Section -->
-            <div class="user-profile">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <i class="fas fa-user text-green-600 text-xl"></i>
+                
+                <!-- User Profile Section -->
+                <div class="user-profile">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <div class="user-name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                            <div class="user-role">{{ Auth::user()->role }}</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="user-name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
-                        <div class="user-role">{{ Auth::user()->role }}</div>
+                    <div class="user-details">
+                        <div class="user-detail">
+                            <span class="detail-label">University ID:</span>
+                            <span class="detail-value">{{ Auth::user()->university_id }}</span>
+                        </div>
+                        <div class="user-detail">
+                            <span class="detail-label">Status:</span>
+                            <span class="status-active">{{ Auth::user()->account_status }}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="user-details">
-                    <div class="user-detail">
-                        <span class="detail-label">University ID:</span>
-                        <span class="detail-value">{{ Auth::user()->university_id }}</span>
+                
+                <!-- Scrollable Content -->
+                <div class="sidebar-content">
+                    <!-- Navigation Menu -->
+                    <div class="nav-section">
+                        <h2 class="section-title">Main Navigation</h2>
+                        <ul class="nav-menu">
+                            <li>
+                                <a href="{{ in_array(Auth::user()->role, ['admin', 'librarian']) ? route('adminInterface.index') : route('userInterface.index') }}" 
+                                   class="nav-item {{ in_array(Auth::user()->role, ['admin', 'librarian']) ? 
+                                                    (request()->routeIs('adminInterface.*') ? 'active' : '') : 
+                                                    (request()->routeIs('userInterface.*') ? 'active' : '') }}">
+                                    <i class="fas fa-home nav-icon"></i>
+                                    Dashboard
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="user-detail">
-                        <span class="detail-label">Status:</span>
-                        <span class="status-active">{{ Auth::user()->account_status }}</span>
+                    
+                    <!-- Management Sections - Only for Admin and Librarian -->
+                    @if(in_array(Auth::user()->role, ['admin', 'librarian']))
+                    <div class="nav-section">
+                        <h2 class="section-title">Management</h2>
+                        <ul class="nav-menu">
+                            <li>
+                                <a href="{{ route('users.index') }}" class="nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                                    <i class="fas fa-users nav-icon"></i>
+                                    User Management
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('books.index') }}" class="nav-item {{ request()->routeIs('books.*') ? 'active' : '' }}">
+                                    <i class="fas fa-book-open nav-icon"></i>
+                                    Book Management
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('theses.index') }}" class="nav-item {{ request()->routeIs('theses.*') ? 'active' : '' }}">
+                                    <i class="fas fa-file-alt nav-icon"></i>
+                                    Thesis Management
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('authors.index') }}" class="nav-item {{ request()->routeIs('authors.*') ? 'active' : '' }}">
+                                    <i class="fas fa-user-edit nav-icon"></i>
+                                    Author Management
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('transactions.index') }}" class="nav-item {{ request()->routeIs('transactions.*') ? 'active' : '' }}">
+                                    <i class="fas fa-exchange-alt nav-icon"></i>
+                                    Transactions
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                </div>
-            </div>
-             
-            <!-- Navigation Menu -->
-            <div class="nav-section">
-                <h2 class="section-title">Main Navigation</h2>
-                <ul class="nav-menu">
-                    <li>
-                        <a href="{{ in_array(Auth::user()->role, ['admin', 'librarian']) ? route('adminInterface.index') : route('userInterface.index') }}" 
-                           class="nav-item {{ in_array(Auth::user()->role, ['admin', 'librarian']) ? 
-                                            (request()->routeIs('adminInterface.*') ? 'active' : '') : 
-                                            (request()->routeIs('userInterface.*') ? 'active' : '') }}">
-                            <i class="fas fa-home nav-icon"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            
-            <!-- Management Sections - Only for Admin and Librarian -->
-            @if(in_array(Auth::user()->role, ['admin', 'librarian']))
-            <div class="nav-section">
-                <h2 class="section-title">Management</h2>
-                <ul class="nav-menu">
-                    <li>
-                        <a href="{{ route('users.index') }}" class="nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                            <i class="fas fa-users nav-icon"></i>
-                            User Management
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('books.index') }}" class="nav-item {{ request()->routeIs('books.*') ? 'active' : '' }}">
-                            <i class="fas fa-book-open nav-icon"></i>
-                            Book Management
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('theses.index') }}" class="nav-item {{ request()->routeIs('theses.*') ? 'active' : '' }}">
-                            <i class="fas fa-file-alt nav-icon"></i>
-                            Thesis Management
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('authors.index') }}" class="nav-item {{ request()->routeIs('authors.*') ? 'active' : '' }}">
-                            <i class="fas fa-user-edit nav-icon"></i>
-                            Author Management
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('transactions.index') }}" class="nav-item {{ request()->routeIs('transactions.*') ? 'active' : '' }}">
-                            <i class="fas fa-exchange-alt nav-icon"></i>
-                            Transactions
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            @endif
+                    @endif
 
-            <!-- User Sections - For All Users -->
-            <div class="nav-section">
-                <h2 class="section-title">My Account</h2>
-                <ul class="nav-menu">
-                    <li>
-                        <a href="{{ route('userInterface.borrowedBooks') }}" class="nav-item {{ request()->routeIs('userInterface.borrowedBooks') ? 'active' : '' }}">
-                            <i class="fas fa-book nav-icon"></i>
-                            My Borrowed Items
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('userInterface.borrowingHistory') }}" class="nav-item {{ request()->routeIs('userInterface.borrowingHistory') ? 'active' : '' }}">
-                            <i class="fas fa-history nav-icon"></i>
-                            Borrowing History
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            
-            <!-- Library Resources - For All Users -->
-            <div class="nav-section">
-                <h2 class="section-title">Library Resources</h2>
-                <ul class="nav-menu">
-                    <li>
-                        <a href="{{ route('theses.index') }}" class="nav-item">
-                            <i class="fas fa-file-alt nav-icon"></i>
-                            Academic Theses
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('books.index') }}" class="nav-item">
-                            <i class="fas fa-book-open nav-icon"></i>
-                            Book Collection
-                        </a>
-                    </li>
-                </ul>
-            </div>
+                    <!-- User Sections - Only for Regular Users -->
+                    @if(!in_array(Auth::user()->role, ['admin', 'librarian']))
+                    <div class="nav-section">
+                        <h2 class="section-title">My Account</h2>
+                        <ul class="nav-menu">
+                            <li>
+                                <a href="{{ route('userInterface.borrowedBooks') }}" class="nav-item {{ request()->routeIs('userInterface.borrowedBooks') ? 'active' : '' }}">
+                                    <i class="fas fa-book nav-icon"></i>
+                                    My Borrowed Items
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('userInterface.borrowingHistory') }}" class="nav-item {{ request()->routeIs('userInterface.borrowingHistory') ? 'active' : '' }}">
+                                    <i class="fas fa-history nav-icon"></i>
+                                    Borrowing History
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Library Resources - Only for Regular Users -->
+                    <div class="nav-section">
+                        <h2 class="section-title">Library Resources</h2>
+                        <ul class="nav-menu">
+                            <li>
+                                <a href="{{ route('theses.index') }}" class="nav-item">
+                                    <i class="fas fa-file-alt nav-icon"></i>
+                                    Academic Theses
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('books.index') }}" class="nav-item">
+                                    <i class="fas fa-book-open nav-icon"></i>
+                                    Book Collection
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    @endif
+                </div>
 
-            <!-- Logout Button -->
-            <div class="logout-section">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="logout-btn">
-                        <i class="fas fa-sign-out-alt nav-icon"></i>
-                        Logout
-                    </button>
-                </form>
+                <!-- Logout Button - Always visible at bottom -->
+                <div class="logout-section">
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="logout-btn">
+                            <i class="fas fa-sign-out-alt nav-icon"></i>
+                            Logout
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
         <!-- Main Content Area -->
-        <main class="flex-1 overflow-auto">
+        <main class="main-content flex-1 overflow-auto">
             @yield('content')
         </main>
     </div>
+
+    <script>
+        // Mobile sidebar toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebarContainer = document.getElementById('sidebarContainer');
+            
+            if (mobileMenuBtn && sidebarContainer) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    sidebarContainer.classList.toggle('mobile-open');
+                });
+            }
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 768) {
+                    const isClickInsideSidebar = sidebarContainer.contains(event.target);
+                    const isClickOnMenuBtn = mobileMenuBtn.contains(event.target);
+                    
+                    if (!isClickInsideSidebar && !isClickOnMenuBtn && sidebarContainer.classList.contains('mobile-open')) {
+                        sidebarContainer.classList.remove('mobile-open');
+                    }
+                }
+            });
+        });
+    </script>
 
     @stack('scripts')
 </body>
