@@ -71,7 +71,10 @@
                 <h2 class="section-title">Main Navigation</h2>
                 <ul class="nav-menu">
                     <li>
-                        <a href="{{ route('adminInterface.index') }}" class="nav-item {{ request()->routeIs('adminInterface.*') ? 'active' : '' }}">
+                        <a href="{{ in_array(Auth::user()->role, ['admin', 'librarian']) ? route('adminInterface.index') : route('userInterface.index') }}" 
+                           class="nav-item {{ in_array(Auth::user()->role, ['admin', 'librarian']) ? 
+                                            (request()->routeIs('adminInterface.*') ? 'active' : '') : 
+                                            (request()->routeIs('userInterface.*') ? 'active' : '') }}">
                             <i class="fas fa-home nav-icon"></i>
                             Dashboard
                         </a>
@@ -79,7 +82,8 @@
                 </ul>
             </div>
             
-            <!-- Management Sections -->
+            <!-- Management Sections - Only for Admin and Librarian -->
+            @if(in_array(Auth::user()->role, ['admin', 'librarian']))
             <div class="nav-section">
                 <h2 class="section-title">Management</h2>
                 <ul class="nav-menu">
@@ -115,8 +119,9 @@
                     </li>
                 </ul>
             </div>
+            @endif
 
-            <!-- User Sections -->
+            <!-- User Sections - For All Users -->
             <div class="nav-section">
                 <h2 class="section-title">My Account</h2>
                 <ul class="nav-menu">
@@ -135,18 +140,18 @@
                 </ul>
             </div>
             
-            <!-- Library Resources -->
+            <!-- Library Resources - For All Users -->
             <div class="nav-section">
                 <h2 class="section-title">Library Resources</h2>
                 <ul class="nav-menu">
                     <li>
-                        <a href="#theses" class="nav-item">
+                        <a href="{{ route('theses.index') }}" class="nav-item">
                             <i class="fas fa-file-alt nav-icon"></i>
                             Academic Theses
                         </a>
                     </li>
                     <li>
-                        <a href="#books" class="nav-item">
+                        <a href="{{ route('books.index') }}" class="nav-item">
                             <i class="fas fa-book-open nav-icon"></i>
                             Book Collection
                         </a>
