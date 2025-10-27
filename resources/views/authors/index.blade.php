@@ -71,6 +71,13 @@
                 Export Prolific Authors
             </a>
         </div>
+            <!-- Error Message -->
+           @if (session('error'))
+               <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                   <i class="fas fa-exclamation-circle mr-2"></i>
+                   {{ session('error') }}
+               </div>
+           @endif
     </div>
 
     <!-- Search and Filter Section -->
