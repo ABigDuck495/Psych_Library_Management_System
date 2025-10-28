@@ -271,11 +271,11 @@ class TransactionController extends Controller
             // Create transaction using polymorphic relationship
             $transaction = Transaction::create([
                 'user_id' => $user->id,
-                'borrowable_id' => $availableCopy->id,
+                'borrowable_id' => $availableCopy->book_id,
                 'borrowable_type' => BookCopy::class,
                 'transaction_status' => 'requested',
                 'borrow_date' => now(),
-                'due_date' => now()->addDays(14),
+                'due_date' => now()->addDays(7),
             ]);
 
             // Mark copy as unavailable
@@ -319,7 +319,7 @@ class TransactionController extends Controller
                 'borrowable_type' => ThesisCopy::class,
                 'transaction_status' => 'requested',
                 'borrow_date' => now(),
-                'due_date' => now()->addDays(14),
+                'due_date' => now()->addDays(1),
             ]);
 
             // Mark copy as unavailable
@@ -362,20 +362,36 @@ class TransactionController extends Controller
         return redirect()->back()->with('success', 'Transaction marked as borrowed.');
     }
 
-    public function returnItem(Transaction $transaction)
+    public function returnBook(Request $request, Transaction $transaction)
     {
-        if (!in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian'])) {
+        $user = auth()->user();
+
+        if (!$user || (!in_array($user->role, ['admin','super-admin','librarian']) && $transaction->user_id !== $user->id)) {
             abort(403, 'Unauthorized action.');
         }
 
-        if ($transaction->transaction_status === 'returned') {
-            return redirect()->back()->with('error', 'Transaction already returned.');
+        if ($transaction->transaction_status !== 'borrowed' && $transaction->transaction_status !== 'overdue') {
+            return redirect()->back()->with('error', 'Only borrowed or overdue transactions can be returned.');
         }
 
         $transaction->markAsReturned();
-        return redirect()->back()->with('success', 'Item returned successfully.');
+        return redirect()->back()->with('success', 'Transaction marked as returned.');
     }
+    public function returnThesis(Request $request, Transaction $transaction)
+    {
+        $user = auth()->user();
 
+        if (!$user || (!in_array($user->role, ['admin','super-admin','librarian']) && $transaction->user_id !== $user->id)) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($transaction->transaction_status !== 'borrowed' && $transaction->transaction_status !== 'overdue') {
+            return redirect()->back()->with('error', 'Only borrowed or overdue transactions can be returned.');
+        }
+
+        $transaction->markAsReturned();
+        return redirect()->back()->with('success', 'Transaction marked as returned.');
+    }
     public function renew(Request $request, Transaction $transaction)
     {
         $user = auth()->user();

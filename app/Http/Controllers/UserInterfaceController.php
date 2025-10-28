@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Models\Thesis;
+use App\Models\BookCopy;
+use App\Models\ThesisCopy;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class UserInterfaceController extends Controller
@@ -76,18 +79,27 @@ class UserInterfaceController extends Controller
 {
     $user = auth()->user();
 
-    $pendingTransactions = Transaction::with('copy')
+    $pendingTransactions = Transaction::with(['borrowable' => function ($morphTo) {
+        $morphTo->morphWith([
+            BookCopy::class => ['book'],
+            ThesisCopy::class => ['thesis'],
+        ]);
+    }])
     ->where('user_id', $user->id)
     ->whereIn('transaction_status', ['requested', 'pending'])
     ->latest()
     ->get();
 
-    $borrowedTransactions = Transaction::with('copy')
+    $borrowedTransactions = Transaction::with(['borrowable' => function ($morphTo) {
+        $morphTo->morphWith([
+            BookCopy::class => ['book'],
+            ThesisCopy::class => ['thesis'],
+        ]);
+    }])
     ->where('user_id', $user->id)
     ->whereIn('transaction_status', ['borrowed', 'overdue'])
     ->latest()
     ->get();
-
 
     return view('userInterface.borrowedBooks', compact('pendingTransactions', 'borrowedTransactions'));
 

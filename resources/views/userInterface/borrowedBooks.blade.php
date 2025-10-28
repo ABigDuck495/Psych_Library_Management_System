@@ -212,7 +212,7 @@
                                             <div class="flex flex-col space-y-2">
                                                 <form action="{{ route('transactions.return', $transaction) }}" method="POST">
                                                     @csrf
-                                                    @method('PUT')
+                                                    @method('PATCH')
                                                     <button type="submit" 
                                                             class="action-btn bg-green-600 hover:bg-green-700 text-white rounded transition"
                                                             onclick="return confirm('Are you sure you want to return this item?')">

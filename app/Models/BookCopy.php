@@ -9,6 +9,8 @@ class BookCopy extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'id'; // ADD THIS LINE
+
     protected $fillable = [
         'book_id',
         'is_available'

@@ -288,35 +288,7 @@
         </form>
     </div>
 
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <!-- Last Updated -->
-        <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
-            <div class="flex items-center">
-                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mr-3">
-                    <i class="fas fa-clock text-blue-600"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-blue-700 font-medium">Last Updated</p>
-                    <p class="text-blue-900">{{ $book->updated_at->format('M j, Y g:i A') }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Created Date -->
-        <div class="bg-green-50 rounded-xl p-4 border border-green-200">
-            <div class="flex items-center">
-                <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3">
-                    <i class="fas fa-calendar-plus text-green-600"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-green-700 font-medium">Created Date</p>
-                    <p class="text-green-900">{{ $book->created_at->format('M j, Y g:i A') }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+   
 
 <script>
     // Dynamic Author Functionality

@@ -15,6 +15,7 @@ class ThesisCopy extends Model
     ];
 
     // Fixed: Added proper foreign key
+    protected $primaryKey = 'id';
     public function thesis()
     {
         return $this->belongsTo(Thesis::class, 'thesis_id');

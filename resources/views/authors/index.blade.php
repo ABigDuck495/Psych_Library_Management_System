@@ -2,41 +2,62 @@
 
 @section('title', 'Authors Management - Psych Library')
 
-@push('styles')
-<style>
-    .table-row-hover:hover {
-        background-color: #f8fafc;
-    }
-    
-    .action-btn {
-        transition: all 0.2s ease;
-    }
-    
-    .action-btn:hover {
-        transform: translateY(-1px);
-    }
-    
-    .add-author-btn {
-        transition: all 0.3s ease;
-    }
-    
-    .add-author-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-    }
-</style>
-@endpush
-
 @section('content')
-<div class="flex-1 p-8">
+<div class="container mx-auto px-6 py-8">
     <!-- Header Section -->
     <div class="flex justify-between items-center mb-8">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800">Author Management</h1>
+            <h1 class="text-3xl font-bold text-gray-800">Authors Management</h1>
+            <p class="text-gray-600 mt-2">Manage book and thesis authors</p>
         </div>
         
-        <div>
-            <a href="{{ route('authors.create') }}" class="add-author-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
+        <div class="flex space-x-3">
+            <!-- Export Dropdown -->
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" 
+                        class="export-dropdown-btn bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
+                    <i class="fas fa-file-export mr-2"></i>
+                    Export Authors
+                    <i class="fas fa-chevron-down ml-2 text-xs"></i>
+                </button>
+                
+                <!-- Dropdown Menu -->
+                <div x-show="open" 
+                     @click.away="open = false" 
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg z-10 border border-gray-200 py-2">
+                    <!-- Export All -->
+                    <div class="px-4 py-2 border-b border-gray-100">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2">Export Authors</h3>
+                        <div class="space-y-1">
+                            <a href="{{ route('export.authors', 'all') }}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition">
+                                <i class="fas fa-users mr-2 text-blue-600"></i>
+                                All Authors
+                            </a>
+                            <a href="{{ route('export.authors', 'books') }}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-lg transition">
+                                <i class="fas fa-book mr-2 text-green-600"></i>
+                                Book Authors
+                            </a>
+                            <a href="{{ route('export.authors', 'theses') }}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition">
+                                <i class="fas fa-graduation-cap mr-2 text-purple-600"></i>
+                                Thesis Authors
+                            </a>
+                            <a href="{{ route('export.authors', 'prolific') }}" class="block px-3 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-700 rounded-lg transition">
+                                <i class="fas fa-star mr-2 text-orange-600"></i>
+                                Prolific Authors
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Author Button -->
+            <a href="{{ route('authors.create') }}" class="add-author-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg font-medium flex items-center transition shadow-md">
                 <i class="fas fa-plus-circle mr-2"></i>
                 Add New Author
             </a>
@@ -51,34 +72,13 @@
         </div>
     @endif
 
-    <!-- Export Buttons -->
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <div class="flex flex-wrap gap-4">
-            <a href="{{ route('export.authors', 'all') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                <i class="fas fa-download mr-2"></i>
-                Export All Authors
-            </a>
-            <a href="{{ route('export.authors', 'books') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                <i class="fas fa-download mr-2"></i>
-                Export Book Authors
-            </a>
-            <a href="{{ route('export.authors', 'theses') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                <i class="fas fa-download mr-2"></i>
-                Export Thesis Authors
-            </a>
-            <a href="{{ route('export.authors', 'prolific') }}" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
-                <i class="fas fa-download mr-2"></i>
-                Export Prolific Authors
-            </a>
+    <!-- Error Message -->
+    @if (session('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            {{ session('error') }}
         </div>
-            <!-- Error Message -->
-           @if (session('error'))
-               <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
-                   <i class="fas fa-exclamation-circle mr-2"></i>
-                   {{ session('error') }}
-               </div>
-           @endif
-    </div>
+    @endif
 
     <!-- Search and Filter Section -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
@@ -138,6 +138,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Works Count</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
@@ -150,20 +151,41 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $author->id }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $author->first_name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $author->last_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <div class="flex items-center space-x-4">
+                                    @if($author->books_count > 0)
+                                        <span class="bg-green-100 text-green-800 works-badge">
+                                            {{ $author->books_count }} Book{{ $author->books_count > 1 ? 's' : '' }}
+                                        </span>
+                                    @endif
+                                    @if($author->theses_count > 0)
+                                        <span class="bg-blue-100 text-blue-800 works-badge">
+                                            {{ $author->theses_count }} Thesis{{ $author->theses_count > 1 ? 'es' : '' }}
+                                        </span>
+                                    @endif
+                                    @if($author->books_count == 0 && $author->theses_count == 0)
+                                        <span class="text-gray-400 text-xs italic">No works</span>
+                                    @endif
+                                </div>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
                                     <a href="{{ route('authors.edit', $author->id) }}" 
-                                       class="text-yellow-600 hover:text-yellow-900 action-btn p-2 text-lg inline-flex items-center justify-center" 
+                                       class="text-yellow-600 hover:text-yellow-900 action-btn" 
                                        title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-
+                                    <a href="{{ route('authors.show', $author->id) }}" 
+                                       class="text-blue-600 hover:text-blue-900 action-btn" 
+                                       title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
                                     <form action="{{ route('authors.destroy', $author->id) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" 
                                                 onclick="return confirm('Are you sure you want to delete this author?');"
-                                                class="text-red-600 hover:text-red-900 action-btn p-2 text-lg inline-flex items-center justify-center" 
+                                                class="text-red-600 hover:text-red-900 action-btn" 
                                                 title="Delete">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -173,7 +195,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-12 text-center">
+                            <td colspan="5" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-gray-400">
                                     <i class="fas fa-user-edit text-5xl mb-4"></i>
                                     <h3 class="text-lg font-medium mb-2">No authors found</h3>
@@ -193,11 +215,95 @@
         </div>
     </div>
 
-    <!-- Pagination would go here -->
+    <!-- Pagination -->
+    @if($authors->count() > 0)
+        <div class="mt-6">
+            {{ $authors->links() }}
+        </div>
+    @endif
 </div>
-@endsection
+
+@push('styles')
+<style>
+    .table-row-hover:hover {
+        background-color: #f8fafc;
+    }
+    
+    .action-btn {
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-1px);
+    }
+    
+    .works-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+    
+    .add-author-btn {
+        transition: all 0.3s ease;
+    }
+    
+    .add-author-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    }
+
+    .export-dropdown-btn {
+        transition: all 0.3s ease;
+    }
+    
+    .export-dropdown-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Pagination Styles */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+    }
+    
+    .pagination li {
+        margin: 0 4px;
+    }
+    
+    .pagination li a, 
+    .pagination li span {
+        display: inline-block;
+        padding: 8px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        color: #374151;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .pagination li a:hover {
+        background-color: #f3f4f6;
+    }
+    
+    .pagination li.active span {
+        background-color: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+    
+    .pagination li.disabled span {
+        color: #9ca3af;
+        background-color: #f9fafb;
+    }
+</style>
+@endpush
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script>
     // Filter functionality
     document.addEventListener('DOMContentLoaded', function() {
@@ -240,3 +346,4 @@
     });
 </script>
 @endpush
+@endsection

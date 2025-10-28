@@ -97,6 +97,10 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('theses', ThesisController::class)->except(['index', 'show']);
         Route::resource('authors', AuthorController::class);
 
+        //pdf
+        Route::get('theses/{thesis}/download', [ThesisController::class, 'downloadPdf'])->name('theses.downloadPdf');
+        Route::get('theses/{thesis}/view', [ThesisController::class, 'viewPdf'])->name('theses.viewPdf');
+
         //user index and show
         Route::resource('users', UserController::class)->only(['index', 'show']);
 
@@ -129,6 +133,7 @@ Route::middleware(['auth'])->group(function () {
         // Request actions and renew
         Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');
         Route::post('/theses/{thesis}/request', [TransactionController::class, 'requestThesis'])->name('transactions.request-thesis');
+        Route::post('/transactions/{transaction}/cancel', [TransactionController::class, 'cancelRequest'])->name('transactions.cancel-request');
         Route::patch('/transactions/{transaction}/renew', [TransactionController::class, 'renew'])->name('transactions.renew');
 
         // Route::get('')
