@@ -42,12 +42,12 @@ class Book extends Model
     {
         return $this->hasManyThrough(
             Transaction::class, 
-            ThesisCopy::class, 
-            'thesis_id', // Foreign key on thesis_copies table
+            BookCopy::class, 
+            'book_id', // Foreign key on book_copies table
             'borrowable_id', // Foreign key on transactions table
-            'id', // Local key on theses table
+            'id', // Local key on book table
             'id' // Local key on thesis_copies table
-        )->where('borrowable_type', ThesisCopy::class);
+        )->where('borrowable_type', BookCopy::class);
     }
 
 // In Book.php - ensure this method exists and works
