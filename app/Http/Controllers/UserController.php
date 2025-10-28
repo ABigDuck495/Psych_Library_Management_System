@@ -81,9 +81,10 @@ class UserController extends Controller
                 'role' => 'required|string|in:user,librarian,admin,super-admin',
                 'user_type' => 'required|string|in:student,employee',
                 'account_status' => 'required|string|in:Active,Inactive,Suspended',
-                'position_title' => 'nullable|required_if:user_type,employee|string|max:255',
-                'academic_program' => 'nullable|required_if:user_type,student|string|max:255',
+                'position_title' => 'nullable|string|max:255',
+                'academic_program' => 'nullable|string|max:255',
                 'department' => 'nullable|string|max:255',
+                'major_department' => 'nullable|string|max:255',
             ]);
 
             $user = User::create([
@@ -104,7 +105,7 @@ class UserController extends Controller
                 Student::create([
                     'id' => $user->id,
                     'academic_program' => $validated['academic_program'],
-                    'department' => $validated['department']
+                    'department' => $validated['major_department']
                 ]);
             } elseif ($validated['user_type'] === 'employee'){
                 Employee::create([
@@ -208,7 +209,7 @@ class UserController extends Controller
                     ['id' => $user->id],
                     [
                         'academic_program' => $validated['academic_program'],
-                        'department' => $validated['department']
+                        'department' => $validated['major_department']
                     ]
                 );
                 // Remove employee record if exists
