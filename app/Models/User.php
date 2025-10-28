@@ -90,29 +90,32 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class, 'user_id')->where('transaction_status', 'overdue');
     }
 
-    // Fixed: Added proper polymorphic relationships
     public function hasPendingRequestForBook($bookId)
     {
+        $book = Book::find($bookId);
+        if (!$book) return false;
+        
+        $copyIds = $book->copies()->pluck('id');
+        
         return $this->transactions()
-                    ->whereIn('transaction_status', ['requested', 'approved'])
-                    ->whereHasMorph('borrowable', [BookCopy::class], function ($query) use ($bookId) {
-                        $query->whereHas('book', function ($q) use ($bookId) {
-                            $q->where('id', $bookId);
-                        });
-                    })
-                    ->exists();
+            ->where('borrowable_type', BookCopy::class)
+            ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
+            ->whereIn('borrowable_id', $copyIds)
+            ->exists();
     }
 
     public function hasPendingRequestForThesis($thesisId)
     {
+        $thesis = Thesis::find($thesisId);
+        if (!$thesis) return false;
+        
+        $copyIds = $thesis->copies()->pluck('id');
+        
         return $this->transactions()
-                    ->whereIn('transaction_status', ['requested', 'approved'])
-                    ->whereHasMorph('borrowable', [ThesisCopy::class], function ($query) use ($thesisId) {
-                        $query->whereHas('thesis', function ($q) use ($thesisId) {
-                            $q->where('id', $thesisId);
-                        });
-                    })
-                    ->exists();
+            ->where('borrowable_type', ThesisCopy::class)
+            ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
+            ->whereIn('borrowable_id', $copyIds)
+            ->exists();
     }
 
     public function scopeStudents($query)

@@ -38,24 +38,19 @@ class Book extends Model
         return $this->hasMany(BookCopy::class, 'book_id')->where('is_available', true);
     }
 
-    // Fixed: Correct polymorphic relationship
     public function transactions()
     {
-        return $this->hasManyThrough(
-            Transaction::class, 
-            BookCopy::class, 
-            'book_id', // Foreign key on book_copies table
-            'borrowable_id', // Foreign key on transactions table
-            'id', // Local key on books table
-            'id' // Local key on book_copies table
-        )->where('borrowable_type', BookCopy::class);
+        return Transaction::where('borrowable_type', BookCopy::class)
+            ->whereHas('borrowable', function($query) {
+                $query->where('book_id', $this->id);
+            });
     }
 
+// In Book.php - ensure this method exists and works
     public function getNextAvailableCopy()
     {
         return $this->copies()->available()->first();
     }
-
     public function canBeRequested()
     {
         return $this->copies()->available()->exists();
@@ -66,15 +61,23 @@ class Book extends Model
         return $this->copies()->available()->count();
     }
 
-    // Fixed: Added proper status check
+
     public function hasUserRequested($userId)
     {
-        return $this->transactions()
-                    ->where('user_id', $userId)
-                    ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
-                    ->exists();
-    }
+        // Get all copy IDs for this specific book
+        $copyIds = $this->copies()->pluck('id');
+        
+        if ($copyIds->isEmpty()) {
+            return false;
+        }
 
+        // Check only for BookCopy transactions
+        return Transaction::where('user_id', $userId)
+            ->where('borrowable_type', BookCopy::class)
+            ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
+            ->whereIn('borrowable_id', $copyIds)
+            ->exists();
+    }
     public function scopeSearch($query, $term)
     {
         $term = "%$term%";
@@ -87,10 +90,12 @@ class Book extends Model
               });
         });
     }
+
     public function hasAvailableCopies()
     {
         return $this->copies()->where('is_available', true)->exists();
     }
+
     public static function availableBooks(){
         return self::whereHas('copies', function($q) {
             $q->where('is_available', true);

@@ -77,10 +77,10 @@
     @if(in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian']))
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
         <div class="flex space-x-4">
-            <a href="{{ route('transactions.requested-books') }}" class="action-button bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
+            <!-- <a href="{{ route('transactions.requested-books') }}" class="action-button bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
                 <i class="fas fa-clock mr-2"></i>
                 View Requested Books
-            </a>
+            </a> -->
             <a href="{{ route('export.transactions', 'overdue') }}" class="action-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
                 <i class="fas fa-exclamation-triangle mr-2"></i>
                 Overdue Report
@@ -210,9 +210,9 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('transactions.show', $transaction) }}" class="text-blue-600 hover:text-blue-900 action-btn" title="View">
+                                        <!-- <a href="{{ route('transactions.show', $transaction) }}" class="text-blue-600 hover:text-blue-900 action-btn" title="View">
                                             <i class="fas fa-eye"></i>
-                                        </a>
+                                        </a> -->
                                         
                                         @if(in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian']))
                                             @if($transaction->transaction_status === 'requested')
