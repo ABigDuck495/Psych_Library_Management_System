@@ -104,15 +104,18 @@ class BookController extends Controller
 
 
     public function show(Book $book)
-    {
-        $activeTransaction = $book->transactions()
-            ->where('user_id', Auth::id())
-            ->where('transaction_status', 'requested')
-            ->latest()
-            ->first();
-        $book->load(['authors', 'category', 'copies']);
-        return view('books.show', compact('book', 'activeTransaction'));
-    }
+{
+    $activeTransaction = $book->viewDetails()
+        ->where('user_id', Auth::id())
+        ->where('transaction_status', 'requested')
+        ->latest()
+        ->first();
+
+    $book->load(['authors', 'category', 'copies']);
+
+    return view('books.show', compact('book', 'activeTransaction'));
+}
+
 
     public function edit(Book $book)
     {
