@@ -1,151 +1,298 @@
 @extends('layouts.app')
 
-@section('title', $book->title)
+@section('title', $book->title . ' - Psych Library')
 
 @section('content')
-<div class="p-8">
-    <div class="max-w-4xl mx-auto">
-        <!-- Header Section -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">{{ $book->title }}</h1>
-            <div class="flex items-center space-x-4 text-gray-600">
-                <span class="flex items-center">
-                    <i class="fas fa-book-open mr-2"></i>
-                    Book Details
-                </span>
-            </div>
+<div class="container mx-auto px-6 py-8">
+    <!-- Header Section -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Book Details and Information</h1>
         </div>
-
-        <!-- Book Details Card -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Book Information -->
-                <div class="lg:col-span-2">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Book Information</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Authors</label>
-                            <p class="mt-1 text-gray-800">
-                                {{ $book->authors->map(function($a) { return trim($a->first_name . ' ' . $a->last_name); })->implode(', ') ?: 'N/A' }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Year Published</label>
-                            <p class="mt-1 text-gray-800">{{ $book->year_published }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Category</label>
-                            <p class="mt-1 text-gray-800">{{ $book->category->category_name }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Available Copies</label>
-                            <p class="mt-1 text-gray-800 font-semibold">
-                                {{ $book->availableCopies()->count() }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600">Description</label>
-                            <p class="mt-1 text-gray-800 leading-relaxed">{{ $book->description }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Request Section -->
-                <div class="flex flex-col justify-center">
-                    <div class="text-center">
-                        @auth
-                            @if($book->canBeRequested() && !$book->hasUserRequested(Auth::id()))
-                                <form action="{{ route('transactions.request-book', $book) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
-                                        <i class="fas fa-hand-paper mr-2"></i>
-                                        Request This Book
-                                    </button>
-                                </form>
-                                <p class="text-sm text-gray-600 mt-3">
-                                    Click to request this book for borrowing
-                                </p>
-                            @elseif($book->hasUserRequested(Auth::id()))
-                                @php
-                                    $activeTransaction = $book->transactions()
-                                        ->where('user_id', Auth::id())
-                                        ->where('transaction_status', 'requested')
-                                        ->latest()
-                                        ->first();
-                                @endphp
-
-                                @if($activeTransaction)
-                                    <form action="{{ route('transactions.cancel-request', $activeTransaction->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
-                                            <i class="fas fa-clock mr-2"></i>
-                                            Cancel Request
-                                        </button>
-                                    </form>
-                                    <p class="text-sm text-gray-600 mt-3">
-                                        You have a pending request. You may cancel it.
-                                    </p>
-                                @else
-                                    <button disabled class="bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg opacity-90 cursor-not-allowed">
-                                        <i class="fas fa-times-circle mr-2"></i>
-                                        No Active Request Found
-                                    </button>
-                                @endif
-                            @else
-                                <button disabled class="bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg opacity-90 cursor-not-allowed">
-                                    <i class="fas fa-times-circle mr-2"></i>
-                                    No Copies Available
-                                </button>
-                                <p class="text-sm text-gray-600 mt-3">
-                                    All copies are currently borrowed
-                                </p>
-                            @endif
-
-                            <div class="mt-6">
-                                <a href="{{ route('userInterface.borrowedBooks') }}" class="text-green-600 hover:text-green-700 font-medium">
-                                    <i class="fas fa-list mr-2"></i>
-                                    View My Requests
-                                </a>
-                            </div>
-                        @else
-                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                                <p class="text-yellow-800">
-                                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                                    Please log in to request books
-                                </p>
-                            </div>
-                        @endauth
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Display messages -->
-        @if(session('success'))
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    {{ session('success') }}
-                </div>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-                <div class="flex items-center">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
-                    {{ session('error') }}
-                </div>
-            </div>
-        @endif
-
-        <!-- Back to Books Link -->
-        <div class="mt-8">
-            <a href="{{ route('books.index') }}" class="inline-flex items-center text-green-600 hover:text-green-700 font-medium">
+        
+        <div>
+            <a href="{{ route('books.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
                 <i class="fas fa-arrow-left mr-2"></i>
-                Back to Book Collection
+                Back to Books
             </a>
         </div>
     </div>
+
+    <!-- Success/Error Messages -->
+    @if(session('success'))
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <!-- Book Information -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <!-- Basic Information Card -->
+        <div class="bg-white rounded-xl shadow-sm p-6 info-card lg:col-span-2">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-info-circle mr-2 text-blue-600"></i>
+                Book Information
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Title</label>
+                        <p class="text-gray-800 font-medium">{{ $book->title }}</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Year Published</label>
+                        <p class="text-gray-800 font-medium">{{ $book->year_published }}</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Available Copies</label>
+                        <div class="flex items-center">
+                            <span class="text-gray-800 font-medium">{{ $book->availableCopies()->count() }}</span>
+                            @if($book->availableCopies()->count() > 0)
+                                <span class="ml-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Available</span>
+                            @else
+                                <span class="ml-2 bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Unavailable</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Category</label>
+                        <span class="bg-purple-100 text-purple-800 department-badge">
+                            {{ $book->category->category_name ?? 'Uncategorized' }}
+                        </span>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Authors</label>
+                        <p class="text-gray-800 font-medium">
+                            {{ $book->authors->map(function($a) { return trim($a->first_name . ' ' . $a->last_name); })->implode(', ') ?: 'N/A' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Request Card -->
+        <div class="bg-white rounded-xl shadow-sm p-6 info-card">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-book mr-2 text-green-600"></i>
+                Request Book
+            </h2>
+            
+            <div class="flex flex-col items-center mb-6">
+                <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                    <i class="fas fa-book-open text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-800 text-center">{{ Str::limit($book->title, 50) }}</h3>
+                <p class="text-gray-600 text-center mt-1">{{ $book->category->category_name ?? 'General' }}</p>
+            </div>
+            
+            <div class="space-y-4">
+                @auth
+                    @if($book->canBeRequested() && !$book->hasUserRequested(Auth::id()))
+                        <form action="{{ route('transactions.request-book', $book) }}" method="POST" class="w-full">
+                            @csrf
+                            <button type="submit"
+                                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
+                                <i class="fas fa-book mr-2"></i>
+                                Request This Book
+                            </button>
+                        </form>
+                    @elseif($book->hasUserRequested(Auth::id()))
+                        @php
+                            $activeTransaction = $book->transactions()
+                                ->where('user_id', Auth::id())
+                                ->where('transaction_status', 'requested')
+                                ->latest()
+                                ->first();
+                        @endphp
+
+                        @if($activeTransaction)
+                            <form action="{{ route('transactions.cancel-request', $activeTransaction->id) }}" method="POST" class="w-full">
+                                @csrf
+                                <button type="submit"
+                                        class="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
+                                    <i class="fas fa-clock mr-2"></i>
+                                    Cancel Request
+                                </button>
+                            </form>
+                            <p class="text-sm text-gray-500 text-center">You have a pending request. You may cancel it.</p>
+                        @else
+                            <button disabled
+                                    class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed">
+                                <i class="fas fa-times-circle mr-2"></i>
+                                No Active Request Found
+                            </button>
+                        @endif
+                    @else
+                        <button disabled
+                                class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed">
+                            <i class="fas fa-times-circle mr-2"></i>
+                            No Copies Available
+                        </button>
+                        <p class="text-sm text-gray-500 text-center">Check back later for availability</p>
+                    @endif
+
+                    <div class="text-center">
+                        <a href="{{ route('userInterface.borrowedBooks') }}" class="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                            <i class="fas fa-list mr-1"></i>
+                            View My Requests
+                        </a>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}" 
+                       class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Login to Request
+                    </a>
+                @endauth
+            </div>
+        </div>
+    </div>
+
+    <!-- Description Section -->
+    @if($book->description)
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6 info-card">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-file-contract mr-2 text-purple-600"></i>
+            Description
+        </h2>
+        
+        <div class="prose max-w-none">
+            <p class="text-gray-700 leading-relaxed">{{ $book->description }}</p>
+        </div>
+    </div>
+    @endif
+
+    <!-- Additional Information -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Authors Information -->
+        <div class="bg-white rounded-xl shadow-sm p-6 info-card">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-users mr-2 text-indigo-600"></i>
+                Authors
+            </h2>
+            
+            <div class="space-y-3">
+                @if($book->authors->isNotEmpty())
+                    @foreach ($book->authors as $author)
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800">
+                                    {{ $author->appellation ? $author->appellation . ' ' : '' }}
+                                    {{ $author->first_name }} 
+                                    {{ $author->middle_name ? $author->middle_name . ' ' : '' }}
+                                    {{ $author->last_name }}
+                                    {{ $author->extension ? ', ' . $author->extension : '' }}
+                                </h4>
+                                <p class="text-sm text-gray-600">Author</p>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-users text-4xl mb-2"></i>
+                        <p>No authors information available</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Book Statistics -->
+        <div class="bg-white rounded-xl shadow-sm p-6 info-card">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-chart-bar mr-2 text-green-600"></i>
+                Book Statistics
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Total Copies</span>
+                    <span class="font-medium text-gray-800">{{ $book->copies->count() ?? 1 }}</span>
+                </div>
+                
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Available Copies</span>
+                    <span class="font-medium text-green-600">{{ $book->availableCopies()->count() }}</span>
+                </div>
+                
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Borrowed Copies</span>
+                    <span class="font-medium text-orange-600">{{ ($book->copies->count() ?? 1) - $book->availableCopies()->count() }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons for Admin/Librarian -->
+    @can('manage-books')
+    <div class="bg-white rounded-xl shadow-sm p-6 info-card">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-cog mr-2 text-red-600"></i>
+            Management Actions
+        </h2>
+        
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ route('books.edit', $book) }}" 
+               class="bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg font-medium flex items-center transition">
+                <i class="fas fa-edit mr-2"></i>
+                Edit Book
+            </a>
+            
+            <form action="{{ route('books.destroy', $book) }}" method="POST" 
+                  onsubmit="return confirm('Are you sure you want to delete this book? This action cannot be undone.')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" 
+                        class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium flex items-center transition">
+                    <i class="fas fa-trash mr-2"></i>
+                    Delete Book
+                </button>
+            </form>
+
+            <a href="{{ route('books.index') }}" 
+               class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium flex items-center transition">
+                <i class="fas fa-list mr-2"></i>
+                View All Books
+            </a>
+        </div>
+    </div>
+    @endcan
 </div>
+
+@push('styles')
+<style>
+    .info-card {
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+    
+    .info-card:hover {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .department-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+</style>
+@endpush
 @endsection
