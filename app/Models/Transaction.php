@@ -166,4 +166,31 @@ class Transaction extends Model
                !$this->isOverdue() &&
                $this->due_date->diffInDays(now()) < 3;
     }
+
+
+    //bagoooooooooooooooooooooooooooooooooooooooooooooooooooo
+    public function bookCopy()
+{
+    return $this->belongsTo(\App\Models\BookCopy::class, 'copy_id', 'id');
+}
+
+public function thesisCopy()
+{
+    return $this->belongsTo(\App\Models\ThesisCopy::class, 'copy_id', 'id');
+}
+
+public function copy()
+{
+    if ($this->borrowable_type === BookCopy::class) {
+        return $this->belongsTo(BookCopy::class, 'copy_id');
+    }
+
+    if ($this->borrowable_type === ThesisCopy::class) {
+        return $this->belongsTo(ThesisCopy::class, 'copy_id');
+    }
+
+    // Optional: fallback in case it's neither
+    return null;
+}
+
 }

@@ -77,16 +77,17 @@ class UserInterfaceController extends Controller
     $user = auth()->user();
 
     $pendingTransactions = Transaction::with('copy')
-        ->where('user_id', $user->id)
-        ->whereIn('transaction_status', ['requested', 'pending'])
-        ->latest()
-        ->get();
+    ->where('user_id', $user->id)
+    ->whereIn('transaction_status', ['requested', 'pending'])
+    ->latest()
+    ->get();
 
     $borrowedTransactions = Transaction::with('copy')
-        ->where('user_id', $user->id)
-        ->whereIn('transaction_status', ['borrowed', 'overdue'])
-        ->latest()
-        ->get();
+    ->where('user_id', $user->id)
+    ->whereIn('transaction_status', ['borrowed', 'overdue'])
+    ->latest()
+    ->get();
+
 
     return view('userInterface.borrowedBooks', compact('pendingTransactions', 'borrowedTransactions'));
 
@@ -97,10 +98,11 @@ public function borrowingHistory()
     $user = auth()->user();
 
     $historyTransactions = Transaction::with('copy')
-        ->where('user_id', $user->id)
-        ->whereIn('transaction_status', ['borrowed', 'overdue', 'returned'])
-        ->orderByDesc('borrow_date')
-        ->get();
+    ->where('user_id', $user->id)
+    ->whereIn('transaction_status', ['borrowed', 'overdue', 'returned'])
+    ->orderByDesc('borrow_date')
+    ->get();
+
 
     return view('userInterface.borrowingHistory', compact('historyTransactions'));
 }
