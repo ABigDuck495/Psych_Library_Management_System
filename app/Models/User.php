@@ -132,4 +132,17 @@ class User extends Authenticatable
     {
         return $query->where('account_status', 'Active');
     }
+    public function scopeHasOverdue($query)
+    {
+        return $query->whereHas('transactions', function ($q) {
+            $q->where('transaction_status', 'overdue');
+        });
+        
+    }
+    public function hasOverdueTransactions(): bool
+{
+    return $this->transactions()
+        ->where('transaction_status', 'overdue')
+        ->exists();
+}
 }

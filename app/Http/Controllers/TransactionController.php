@@ -249,6 +249,9 @@ class TransactionController extends Controller
     public function requestBook(Request $request, Book $book)
     {
         $user = Auth::user();
+        if (Auth::user()->hasOverdueTransactions()) {
+        return redirect()->back()->withErrors('You cannot request new items while you have overdue transactions.');
+    }
         if (!$user) return redirect()->route('login');
 
         if ($user->hasPendingRequestForBook($book->id)) {
@@ -293,6 +296,9 @@ class TransactionController extends Controller
     public function requestThesis(Request $request, Thesis $thesis)
     {
         $user = Auth::user();
+        if (Auth::user()->hasOverdueTransactions()) {
+            return redirect()->back()->withErrors('You cannot request new items while you have overdue transactions.');
+        }
         if (!$user) return redirect()->route('login');
 
         if ($user->hasPendingRequestForThesis($thesis->id)) {
