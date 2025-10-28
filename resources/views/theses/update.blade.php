@@ -253,38 +253,55 @@
                     </div>
                 </div>
 
-                <!-- Author Selection -->
-                <div class="mb-4">
-                    <label for="author_ids" class="block text-sm font-medium text-gray-700 mb-2">
-                        Select Authors <span class="text-red-500">*</span>
-                    </label>
-                    <select 
-                        id="author_ids" 
-                        name="author_ids[]" 
-                        multiple 
-                        class="form-input block w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition"
-                        style="min-height: 150px;"
-                        required
-                    >
-                        @foreach($authors as $author)
-                            <option value="{{ $author->id }}"
-                                {{ in_array($author->id, old('author_ids', $thesis->authors->pluck('id')->toArray())) ? 'selected' : '' }}>
-                                {{ $author->first_name }} {{ $author->last_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <div class="mt-2 flex justify-between items-center">
-                        <small class="text-gray-500">Hold Ctrl/Cmd to select multiple authors</small>
-                        <a href="{{ route('authors.create', ['return_to' => url()->current()]) }}" 
-                           class="inline-flex items-center px-3 py-1 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition">
-                            <i class="fas fa-plus mr-1"></i> Add New Author
-                        </a>
-                    </div>
-                    @error('author_ids')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                <!-- Dynamic Authors Section -->
+<div class="mb-4">
+    <label class="block text-gray-700 font-semibold mb-2">Authors</label>
+
+    <div id="authors-container">
+        @foreach($thesis->authors as $index => $author)
+            <div class="author-group flex space-x-2 mb-2">
+                <input type="text" name="authors[{{ $index }}][appellation]" value="{{ $author->appellation }}" placeholder="Appellation" class="w-1/6 border-gray-300 rounded-lg p-2">
+                <input type="text" name="authors[{{ $index }}][first_name]" value="{{ $author->first_name }}" placeholder="First Name" class="w-1/4 border-gray-300 rounded-lg p-2" required>
+                <input type="text" name="authors[{{ $index }}][middle_name]" value="{{ $author->middle_name }}" placeholder="Middle Name" class="w-1/4 border-gray-300 rounded-lg p-2">
+                <input type="text" name="authors[{{ $index }}][last_name]" value="{{ $author->last_name }}" placeholder="Last Name" class="w-1/4 border-gray-300 rounded-lg p-2" required>
+                <input type="text" name="authors[{{ $index }}][extension]" value="{{ $author->extension }}" placeholder="Extension" class="w-1/6 border-gray-300 rounded-lg p-2">
+                <button type="button" class="remove-author bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Remove</button>
             </div>
+        @endforeach
+    </div>
+
+    <button type="button" id="add-author" class="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+        + Add Author
+    </button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const authorsContainer = document.getElementById('authors-container');
+        const addAuthorButton = document.getElementById('add-author');
+
+        addAuthorButton.addEventListener('click', function () {
+            const index = authorsContainer.children.length;
+            const authorGroup = document.createElement('div');
+            authorGroup.classList.add('author-group', 'flex', 'space-x-2', 'mb-2');
+            authorGroup.innerHTML = `
+                <input type="text" name="authors[${index}][appellation]" placeholder="Appellation" class="w-1/6 border-gray-300 rounded-lg p-2">
+                <input type="text" name="authors[${index}][first_name]" placeholder="First Name" class="w-1/4 border-gray-300 rounded-lg p-2" required>
+                <input type="text" name="authors[${index}][middle_name]" placeholder="Middle Name" class="w-1/4 border-gray-300 rounded-lg p-2">
+                <input type="text" name="authors[${index}][last_name]" placeholder="Last Name" class="w-1/4 border-gray-300 rounded-lg p-2" required>
+                <input type="text" name="authors[${index}][extension]" placeholder="Extension" class="w-1/6 border-gray-300 rounded-lg p-2">
+                <button type="button" class="remove-author bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Remove</button>
+            `;
+            authorsContainer.appendChild(authorGroup);
+        });
+
+        authorsContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-author')) {
+                e.target.closest('.author-group').remove();
+            }
+        });
+    });
+</script>
 
             <!-- Form Actions -->
             <div class="flex items-center justify-between pt-6 mt-6 border-t border-gray-200">
