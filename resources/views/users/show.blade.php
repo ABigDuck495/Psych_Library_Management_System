@@ -27,12 +27,12 @@
         </div>
     @endif
 
-    <!-- Action Buttons -->
+    <!-- Enhanced Action Buttons -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
         <h2 class="text-xl font-semibold text-gray-800 mb-4">User Actions</h2>
         
         <div class="flex flex-wrap gap-3">
-            <a href="{{ route('users.edit', $user) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
+            <a href="{{ route('users.edit', $user) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg font-medium flex items-center transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                 <i class="fas fa-edit mr-2"></i>
                 Edit User
             </a>
@@ -41,7 +41,7 @@
                 <form action="{{ route('users.deactivate', $user) }}" method="POST" class="inline">
                     @csrf
                     @method('PATCH')
-                    <button type="submit" onclick="return confirm('Deactivate this user?')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
+                    <button type="submit" onclick="return confirm('Deactivate this user?')" class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-lg font-medium flex items-center transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                         <i class="fas fa-ban mr-2"></i>
                         Deactivate Account
                     </button>
@@ -50,7 +50,7 @@
                 <form action="{{ route('users.activate', $user) }}" method="POST" class="inline">
                     @csrf
                     @method('PATCH')
-                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-lg font-medium flex items-center transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                         <i class="fas fa-user-check mr-2"></i>
                         Activate Account
                     </button>
@@ -183,123 +183,86 @@
         </div>
     </div>
     
-    <!-- Additional Information -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <!-- User Type Specific Information -->
-        @if(isset($user->user_type) && $user->user_type === 'student')
-        <div class="bg-white rounded-xl shadow-sm p-6 info-card">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-university mr-2 text-blue-600"></i>
-                Student Information
-            </h2>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">Academic Program</label>
-                    <p class="text-gray-800 font-medium">{{ $user->academic_program ?? 'Not Specified' }}</p>
-                </div>
+    <!-- Additional Information - Expanded to full width -->
+    <div class="bg-white rounded-xl shadow-sm p-6 info-card mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-info-circle mr-2 text-gray-600"></i>
+            Additional Information
+        </h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- User Type Specific Information -->
+            @if(isset($user->user_type) && $user->user_type === 'student')
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-3 flex items-center">
+                    <i class="fas fa-university mr-2 text-blue-600"></i>
+                    Student Information
+                </h3>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">Major/Department</label>
-                    <p class="text-gray-800 font-medium">{{ $user->department ?? 'Not Specified' }}</p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Academic Program</label>
+                        <p class="text-gray-800 font-medium">{{ $user->academic_program ?? 'Not Specified' }}</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Major/Department</label>
+                        <p class="text-gray-800 font-medium">{{ $user->department ?? 'Not Specified' }}</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        @elseif(isset($user->user_type) && $user->user_type === 'employee')
-        <div class="bg-white rounded-xl shadow-sm p-6 info-card">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-briefcase mr-2 text-green-600"></i>
-                Employee Information
-            </h2>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">Department</label>
-                    <p class="text-gray-800 font-medium">{{ $user->employee->department ?? 'Not Specified' }}</p>
-                </div>
+            @elseif(isset($user->user_type) && $user->user_type === 'employee')
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-3 flex items-center">
+                    <i class="fas fa-briefcase mr-2 text-green-600"></i>
+                    Employee Information
+                </h3>
                 
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">Position Title</label>
-                    <p class="text-gray-800 font-medium">{{ $user->employee->position_title ?? 'Not Specified' }}</p>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">Employee ID</label>
-                    <p class="text-gray-800 font-medium">{{ $user->university_id ?? 'Not Specified' }}</p>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">Employment Status</label>
-                    <span class="status-badge bg-blue-100 text-blue-800">{{ $user->employment_status ?? 'Active' }}</span>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Department</label>
+                        <p class="text-gray-800 font-medium">{{ $user->employee->department ?? 'Not Specified' }}</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Position Title</label>
+                        <p class="text-gray-800 font-medium">{{ $user->employee->position_title ?? 'Not Specified' }}</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Employee ID</label>
+                        <p class="text-gray-800 font-medium">{{ $user->university_id ?? 'Not Specified' }}</p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">Employment Status</label>
+                        <span class="status-badge bg-blue-100 text-blue-800">{{ $user->employment_status ?? 'Active' }}</span>
+                    </div>
                 </div>
             </div>
-        </div>
-        @else
-        <div class="bg-white rounded-xl shadow-sm p-6 info-card">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-info-circle mr-2 text-gray-600"></i>
-                Additional Information
-            </h2>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-1">User Type</label>
-                    <p class="text-gray-800 font-medium capitalize">{{ $user->user_type ?? 'Not Specified' }}</p>
-                </div>
+            @else
+            <div>
+                <h3 class="text-lg font-medium text-gray-800 mb-3 flex items-center">
+                    <i class="fas fa-user-tag mr-2 text-gray-600"></i>
+                    User Type Information
+                </h3>
                 
-                <div class="text-center py-8 text-gray-400">
-                    <i class="fas fa-user-tag text-4xl mb-2"></i>
-                    <p>No additional information available</p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500 mb-1">User Type</label>
+                        <p class="text-gray-800 font-medium capitalize">{{ $user->user_type ?? 'Not Specified' }}</p>
+                    </div>
                 </div>
             </div>
+            @endif
+
+        
+        @if(!(isset($user->user_type) && in_array($user->user_type, ['student', 'employee'])))
+        <div class="mt-6 text-center py-4 text-gray-400 border-t border-gray-200">
+            <i class="fas fa-user-tag text-3xl mb-2"></i>
+            <p>Basic user account with standard permissions</p>
         </div>
         @endif
-        
-        <!-- Activity Summary Card -->
-        <div class="bg-white rounded-xl shadow-sm p-6 info-card">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-chart-bar mr-2 text-purple-600"></i>
-                Activity Summary
-            </h2>
-            
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-500">Currently Borrowed</span>
-                    <span class="text-gray-800 font-medium">{{ $currentlyBorrowedCount ?? 0 }} items</span>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-500">Reservations</span>
-                    <span class="text-gray-800 font-medium">{{ $reservationsCount ?? 0 }} items</span>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-500">Overdue Items</span>
-                    <span class="text-red-600 font-medium">{{ $overdueItemsCount ?? 0 }} items</span>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-500">Total Checkouts</span>
-                    <span class="text-gray-800 font-medium">{{ $totalCheckoutsCount ?? 0 }} items</span>
-                </div>
-            </div>
-            
-            <div class="mt-6 pt-4 border-t border-gray-200">
-                <h3 class="text-sm font-medium text-gray-500 mb-2">Recent Activity</h3>
-                @if(isset($recentActivity) && count($recentActivity) > 0)
-                    <ul class="space-y-2 text-sm">
-                        @foreach($recentActivity as $activity)
-                            <li class="flex items-center">
-                                <i class="fas {{ $activity['icon'] }} {{ $activity['color'] }} mr-2"></i>
-                                <span>{{ $activity['description'] }} - {{ $activity['date'] }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
-                @else
-                    <p class="text-gray-400 text-sm">No recent activity recorded</p>
-                @endif
-            </div>
-        </div>
     </div>
 </div>
 

@@ -386,74 +386,17 @@
     });
 </script>
 
-<!-- Form Actions -->
-<div class="flex items-center justify-between pt-6 mt-6 border-t border-gray-200">
-    <div>
-        <a href="{{ route('theses.index') }}" 
-           class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
-            <i class="fas fa-arrow-left mr-2"></i>
-            Cancel
-        </a>
-    </div>
-    <div class="flex space-x-3">
-        <button 
-            type="button" 
-            onclick="resetForm()" 
-            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition"
-        >
-            <i class="fas fa-redo mr-2"></i>
-            Reset Form
-        </button>
-        <button 
-            type="submit" 
-            class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
-        >
-            <i class="fas fa-save mr-2"></i>
-            Save Thesis
-        </button>
-    </div>
-</div>
-
-<!-- Quick Tips -->
-<div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
-    <div class="flex items-start">
-        <div class="flex-shrink-0">
-            <i class="fas fa-lightbulb text-blue-500 text-xl mt-1"></i>
-        </div>
-        <div class="ml-4">
-            <h3 class="text-lg font-medium text-blue-800">Quick Tips</h3>
-            <div class="mt-2 text-blue-700 text-sm">
-                <ul class="list-disc list-inside space-y-1">
-                    <li>Ensure all required fields (marked with *) are filled</li>
-                    <li>Add at least one author for the thesis</li>
-                    <li>Publication year must be between 1900 and current year</li>
-                    <li>Use the "Add Author" button if an author is missing</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
-    // Form reset function
     function resetForm() {
         document.getElementById('bookForm').reset();
-        showTemporaryMessage('Form has been reset', 'blue');
-    }
-
-    // Show temporary message
-    function showTemporaryMessage(message, type = 'blue') {
-        const existingMessage = document.getElementById('temporaryMessage');
-        if (existingMessage) existingMessage.remove();
-
-        const messageDiv = document.createElement('div');
-        messageDiv.id = 'temporaryMessage';
-        const bgColor = type === 'red' ? 'red' : 'blue';
-        messageDiv.className = `fixed top-4 right-4 bg-${bgColor}-100 border border-${bgColor}-400 text-${bgColor}-700 px-4 py-3 rounded-lg shadow-lg z-50`;
-        messageDiv.innerHTML = `<div class="flex items-center"><i class="fas fa-info-circle mr-2"></i><span>${message}</span></div>`;
-
-        document.body.appendChild(messageDiv);
-        setTimeout(() => { messageDiv.remove(); }, 3000);
+        // Remove all author rows except the first one
+        const authorsContainer = document.getElementById('authorsContainer');
+        const authorRows = authorsContainer.querySelectorAll('.author-row');
+        authorRows.forEach((row, index) => {
+            if (index > 0) {
+                row.remove();
+            }
+        });
     }
 </script>
 @endpush
