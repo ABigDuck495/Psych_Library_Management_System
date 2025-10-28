@@ -247,51 +247,58 @@ class TransactionController extends Controller
     }
 
     public function requestBook(Request $request, Book $book)
-    {
-        $user = Auth::user();
-        if (Auth::user()->hasOverdueTransactions()) {
+{
+    $user = Auth::user();
+    if (!$user) {
+        return redirect()->route('login');
+    }
+
+    // Check overdue
+    if ($user->hasOverdueTransactions()) {
         return redirect()->back()->withErrors('You cannot request new items while you have overdue transactions.');
     }
-        if (!$user) return redirect()->route('login');
 
-        if ($user->hasPendingRequestForBook($book->id)) {
-            return redirect()->back()->with('error', 'You already have a pending request for this book.');
-        }
+    // Check pending requests for same book
+    if ($user->hasPendingRequestForBook($book->id)) {
+        return redirect()->back()->with('error', 'You already have a pending request for this book.');
+    }
 
-        if (!$book->canBeRequested()) {
+    // Check if book can be requested
+    if (!$book->canBeRequested()) {
+        return redirect()->back()->with('error', 'No available copies found for this book.');
+    }
+
+    DB::beginTransaction();
+    try {
+        $availableCopy = $book->getNextAvailableCopy();
+
+        if (!$availableCopy) {
+            DB::rollBack();
             return redirect()->back()->with('error', 'No available copies found for this book.');
         }
 
-        DB::beginTransaction();
-        try {
-            $availableCopy = $book->getNextAvailableCopy();
-            
-            if (!$availableCopy) {
-                DB::rollBack();
-                return redirect()->back()->with('error', 'No available copies found for this book.');
-            }
+        // ✅ Create transaction (keep borrowable_id = $availableCopy->book_id as requested)
+        $transaction = Transaction::create([
+            'user_id' => $user->id,
+            'borrowable_id' => $availableCopy->book_id, // you wanted to keep this
+            'borrowable_type' => BookCopy::class,
+            'transaction_status' => 'requested',
+            'borrow_date' => now(),
+            'due_date' => now()->addDays(7),
+        ]);
 
-            // Create transaction using polymorphic relationship
-            $transaction = Transaction::create([
-                'user_id' => $user->id,
-                'borrowable_id' => $availableCopy->book_id,
-                'borrowable_type' => BookCopy::class,
-                'transaction_status' => 'requested',
-                'borrow_date' => now(),
-                'due_date' => now()->addDays(7),
-            ]);
+        // Mark the copy as unavailable
+        $availableCopy->markAsUnavailable();
 
-            // Mark copy as unavailable
-            $availableCopy->markAsUnavailable();
+        DB::commit();
+        return redirect()->back()->with('success', 'Book request submitted successfully.');
 
-            DB::commit();
-            return redirect()->back()->with('success', 'Book request submitted successfully.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Failed to process book request: ' . $e->getMessage());
-        }
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Failed to process book request: ' . $e->getMessage());
     }
+}
+
 
     public function requestThesis(Request $request, Thesis $thesis)
     {

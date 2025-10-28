@@ -9,12 +9,19 @@ class BookCopy extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'id'; // ADD THIS LINE
+    // protected $primaryKey = 'id'; // ADD THIS LINE
+
+    
+    protected $primaryKey = 'copy_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'book_id',
         'is_available'
     ];
+
+    
 
     // Fixed: Added proper foreign key
     public function book()

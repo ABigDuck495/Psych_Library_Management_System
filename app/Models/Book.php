@@ -67,7 +67,7 @@ class Book extends Model
     }
     public function canBeRequested()
     {
-        return $this->copies()->available()->exists();
+        return $this->copies()->where('is_available', true)->first();
     }
 
     public function availableCopiesCount()
@@ -144,4 +144,44 @@ class Book extends Model
             $q->where('is_available', true);
         });
     }
+
+    public function requestBook()
+{
+    // Get all copy IDs of this book
+    $copyIds = $this->copies()->pluck('id');
+
+    // Check if user already has a pending/approved/borrowed request
+    $existingRequest = Transaction::where('user_id', Auth::id())
+        ->where('borrowable_type', BookCopy::class)
+        ->whereIn('borrowable_id', $copyIds)
+        ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
+        ->first();
+
+    if ($existingRequest) {
+        return null; // Already has an active request
+    }
+
+    // Find first available copy
+    $availableCopy = $this->copies()->where('is_available', true)->first();
+
+    if (!$availableCopy) {
+        return null; // No available copies
+    }
+
+    // Create new transaction
+    $transaction = Transaction::create([
+        'user_id' => Auth::id(),
+        'borrowable_id' => $availableCopy->id,
+        'borrowable_type' => BookCopy::class,
+        'transaction_status' => 'requested',
+        'borrow_date' => now(),
+    ]);
+
+    // Mark copy as unavailable
+    $availableCopy->update(['is_available' => false]);
+
+    return $transaction;
+}
+
+
 }

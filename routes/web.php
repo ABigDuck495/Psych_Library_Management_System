@@ -131,6 +131,8 @@ Route::middleware(['auth'])->group(function () {
         })->name('catalogue');
 
         // Request actions and renew
+        // Route::post('/books/{id}/request', [BookController::class, 'requestBook'])->name('books.request');
+
         Route::post('/books/{book}/request', [TransactionController::class, 'requestBook'])->name('transactions.request-book');
         Route::post('/theses/{thesis}/request', [TransactionController::class, 'requestThesis'])->name('transactions.request-thesis');
         Route::post('/transactions/{transaction}/cancel', [TransactionController::class, 'cancelRequest'])->name('transactions.cancel-request');

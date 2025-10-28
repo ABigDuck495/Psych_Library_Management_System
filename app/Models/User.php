@@ -95,7 +95,7 @@ class User extends Authenticatable
         $book = Book::find($bookId);
         if (!$book) return false;
         
-        $copyIds = $book->copies()->pluck('id');
+        $copyIds = $book->copies()->pluck('copy_id');
         
         return $this->transactions()
             ->where('borrowable_type', BookCopy::class)
