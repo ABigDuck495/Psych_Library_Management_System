@@ -4,11 +4,11 @@
 
 @section('content')
 <div class="p-8">
-    <!-- Header -->
+    <!-- Header
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-800">Edit Thesis</h1>
         <p class="text-gray-600 mt-2">Update thesis information in the library system</p>
-    </div>
+    </div> -->
 
     <!-- Success/Error Messages -->
     @if(session('success'))
@@ -40,13 +40,13 @@
         </div>
     @endif
 
-    <!-- Back Button -->
+    <!-- Back Button
     <div class="mb-6">
         <a href="{{ route('theses.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
             <i class="fas fa-arrow-left mr-2"></i>
             Back to Theses List
         </a>
-    </div>
+    </div> -->
 
     <!-- Edit Thesis Form -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-8">

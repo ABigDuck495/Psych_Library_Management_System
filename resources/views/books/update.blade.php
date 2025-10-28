@@ -4,12 +4,6 @@
 
 @section('content')
 <div class="p-8">
-    <!-- Header -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">Edit Book</h1>
-        <p class="text-gray-600 mt-2">Update book information in the library system</p>
-    </div>
-
     <!-- Success/Error Messages -->
     @if(session('success'))
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
@@ -40,17 +34,9 @@
         </div>
     @endif
 
-    <!-- Back Button -->
-    <div class="mb-6">
-        <a href="{{ route('books.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
-            <i class="fas fa-arrow-left mr-2"></i>
-            Back to Books List
-        </a>
-    </div>
-
     <!-- Edit Book Form -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
-        <form action="{{ route('books.update', $book->id) }}" method="POST" id="bookForm">
+        <form action="{{ route('books.update', $book->id) }}" method="POST" id="bookForm" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -203,11 +189,12 @@
                 </div>
             </div>
 
+
             <!-- Author Information Section -->
             <div class="border-t border-gray-200 pt-6 mb-6">
                 <div class="flex items-center mb-6">
-                    <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mr-3">
-                        <i class="fas fa-user-edit text-purple-600"></i>
+                    <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mr-3">
+                        <i class="fas fa-user-edit text-blue-600"></i>
                     </div>
                     <div>
                         <h3 class="text-lg font-bold text-gray-800">Author Information</h3>
@@ -215,90 +202,28 @@
                     </div>
                 </div>
 
-                <!-- Author Information Section -->
-<div class="border-t border-gray-200 pt-6 mb-6">
-    <div class="flex items-center mb-6">
-        <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mr-3">
-            <i class="fas fa-user-edit text-purple-600"></i>
-        </div>
-        <div>
-            <h3 class="text-lg font-bold text-gray-800">Author Information</h3>
-            <p class="text-gray-600 text-sm">Update authors for this book</p>
-        </div>
-    </div>
+                <!-- Dynamic Authors Section -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-semibold mb-2">Authors</label>
 
-    <!-- Dynamic Author Fields -->
-    <div id="authorsContainer" class="space-y-6">
-        @php $authorIndex = 0; @endphp
-        @foreach(old('authors', $book->authors) as $index => $author)
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 author-row bg-gray-50 p-4 rounded-lg relative border border-gray-200">
-                <!-- Appellation -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Appellation</label>
-                    <input type="text" name="authors[{{ $authorIndex }}][appellation]" 
-                        value="{{ old('authors.'.$index.'.appellation', $author->appellation) }}" 
-                        placeholder="e.g. Dr., Prof."
-                        class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-                </div>
-
-                <!-- First Name -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
-                    <input type="text" name="authors[{{ $authorIndex }}][first_name]" 
-                        value="{{ old('authors.'.$index.'.first_name', $author->first_name) }}" 
-                        placeholder="First Name" required
-                        class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-                </div>
-
-                <!-- Middle Name -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
-                    <input type="text" name="authors[{{ $authorIndex }}][middle_name]" 
-                        value="{{ old('authors.'.$index.'.middle_name', $author->middle_name) }}" 
-                        placeholder="Middle Name"
-                        class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-                </div>
-
-                <!-- Last Name -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span class="text-red-500">*</span></label>
-                    <input type="text" name="authors[{{ $authorIndex }}][last_name]" 
-                        value="{{ old('authors.'.$index.'.last_name', $author->last_name) }}" 
-                        placeholder="Last Name" required
-                        class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-                </div>
-
-                <!-- Extension + Remove -->
-                <div class="relative">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Extension</label>
-                    <div class="flex">
-                        <input type="text" name="authors[{{ $authorIndex }}][extension]" 
-                            value="{{ old('authors.'.$index.'.extension', $author->extension) }}" 
-                            placeholder="e.g. Jr., Sr."
-                            class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-                        @if($authorIndex > 0)
-                        <button type="button" 
-                            class="ml-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 remove-author-btn transition">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        @endif
+                    <div id="authors-container">
+                        @foreach($book->authors as $index => $author)
+                            <div class="author-group flex space-x-2 mb-2">
+                                <input type="text" name="authors[{{ $index }}][appellation]" value="{{ $author->appellation }}" placeholder="Appellation" class="w-1/6 border-gray-300 rounded-lg p-2">
+                                <input type="text" name="authors[{{ $index }}][first_name]" value="{{ $author->first_name }}" placeholder="First Name" class="w-1/4 border-gray-300 rounded-lg p-2" required>
+                                <input type="text" name="authors[{{ $index }}][middle_name]" value="{{ $author->middle_name }}" placeholder="Middle Name" class="w-1/4 border-gray-300 rounded-lg p-2">
+                                <input type="text" name="authors[{{ $index }}][last_name]" value="{{ $author->last_name }}" placeholder="Last Name" class="w-1/4 border-gray-300 rounded-lg p-2" required>
+                                <input type="text" name="authors[{{ $index }}][extension]" value="{{ $author->extension }}" placeholder="Extension" class="w-1/6 border-gray-300 rounded-lg p-2">
+                                <button type="button" class="remove-author bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Remove</button>
+                            </div>
+                        @endforeach
                     </div>
+
+                    <button type="button" id="add-author" class="mt-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                        + Add Author
+                    </button>
                 </div>
             </div>
-            @php $authorIndex++; @endphp
-        @endforeach
-    </div>
-
-    <!-- Add Author Button -->
-    <div class="mt-4">
-        <button type="button" id="addAuthorBtn"
-            class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
-            <i class="fas fa-plus mr-2"></i> Add Author
-        </button>
-    </div>
-</div>
-
-
 
             <!-- Form Actions -->
             <div class="flex items-center justify-between pt-6 mt-6 border-t border-gray-200">
@@ -328,72 +253,42 @@
             </div>
         </form>
     </div>
+</div>
 
-   
-
-<!-- JS: Dynamic Author Fields -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    let authorIndex = parseInt("{{ $authorIndex }}") || 0;
-    const addAuthorBtn = document.getElementById('addAuthorBtn');
-    const authorsContainer = document.getElementById('authorsContainer');
+    document.addEventListener('DOMContentLoaded', function() {
+        const authorsContainer = document.getElementById('authors-container');
+        const addAuthorButton = document.getElementById('add-author');
 
-    addAuthorBtn.addEventListener('click', () => {
-        const authorRow = document.createElement('div');
-        authorRow.classList.add('grid', 'grid-cols-1', 'lg:grid-cols-5', 'gap-4', 'author-row', 'bg-gray-50', 'p-4', 'rounded-lg', 'relative', 'border', 'border-gray-200', 'mt-2');
+        addAuthorButton.addEventListener('click', function() {
+            const index = authorsContainer.children.length;
+            const authorGroup = document.createElement('div');
+            authorGroup.classList.add('author-group', 'flex', 'space-x-2', 'mb-2');
+            authorGroup.innerHTML = `
+                <input type="text" name="authors[${index}][appellation]" placeholder="Appellation" class="w-1/6 border-gray-300 rounded-lg p-2">
+                <input type="text" name="authors[${index}][first_name]" placeholder="First Name" class="w-1/4 border-gray-300 rounded-lg p-2" required>
+                <input type="text" name="authors[${index}][middle_name]" placeholder="Middle Name" class="w-1/4 border-gray-300 rounded-lg p-2">
+                <input type="text" name="authors[${index}][last_name]" placeholder="Last Name" class="w-1/4 border-gray-300 rounded-lg p-2" required>
+                <input type="text" name="authors[${index}][extension]" placeholder="Extension" class="w-1/6 border-gray-300 rounded-lg p-2">
+                <button type="button" class="remove-author bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600">Remove</button>
+            `;
+            authorsContainer.appendChild(authorGroup);
+        });
 
-        authorRow.innerHTML = `
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Appellation</label>
-                <input type="text" name="authors[\${authorIndex}][appellation]" placeholder="e.g. Dr., Prof."
-                    class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
-                <input type="text" name="authors[\${authorIndex}][first_name]" placeholder="First Name" required
-                    class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
-                <input type="text" name="authors[\${authorIndex}][middle_name]" placeholder="Middle Name"
-                    class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name <span class="text-red-500">*</span></label>
-                <input type="text" name="authors[\${authorIndex}][last_name]" placeholder="Last Name" required
-                    class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-            </div>
-            <div class="relative">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Extension</label>
-                <div class="flex">
-                    <input type="text" name="authors[\${authorIndex}][extension]" placeholder="e.g. Jr., Sr."
-                        class="form-input block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition">
-                    <button type="button" class="ml-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 remove-author-btn transition">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-
-        authorsContainer.appendChild(authorRow);
-        authorRow.querySelector('.remove-author-btn').addEventListener('click', () => authorRow.remove());
-        authorIndex++;
-    });
-
-    document.querySelectorAll('.remove-author-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            this.closest('.author-row').remove();
+        authorsContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-author')) {
+                e.target.closest('.author-group').remove();
+            }
         });
     });
-});
+
     // Reset form to original values
     function resetForm() {
         document.getElementById('title').value = "{{ $book->title }}";
-        document.getElementById('description').value = `{{ $book->description }}`;
         document.getElementById('year_published').value = "{{ $book->year_published }}";
         document.getElementById('category_id').value = "{{ $book->category_id }}";
         document.getElementById('copies_count').value = "{{ $copies_count ?? 1 }}";
-        
+        document.getElementById('description').value = `{{ $book->description }}`;
         showTemporaryMessage('Form reset to original values', 'blue');
     }
 
@@ -436,22 +331,41 @@ document.addEventListener('DOMContentLoaded', function() {
             showTemporaryMessage('Please fill in all required fields', 'red');
             return false;
         }
+
+        // Validate author fields
+        const authorGroups = document.querySelectorAll('.author-group');
+        let hasAuthorErrors = false;
+        
+        authorGroups.forEach(group => {
+            const firstName = group.querySelector('input[name*="[first_name]"]').value.trim();
+            const lastName = group.querySelector('input[name*="[last_name]"]').value.trim();
+            
+            if (!firstName || !lastName) {
+                hasAuthorErrors = true;
+                group.style.border = '2px solid red';
+            } else {
+                group.style.border = '';
+            }
+        });
+        
+        if (hasAuthorErrors) {
+            e.preventDefault();
+            showTemporaryMessage('Please fill in all required author fields', 'red');
+            return false;
+        }
+        
         
         // Show loading state
         const submitBtn = this.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
         submitBtn.disabled = true;
-        
-        setTimeout(() => {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }, 3000);
     });
 
     // Auto-focus title field
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('title').focus();
     });
+
 </script>
 @endsection
