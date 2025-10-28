@@ -110,21 +110,40 @@
                     @if($thesis->canBeRequested() && !$thesis->hasUserRequested(Auth::id()))
                         <form action="{{ route('transactions.request-thesis', $thesis) }}" method="POST" class="w-full">
                             @csrf
-                            <button type="submit" 
+                            <button type="submit"
                                     class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
                                 <i class="fas fa-file-alt mr-2"></i>
                                 Request This Thesis
                             </button>
                         </form>
                     @elseif($thesis->hasUserRequested(Auth::id()))
-                        <button disabled 
-                                class="w-full bg-orange-500 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed">
-                            <i class="fas fa-clock mr-2"></i>
-                            Request Pending
-                        </button>
-                        <p class="text-sm text-gray-500 text-center">Your request is being processed</p>
+                        @php
+                            $activeTransaction = $thesis->transactions()
+                                ->where('user_id', Auth::id())
+                                ->where('transaction_status', 'requested')
+                                ->latest()
+                                ->first();
+                        @endphp
+
+                        @if($activeTransaction)
+                            <form action="{{ route('transactions.cancel-request', $activeTransaction->id) }}" method="POST" class="w-full">
+                                @csrf
+                                <button type="submit"
+                                        class="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
+                                    <i class="fas fa-clock mr-2"></i>
+                                    Cancel Request
+                                </button>
+                            </form>
+                            <p class="text-sm text-gray-500 text-center">You have a pending request. You may cancel it.</p>
+                        @else
+                            <button disabled
+                                    class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed">
+                                <i class="fas fa-times-circle mr-2"></i>
+                                No Active Request Found
+                            </button>
+                        @endif
                     @else
-                        <button disabled 
+                        <button disabled
                                 class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed">
                             <i class="fas fa-times-circle mr-2"></i>
                             No Copies Available

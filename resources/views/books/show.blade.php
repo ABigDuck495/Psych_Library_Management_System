@@ -66,13 +66,31 @@
                                     Click to request this book for borrowing
                                 </p>
                             @elseif($book->hasUserRequested(Auth::id()))
-                                <button disabled class="bg-orange-500 text-white font-semibold py-3 px-6 rounded-lg opacity-90 cursor-not-allowed">
-                                    <i class="fas fa-clock mr-2"></i>
-                                    Request Pending
-                                </button>
-                                <p class="text-sm text-gray-600 mt-3">
-                                    Your request is being processed
-                                </p>
+                                @php
+                                    $activeTransaction = $book->transactions()
+                                        ->where('user_id', Auth::id())
+                                        ->where('transaction_status', 'requested')
+                                        ->latest()
+                                        ->first();
+                                @endphp
+
+                                @if($activeTransaction)
+                                    <form action="{{ route('transactions.cancel-request', $activeTransaction->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+                                            <i class="fas fa-clock mr-2"></i>
+                                            Cancel Request
+                                        </button>
+                                    </form>
+                                    <p class="text-sm text-gray-600 mt-3">
+                                        You have a pending request. You may cancel it.
+                                    </p>
+                                @else
+                                    <button disabled class="bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg opacity-90 cursor-not-allowed">
+                                        <i class="fas fa-times-circle mr-2"></i>
+                                        No Active Request Found
+                                    </button>
+                                @endif
                             @else
                                 <button disabled class="bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg opacity-90 cursor-not-allowed">
                                     <i class="fas fa-times-circle mr-2"></i>
@@ -82,7 +100,7 @@
                                     All copies are currently borrowed
                                 </p>
                             @endif
-                            
+
                             <div class="mt-6">
                                 <a href="{{ route('userInterface.borrowedBooks') }}" class="text-green-600 hover:text-green-700 font-medium">
                                     <i class="fas fa-list mr-2"></i>

@@ -18,7 +18,7 @@ class Thesis extends Model
         'abstract',
         'year_published',
         'department',
-        'thesis_pdf',
+        ''
     ];
 
     // Fixed: Added proper foreign key and table names

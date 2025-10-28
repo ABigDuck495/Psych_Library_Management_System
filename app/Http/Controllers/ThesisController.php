@@ -9,6 +9,7 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ThesisController extends Controller
@@ -139,7 +140,13 @@ class ThesisController extends Controller
     public function show(Thesis $thesis)
     {
         $thesis->load('authors', 'copies');
-        return view('theses.show', compact('thesis'));
+        $activeTransaction = $thesis->transactions()
+            ->where('user_id', Auth::id())
+            ->where('transaction_status', 'requested')
+            ->latest()
+            ->first();
+
+        return view('theses.show', compact('thesis', 'activeTransaction'));
     }
 
     public function edit(Thesis $thesis)

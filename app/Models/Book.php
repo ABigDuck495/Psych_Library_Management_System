@@ -40,10 +40,14 @@ class Book extends Model
 
     public function transactions()
     {
-        return Transaction::where('borrowable_type', BookCopy::class)
-            ->whereHas('borrowable', function($query) {
-                $query->where('book_id', $this->id);
-            });
+        return $this->hasManyThrough(
+            Transaction::class, 
+            ThesisCopy::class, 
+            'thesis_id', // Foreign key on thesis_copies table
+            'borrowable_id', // Foreign key on transactions table
+            'id', // Local key on theses table
+            'id' // Local key on thesis_copies table
+        )->where('borrowable_type', ThesisCopy::class);
     }
 
 // In Book.php - ensure this method exists and works
@@ -64,19 +68,10 @@ class Book extends Model
 
     public function hasUserRequested($userId)
     {
-        // Get all copy IDs for this specific book
-        $copyIds = $this->copies()->pluck('id');
-        
-        if ($copyIds->isEmpty()) {
-            return false;
-        }
-
-        // Check only for BookCopy transactions
-        return Transaction::where('user_id', $userId)
-            ->where('borrowable_type', BookCopy::class)
-            ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
-            ->whereIn('borrowable_id', $copyIds)
-            ->exists();
+        return $this->transactions()
+                    ->where('user_id', $userId)
+                    ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
+                    ->exists();
     }
     public function scopeSearch($query, $term)
     {
