@@ -50,7 +50,17 @@ class Book extends Model
         )->where('borrowable_type', BookCopy::class);
     }
 
-// In Book.php - ensure this method exists and works
+    public function viewDetails()
+{
+    return Transaction::where('borrowable_type', BookCopy::class)
+        ->whereIn('borrowable_id', function ($query) {
+            $query->select('id')
+                  ->from('book_copies')
+                  ->where('book_id', $this->id);
+        });
+}
+
+    // In Book.php - ensure this method exists and works
     public function getNextAvailableCopy()
     {
         return $this->copies()->available()->first();
@@ -65,14 +75,22 @@ class Book extends Model
         return $this->copies()->available()->count();
     }
 
+//if my problem pwede ibalik, gagawan ko nalang bagong function name, pero for now tanggal muna
+    // public function hasUserRequested($userId)
+    // {
+    //     return $this->transactions()
+    //                 ->where('user_id', $userId)
+    //                 ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
+    //                 ->exists();
+    // }
 
     public function hasUserRequested($userId)
-    {
-        return $this->transactions()
-                    ->where('user_id', $userId)
-                    ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
-                    ->exists();
-    }
+{
+    return $this->viewDetails()
+                ->where('user_id', $userId)
+                ->whereIn('transaction_status', ['requested', 'approved', 'borrowed'])
+                ->exists();
+}
     public function scopeSearch($query, $term)
     {
         $term = "%$term%";
