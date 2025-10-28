@@ -84,6 +84,8 @@
                         <label class="block text-sm font-medium text-gray-500 mb-1">Thesis ID</label>
                         <p class="text-gray-800 font-medium">#{{ $thesis->id }}</p>
                     </div>
+                    <a href="{{ route('theses.viewPdf', $thesis->id) }}">view pdf</a>
+                    <a href="{{ route('theses.downloadPdf', $thesis->id) }}">download pdf</a>
                 </div>
             </div>
         </div>
@@ -194,7 +196,7 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
                     <span class="text-gray-600">Total Copies</span>
-                    <span class="font-medium text-gray-800">{{ $thesis->copies_count ?? 1 }}</span>
+                    <span class="font-medium text-gray-800">{{ $thesis->copies->count() ?? 1 }}</span>
                 </div>
                 
                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
@@ -204,7 +206,7 @@
                 
                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
                     <span class="text-gray-600">Borrowed Copies</span>
-                    <span class="font-medium text-orange-600">{{ ($thesis->copies_count ?? 1) - $thesis->availableCopiesCount() }}</span>
+                    <span class="font-medium text-orange-600">{{ ($thesis->copies->count() ?? 1) - $thesis->availableCopiesCount() }}</span>
                 </div>
                 
                 <div class="flex justify-between items-center py-2">

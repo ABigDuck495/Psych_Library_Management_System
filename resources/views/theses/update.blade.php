@@ -50,7 +50,7 @@
 
     <!-- Edit Thesis Form -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
-        <form action="{{ route('theses.update', $thesis->id) }}" method="POST" id="thesisForm">
+        <form action="{{ route('theses.update', $thesis->id) }}" method="POST" id="thesisForm" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -200,6 +200,44 @@
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    <!-- PDF Submission Field - NEW FIELD ADDED -->
+                    <div>
+                        <label for="pdf_file" class="block text-sm font-medium text-gray-700 mb-2">
+                            Thesis PDF File
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-file-pdf text-gray-400"></i>
+                            </div>
+                            <input 
+                                type="file" 
+                                id="pdf_file" 
+                                name="pdf_file" 
+                                accept=".pdf"
+                                class="form-input block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                            >
+                        </div>
+                        <div class="mt-2 text-sm text-gray-500">
+                            <p>Upload a PDF file of the thesis (max: 10MB)</p>
+                            @if($thesis->pdf_path)
+                                <div class="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
+                                    <p class="text-green-700 flex items-center">
+                                        <i class="fas fa-check-circle mr-2"></i>
+                                        PDF file already uploaded
+                                        @if($thesis->pdf_path)
+                                            <a href="{{ Storage::url($thesis->pdf_path) }}" target="_blank" class="ml-2 text-blue-600 hover:text-blue-800 underline">
+                                                View Current PDF
+                                            </a>
+                                        @endif
+                                    </p>
+                                </div>
+                            @endif
+                        </div>
+                        @error('pdf_file')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
             </div>
 
@@ -286,6 +324,7 @@
         document.getElementById('year_published').value = "{{ $thesis->year_published }}";
         document.getElementById('department').value = "{{ $thesis->department }}";
         document.getElementById('copies_count').value = "{{ $copies_count ?? 1 }}";
+        document.getElementById('pdf_file').value = '';
         
         // Reset authors selection
         const authorSelect = document.getElementById('author_ids');
@@ -333,10 +372,18 @@
         const department = document.getElementById('department').value;
         const authorSelect = document.getElementById('author_ids');
         const selectedAuthors = Array.from(authorSelect.selectedOptions).length;
+        const pdfFile = document.getElementById('pdf_file').files[0];
         
         if (!title || !abstract || !yearPublished || !department || selectedAuthors === 0) {
             e.preventDefault();
             showTemporaryMessage('Please fill in all required fields', 'red');
+            return false;
+        }
+
+        // PDF file size validation (max 10MB)
+        if (pdfFile && pdfFile.size > 10 * 1024 * 1024) {
+            e.preventDefault();
+            showTemporaryMessage('PDF file must be less than 10MB', 'red');
             return false;
         }
         
@@ -355,6 +402,22 @@
     // Auto-focus title field
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('title').focus();
+    });
+
+    // PDF file input styling
+    document.getElementById('pdf_file').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.type !== 'application/pdf') {
+                showTemporaryMessage('Please select a PDF file', 'red');
+                this.value = '';
+            } else if (file.size > 10 * 1024 * 1024) {
+                showTemporaryMessage('File must be less than 10MB', 'red');
+                this.value = '';
+            } else {
+                showTemporaryMessage('PDF file selected successfully', 'blue');
+            }
+        }
     });
 </script>
 @endsection

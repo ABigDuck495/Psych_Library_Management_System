@@ -39,7 +39,7 @@
 
         <!-- Thesis Form -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <form action="{{ route('theses.store') }}" method="POST">
+            <form action="{{ route('theses.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <!-- Title Field -->
@@ -125,6 +125,30 @@
                         <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
                     @enderror
                 </div>
+                    <!-- PDF Submission Field -->
+                    <div>
+                        <label for="pdf_file" class="block text-sm font-medium text-gray-700 mb-2">
+                            Thesis PDF File
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-file-pdf text-gray-400"></i>
+                            </div>
+                            <input 
+                                type="file" 
+                                id="pdf_file" 
+                                name="pdf_file" 
+                                accept=".pdf"
+                                class="form-input block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                            >
+                        </div>
+                        <div class="mt-2 text-sm text-gray-500">
+                            <p>Upload a PDF file of the thesis (max: 10MB)</p>
+                        </div>
+                        @error('pdf_file')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
                 <!-- Authors Section (Dynamic Author Fields) -->
 <div class="border-t border-gray-200 pt-6 mb-6">

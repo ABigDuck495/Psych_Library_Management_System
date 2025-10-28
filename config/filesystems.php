@@ -59,7 +59,12 @@ return [
             'throw' => false,
             'report' => false,
         ],
-
+        'thesis' => [
+        'driver' => 'local',
+        'root' => storage_path('app/thesis_pdfs'),
+        'url' => env('APP_URL').'/storage/thesis_pdfs',
+        'visibility' => 'public',
+    ],
     ],
 
     /*

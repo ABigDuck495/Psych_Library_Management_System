@@ -97,6 +97,10 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('theses', ThesisController::class)->except(['index', 'show']);
         Route::resource('authors', AuthorController::class);
 
+        //pdf
+        Route::get('theses/{thesis}/download', [ThesisController::class, 'downloadPdf'])->name('theses.downloadPdf');
+        Route::get('theses/{thesis}/view', [ThesisController::class, 'viewPdf'])->name('theses.viewPdf');
+
         //user index and show
         Route::resource('users', UserController::class)->only(['index', 'show']);
 

@@ -275,7 +275,7 @@ class TransactionController extends Controller
                 'borrowable_type' => BookCopy::class,
                 'transaction_status' => 'requested',
                 'borrow_date' => now(),
-                'due_date' => now()->addDays(14),
+                'due_date' => now()->addDays(7),
             ]);
 
             // Mark copy as unavailable
@@ -319,7 +319,7 @@ class TransactionController extends Controller
                 'borrowable_type' => ThesisCopy::class,
                 'transaction_status' => 'requested',
                 'borrow_date' => now(),
-                'due_date' => now()->addDays(14),
+                'due_date' => now()->addDays(1),
             ]);
 
             // Mark copy as unavailable
