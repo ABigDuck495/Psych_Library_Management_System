@@ -134,7 +134,7 @@
             @endif
         </div>
 
-        {{-- ✅ BORROWED ITEMS --}}
+       
         <div>
             <h2 class="sub-title">Currently Borrowed Items</h2>
             @if($borrowedTransactions->isEmpty())
@@ -158,7 +158,7 @@
                                 <th class="px-4 py-3">Borrow Date</th>
                                 <th class="px-4 py-3">Due Date</th>
                                 <th class="px-4 py-3">Status</th>
-                                <th class="px-4 py-3">Actions</th>
+                                <!-- <th class="px-4 py-3">Actions</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -207,7 +207,7 @@
                                             <span class="badge badge-returned">{{ ucfirst($transaction->transaction_status) }}</span>
                                         @endif
                                     </td>
-                                    <td class="px-4 py-3">
+                                    <!-- <td class="px-4 py-3">
                                         @if($transaction->transaction_status === 'borrowed')
                                             <div class="flex flex-col space-y-2">
                                                 <form action="{{ route('transactions.return', $transaction) }}" method="POST">
@@ -232,7 +232,7 @@
                                         @else
                                             <span class="text-gray-400 text-sm">No actions</span>
                                         @endif
-                                    </td>
+                                    </td> -->
                                 </tr>
                             @endforeach
                         </tbody>
