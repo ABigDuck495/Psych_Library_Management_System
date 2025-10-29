@@ -263,105 +263,110 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year Published</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Authors</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Available Copies</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200" id="booksTableBody">
                     @forelse ($books as $book)
-                        <tr class="table-row-hover book-row" 
-                            data-title="{{ strtolower($book->title) }}"
-                            data-category="{{ strtolower($book->category->category_name ?? '') }}"
-                            data-year="{{ $book->year_published }}">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $book->id }}</td>
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900 max-w-xs">{{ $book->title }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500 max-w-md">
-                                <div class="description-preview">{{ $book->description }}</div>
-                                @if(strlen($book->description) > 200)
-                                    <a href="{{ route('books.show', $book->id) }}" 
-                                       class="text-blue-600 text-xs mt-1 hover:text-blue-800 focus:outline-none inline-flex items-center">
-                                        Read full description
-                                        <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                                    </a>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <span class="bg-blue-100 text-blue-800 category-badge">
-                                    {{ $book->year_published }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                @if($book->category)
-                                    <span class="bg-purple-100 text-purple-800 category-badge">
-                                        {{ $book->category->category_name }}
-                                    </span>
-                                @else
-                                    <span class="bg-gray-100 text-gray-600 category-badge">
-                                        Uncategorized
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-900">
-                                @if($book->authors->isNotEmpty())
-                                    <div class="space-y-1">
-                                        @foreach ($book->authors as $author)
-                                            <div class="flex items-center">
-                                                <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                                                <span>{{ $author->first_name }} {{ $author->last_name }}</span>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <span class="text-gray-400 italic">No authors linked</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    @if(in_array(auth()->user()->role, ['admin', 'librarian']))
-                                        <a href="{{ route('books.edit', $book->id) }}" 
-                                        class="text-yellow-600 hover:text-yellow-900 action-btn" 
-                                        title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                    @endif
-                                    <a href="{{ route('books.show', $book->id) }}" 
-                                       class="text-blue-600 hover:text-blue-900 action-btn" 
-                                       title="View">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    @if(in_array(auth()->user()->role, ['admin', 'librarian']))
-                                        <form action="{{ route('books.destroy', $book->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" 
-                                                    onclick="return confirm('Are you sure you want to delete this book?');"
-                                                    class="text-red-600 hover:text-red-900 action-btn" 
-                                                    title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center justify-center text-gray-400">
-                                    <i class="fas fa-book text-5xl mb-4"></i>
-                                    <h3 class="text-lg font-medium mb-2">No books found</h3>
-                                    <p class="mb-4">Get started by adding your first book</p>
-                                    <div class="flex space-x-3">
-                                        @if(in_array(auth()->user()->role, ['admin', 'librarian']))
-                                        <a href="{{ route('books.create') }}" class="add-book-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
-                                            <i class="fas fa-plus-circle mr-2"></i>
-                                            Add New Book
-                                        </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
+        <tr class="table-row-hover book-row" 
+            data-title="{{ strtolower($book->title) }}"
+            data-category="{{ strtolower($book->category->category_name ?? '') }}"
+            data-year="{{ $book->year_published }}">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $book->id }}</td>
+            <td class="px-6 py-4 text-sm font-medium text-gray-900 max-w-xs">{{ $book->title }}</td>
+            <td class="px-6 py-4 text-sm text-gray-500 max-w-md">
+                <div class="description-preview">{{ $book->description }}</div>
+                @if(strlen($book->description) > 200)
+                    <a href="{{ route('books.show', $book->id) }}" 
+                       class="text-blue-600 text-xs mt-1 hover:text-blue-800 focus:outline-none inline-flex items-center">
+                        Read full description
+                        <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                    </a>
+                @endif
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <span class="bg-blue-100 text-blue-800 category-badge">
+                    {{ $book->year_published }}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                @if($book->category)
+                    <span class="bg-purple-100 text-purple-800 category-badge">
+                        {{ $book->category->category_name }}
+                    </span>
+                @else
+                    <span class="bg-gray-100 text-gray-600 category-badge">
+                        Uncategorized
+                    </span>
+                @endif
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-900">
+                @if($book->authors->isNotEmpty())
+                    <div class="space-y-1">
+                        @foreach ($book->authors as $author)
+                            <div class="flex items-center">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                                <span>{{ $author->first_name }} {{ $author->last_name }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <span class="text-gray-400 italic">No authors linked</span>
+                @endif
+            </td>
+              <td class="px-6 py-4 text-sm text-gray-900">
+                    <!-- Display available stock -->
+                    {{ $book->available_stock }}
+                </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex space-x-2">
+                    @if(in_array(auth()->user()->role, ['admin', 'librarian']))
+                        <a href="{{ route('books.edit', $book->id) }}" 
+                        class="text-yellow-600 hover:text-yellow-900 action-btn" 
+                        title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    @endif
+                    <a href="{{ route('books.show', $book->id) }}" 
+                       class="text-blue-600 hover:text-blue-900 action-btn" 
+                       title="View">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    @if(in_array(auth()->user()->role, ['admin', 'librarian']))
+                        <form action="{{ route('books.destroy', $book->id) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" 
+                                    onclick="return confirm('Are you sure you want to delete this book?');"
+                                    class="text-red-600 hover:text-red-900 action-btn" 
+                                    title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </td>
+        </tr>
+    @empty
+        <tr>
+            <td colspan="8" class="px-6 py-12 text-center"> <!-- Adjusted colspan -->
+                <div class="flex flex-col items-center justify-center text-gray-400">
+                    <i class="fas fa-book text-5xl mb-4"></i>
+                    <h3 class="text-lg font-medium mb-2">No books found</h3>
+                    <p class="mb-4">Get started by adding your first book</p>
+                    <div class="flex space-x-3">
+                        @if(in_array(auth()->user()->role, ['admin', 'librarian']))
+                        <a href="{{ route('books.create') }}" class="add-book-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
+                            <i class="fas fa-plus-circle mr-2"></i>
+                            Add New Book
+                        </a>
+                        @endif
+                    </div>
+                </div>
+            </td>
+        </tr>
+    @endforelse
                 </tbody>
             </table>
         </div>

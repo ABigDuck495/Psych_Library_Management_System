@@ -22,8 +22,14 @@ class BookController extends Controller
 
     public function index()
     {
-        $books = Book::with(['authors', 'category', 'copies'])->paginate(10);
-        return view('books.index', compact('books'));
+       $books = Book::with(['authors', 'category', 'copies'])->paginate(10);
+
+    // Attach available copies count to each book
+    foreach ($books as $book) {
+        $book->available_stock = $book->copies()->where('is_available', true)->count();
+    }
+
+    return view('books.index', compact('books'));
     }
 
     public function userInterface()
