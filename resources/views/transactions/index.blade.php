@@ -250,10 +250,16 @@
                                                 <i class="fas fa-edit"></i>
                                             </a>
                                              -->
-                                            <form action="{{ route('transactions.destroy', $transaction) }}" method="POST" class="inline">
+                                            <form action="{{ route('transactions.destroy', $transaction) }}" method="POST" class="inline delete-form">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" onclick="return confirm('Delete this transaction?')" class="text-red-600 hover:text-red-900 action-btn" title="Delete">
+                                                <button type="button" 
+                                                        class="text-red-600 hover:text-red-900 action-btn delete-btn" 
+                                                        title="Delete"
+                                                        data-transaction-id="{{ $transaction->id }}"
+                                                        data-user-name="{{ $transaction->user->first_name }} {{ $transaction->user->last_name }}"
+                                                        data-item-title="{{ $transaction->item_title ?? 'N/A' }}"
+                                                        data-status="{{ $transaction->transaction_status }}">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
@@ -357,5 +363,68 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // SweetAlert for delete confirmation
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const transactionId = this.getAttribute('data-transaction-id');
+                const userName = this.getAttribute('data-user-name');
+                const itemTitle = this.getAttribute('data-item-title');
+                const status = this.getAttribute('data-status');
+                const form = this.closest('.delete-form');
+                
+                Swal.fire({
+                    title: 'Are you sure?',
+                    html: `You are about to delete transaction #<strong>${transactionId}</strong><br>
+                           <strong>User:</strong> ${userName}<br>
+                           <strong>Item:</strong> ${itemTitle}<br>
+                           <strong>Status:</strong> ${status.charAt(0).toUpperCase() + status.slice(1)}<br><br>
+                           This action cannot be undone!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'swal2-confirm',
+                        cancelButton: 'swal2-cancel'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state
+                        Swal.fire({
+                            title: 'Deleting...',
+                            text: 'Please wait while we delete the transaction',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        // Submit the form
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // Success message handling (if there was a successful deletion)
+        @if(session('delete_success'))
+        Swal.fire({
+            title: 'Deleted!',
+            text: '{{ session('delete_success') }}',
+            icon: 'success',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
+        @endif
+    });
+</script>
 @endpush
 @endsection

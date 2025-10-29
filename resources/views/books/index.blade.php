@@ -269,10 +269,11 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200" id="booksTableBody">
                     @forelse ($books as $book)
-        <tr class="table-row-hover book-row" 
+        <tr class="table-row-hover book-row clickable-row" 
             data-title="{{ strtolower($book->title) }}"
             data-category="{{ strtolower($book->category->category_name ?? '') }}"
-            data-year="{{ $book->year_published }}">
+            data-year="{{ $book->year_published }}"
+            data-href="{{ route('books.show', $book->id) }}">
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $book->id }}</td>
             <td class="px-6 py-4 text-sm font-medium text-gray-900 max-w-xs">{{ $book->title }}</td>
             <td class="px-6 py-4 text-sm text-gray-500 max-w-md">
@@ -319,7 +320,7 @@
                     <!-- Display available stock -->
                     {{ $book->available_stock }}
                 </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium no-click">
                 <div class="flex space-x-2">
                     @if(in_array(auth()->user()->role, ['admin', 'librarian']))
                         <a href="{{ route('books.edit', $book->id) }}" 
@@ -427,6 +428,28 @@
         max-height: 15rem;
     }
 
+    /* Clickable row styles */
+    .clickable-row {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .clickable-row:hover {
+        background-color: #f3f4f6 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .no-click {
+        cursor: default !important;
+    }
+
+    .no-click:hover {
+        background-color: transparent !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
     /* Pagination Styles */
     .pagination {
         display: flex;
@@ -508,7 +531,29 @@
 
         // Real-time search
         searchInput.addEventListener('input', filterBooks);
+
+        // Clickable row functionality
+        document.querySelectorAll('.clickable-row').forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Don't trigger if clicking on action buttons or links
+                if (e.target.closest('.no-click') || 
+                    e.target.tagName === 'A' || 
+                    e.target.tagName === 'BUTTON' ||
+                    e.target.closest('a') || 
+                    e.target.closest('button') ||
+                    e.target.closest('form')) {
+                    return;
+                }
+                
+                const href = this.getAttribute('data-href');
+                if (href) {
+                    window.location.href = href;
+                }
+            });
+        });
     });
+
+    
 </script>
 @endpush
 @endsection

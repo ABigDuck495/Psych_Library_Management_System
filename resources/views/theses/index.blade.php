@@ -178,10 +178,11 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200" id="thesesTableBody">
                     @forelse ($theses as $thesis)
-    <tr class="table-row-hover thesis-row" 
+    <tr class="table-row-hover thesis-row clickable-row" 
         data-title="{{ strtolower($thesis->title) }}"
         data-department="{{ strtolower($thesis->department) }}"
-        data-year="{{ $thesis->year_published }}">
+        data-year="{{ $thesis->year_published }}"
+        data-href="{{ route('theses.show', $thesis->id) }}">
         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $thesis->id }}</td>
         <td class="px-6 py-4 text-sm font-medium text-gray-900 max-w-xs">{{ $thesis->title }}</td>
         <td class="px-6 py-4 text-sm text-gray-500 max-w-md">
@@ -224,7 +225,7 @@
             {{ $thesis->availableCopies()->where('is_available', true)->count() }} <!-- Available copies count -->
         </td>
 
-        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium no-click">
             <div class="flex space-x-2">
                 @if(in_array(auth()->user()->role, ['admin', 'librarian']))
                     <a href="{{ route('theses.edit', $thesis->id) }}" 
@@ -239,13 +240,14 @@
                     <i class="fas fa-eye"></i>
                 </a>
                 @if(in_array(auth()->user()->role, ['admin', 'librarian']))
-                    <form action="{{ route('theses.destroy', $thesis->id) }}" method="POST" class="inline">
+                    <form action="{{ route('theses.destroy', $thesis->id) }}" method="POST" class="inline delete-form">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" 
-                                onclick="return confirm('Are you sure you want to delete this thesis?');"
-                                class="text-red-600 hover:text-red-900 action-btn" 
-                                title="Delete">
+                        <button type="button" 
+                                class="text-red-600 hover:text-red-900 action-btn delete-btn" 
+                                title="Delete"
+                                data-thesis-title="{{ $thesis->title }}"
+                                data-thesis-id="{{ $thesis->id }}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </form>
@@ -315,7 +317,6 @@
         font-weight: 500;
     }
     
-    
     .add-thesis-btn {
         transition: all 0.3s ease;
     }
@@ -332,6 +333,28 @@
     .export-dropdown-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Clickable row styles */
+    .clickable-row {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .clickable-row:hover {
+        background-color: #f3f4f6 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .no-click {
+        cursor: default !important;
+    }
+
+    .no-click:hover {
+        background-color: transparent !important;
+        transform: none !important;
+        box-shadow: none !important;
     }
 
     /* Pagination Styles */
@@ -376,6 +399,7 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // Filter functionality
     document.addEventListener('DOMContentLoaded', function() {
@@ -415,6 +439,79 @@
 
         // Real-time search
         searchInput.addEventListener('input', filterTheses);
+
+        // Clickable row functionality
+        document.querySelectorAll('.clickable-row').forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Don't trigger if clicking on action buttons or links
+                if (e.target.closest('.no-click') || 
+                    e.target.tagName === 'A' || 
+                    e.target.tagName === 'BUTTON' ||
+                    e.target.closest('a') || 
+                    e.target.closest('button') ||
+                    e.target.closest('form')) {
+                    return;
+                }
+                
+                const href = this.getAttribute('data-href');
+                if (href) {
+                    window.location.href = href;
+                }
+            });
+        });
+
+        // SweetAlert for delete confirmation
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const thesisTitle = this.getAttribute('data-thesis-title');
+                const thesisId = this.getAttribute('data-thesis-id');
+                const form = this.closest('.delete-form');
+                
+                Swal.fire({
+                    title: 'Are you sure?',
+                    html: `You are about to delete the thesis <strong>"${thesisTitle}"</strong>. This action cannot be undone!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'swal2-confirm',
+                        cancelButton: 'swal2-cancel'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state
+                        Swal.fire({
+                            title: 'Deleting...',
+                            text: 'Please wait while we delete the thesis',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        // Submit the form
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // Success message handling (if there was a successful deletion)
+        @if(session('delete_success'))
+        Swal.fire({
+            title: 'Deleted!',
+            text: '{{ session('delete_success') }}',
+            icon: 'success',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
+        @endif
     });
 </script>
 @endpush

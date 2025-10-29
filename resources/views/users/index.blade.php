@@ -241,35 +241,43 @@
                                         </a>
                                         
                                         @if($user->account_status === 'Active')
-                                            <form action="{{ route('users.deactivate', $user) }}" method="POST" class="inline">
+                                            <form action="{{ route('users.deactivate', $user) }}" method="POST" class="inline deactivate-form">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" 
-                                                        onclick="return confirm('Deactivate this user?')"
-                                                        class="text-orange-600 hover:text-orange-900 action-btn" 
-                                                        title="Deactivate">
+                                                <button type="button" 
+                                                        class="text-orange-600 hover:text-orange-900 action-btn deactivate-btn" 
+                                                        title="Deactivate"
+                                                        data-user-name="{{ $user->first_name }} {{ $user->last_name }}"
+                                                        data-user-id="{{ $user->id }}"
+                                                        data-user-role="{{ $user->role }}">
                                                     <i class="fas fa-user-slash"></i>
                                                 </button>
                                             </form>
                                         @else
-                                            <form action="{{ route('users.activate', $user) }}" method="POST" class="inline">
+                                            <form action="{{ route('users.activate', $user) }}" method="POST" class="inline activate-form">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" 
-                                                        class="text-green-600 hover:text-green-900 action-btn" 
-                                                        title="Activate">
+                                                <button type="button" 
+                                                        class="text-green-600 hover:text-green-900 action-btn activate-btn" 
+                                                        title="Activate"
+                                                        data-user-name="{{ $user->first_name }} {{ $user->last_name }}"
+                                                        data-user-id="{{ $user->id }}"
+                                                        data-user-role="{{ $user->role }}">
                                                     <i class="fas fa-user-check"></i>
                                                 </button>
                                             </form>
                                         @endif
 
-                                        <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline">
+                                        <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline delete-form">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" 
-                                                    onclick="return confirm('Delete this user permanently?')"
-                                                    class="text-red-600 hover:text-red-900 action-btn" 
-                                                    title="Delete">
+                                            <button type="button" 
+                                                    class="text-red-600 hover:text-red-900 action-btn delete-btn" 
+                                                    title="Delete"
+                                                    data-user-name="{{ $user->first_name }} {{ $user->last_name }}"
+                                                    data-user-id="{{ $user->id }}"
+                                                    data-user-role="{{ $user->role }}"
+                                                    data-user-email="{{ $user->email }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -347,6 +355,7 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // Filter functionality
     document.addEventListener('DOMContentLoaded', function() {
@@ -393,6 +402,169 @@
 
         // Real-time search
         searchInput.addEventListener('input', filterUsers);
+
+        // SweetAlert for delete confirmation
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const userName = this.getAttribute('data-user-name');
+                const userId = this.getAttribute('data-user-id');
+                const userRole = this.getAttribute('data-user-role');
+                const userEmail = this.getAttribute('data-user-email');
+                const form = this.closest('.delete-form');
+                
+                Swal.fire({
+                    title: 'Are you sure?',
+                    html: `You are about to permanently delete user:<br>
+                           <strong>${userName}</strong><br>
+                           <strong>Role:</strong> ${userRole.charAt(0).toUpperCase() + userRole.slice(1)}<br>
+                           <strong>Email:</strong> ${userEmail}<br><br>
+                           <span class="text-red-600 font-semibold">This action cannot be undone and will permanently remove all user data!</span>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete permanently!',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'swal2-confirm',
+                        cancelButton: 'swal2-cancel'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state
+                        Swal.fire({
+                            title: 'Deleting...',
+                            text: 'Please wait while we delete the user',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        // Submit the form
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // SweetAlert for deactivate confirmation
+        document.querySelectorAll('.deactivate-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const userName = this.getAttribute('data-user-name');
+                const userId = this.getAttribute('data-user-id');
+                const userRole = this.getAttribute('data-user-role');
+                const form = this.closest('.deactivate-form');
+                
+                Swal.fire({
+                    title: 'Deactivate User?',
+                    html: `You are about to deactivate user:<br>
+                           <strong>${userName}</strong><br>
+                           <strong>Role:</strong> ${userRole.charAt(0).toUpperCase() + userRole.slice(1)}<br><br>
+                           The user will no longer be able to access the system until reactivated.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#f59e0b',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, deactivate user',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state
+                        Swal.fire({
+                            title: 'Deactivating...',
+                            text: 'Please wait while we deactivate the user',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        // Submit the form
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // SweetAlert for activate confirmation
+        document.querySelectorAll('.activate-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const userName = this.getAttribute('data-user-name');
+                const userId = this.getAttribute('data-user-id');
+                const userRole = this.getAttribute('data-user-role');
+                const form = this.closest('.activate-form');
+                
+                Swal.fire({
+                    title: 'Activate User?',
+                    html: `You are about to activate user:<br>
+                           <strong>${userName}</strong><br>
+                           <strong>Role:</strong> ${userRole.charAt(0).toUpperCase() + userRole.slice(1)}<br><br>
+                           The user will be able to access the system again.`,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, activate user',
+                    cancelButtonText: 'Cancel',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading state
+                        Swal.fire({
+                            title: 'Activating...',
+                            text: 'Please wait while we activate the user',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        // Submit the form
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // Success message handling
+        @if(session('delete_success'))
+        Swal.fire({
+            title: 'Deleted!',
+            text: '{{ session('delete_success') }}',
+            icon: 'success',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
+        @endif
+
+        @if(session('deactivate_success'))
+        Swal.fire({
+            title: 'Deactivated!',
+            text: '{{ session('deactivate_success') }}',
+            icon: 'success',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
+        @endif
+
+        @if(session('activate_success'))
+        Swal.fire({
+            title: 'Activated!',
+            text: '{{ session('activate_success') }}',
+            icon: 'success',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+        });
+        @endif
     });
 </script>
 @endpush

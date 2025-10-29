@@ -40,7 +40,7 @@ class Transaction extends Model
     public function borrowable()
     {
         return $this->morphTo();
-    }
+    }   
 
     // Fixed: Added proper foreign key
     public function penalty()
