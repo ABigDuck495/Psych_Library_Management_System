@@ -91,4 +91,8 @@ class AuthorController extends Controller
         $theses = $author->theses()->paginate(10); // ✅ corrected plural
         return view('authors.theses', compact('author', 'theses'));
     }
+    public function show(Author $author){
+        $author = Author::findOrFail($author->id);
+        return view('authors.show', compact('author'));
+    }
 }
