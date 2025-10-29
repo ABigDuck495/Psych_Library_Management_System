@@ -71,15 +71,6 @@ class AuthorController extends Controller
         return redirect()->route('authors.index')->with('success', 'Author updated successfully!');
     }
 
-    public function show($id)
-    {
-        // Eager load books and theses to prevent N+1 problem
-        $author = Author::with(['books', 'theses'])->findOrFail($id);
-
-        // Pass to view
-        return view('authors.show', compact('author'));
-    }
-
     // Delete an author
     public function destroy(Author $author)
     {

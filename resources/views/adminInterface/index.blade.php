@@ -176,30 +176,34 @@
                 <h2 class="text-xl font-bold text-gray-800">Recent Transactions</h2>
                 <a href="{{ route('transactions.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">View All</a>
             </div>
-            <div class="space-y-4">
+    <div class="space-y-4">
     @forelse($recentTransactions as $transaction)
-    <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-        <div class="flex items-center">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-gray-200">
-                <i class="fas fa-book text-gray-700"></i>
+        @php
+            $title = 'Unknown Item';
+
+            if ($transaction->borrowable instanceof \App\Models\BookCopy) {
+                $title = $transaction->borrowable->book->title ?? 'Unknown Book';
+            } elseif ($transaction->borrowable instanceof \App\Models\ThesisCopy) {
+                $title = $transaction->borrowable->thesis->title ?? 'Unknown Thesis';
+            }
+        @endphp
+
+        <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50">
+            <div class="flex items-center">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3 bg-gray-200">
+                    <i class="fas fa-book text-gray-700"></i>
+                </div>
+                <span>{{ $title }}</span>
             </div>
-            <span>
-                @if($transaction->copy_type === 'App\\Models\\BookCopy' && $transaction->bookCopy)
-                    {{ $transaction->bookCopy->book->title ?? 'Unknown Book' }}
-                @elseif($transaction->copy_type === 'App\\Models\\ThesisCopy' && $transaction->thesisCopy)
-                    {{ $transaction->thesisCopy->thesis->title ?? 'Unknown Thesis' }}
-                @else
-                    Unknown Item
-                @endif
+            <span class="text-sm font-medium text-gray-700">
+                {{ ucfirst($transaction->transaction_status) }}
             </span>
         </div>
-        <span class="text-sm font-medium text-gray-700">
-            {{ ucfirst($transaction->transaction_status) }}
-        </span>
-    </div>
-@empty
-    <p class="text-gray-500 text-sm text-center py-3">No recent transactions found.</p>
-@endforelse
+    @empty
+        <p class="text-gray-500 text-sm text-center py-3">
+            No recent transactions found.
+        </p>
+    @endforelse
 
 </div>
 

@@ -59,4 +59,20 @@ class ThesisCopy extends Model
     {
         return 'Thesis';
     }
+    
+public function getAuthorsAttribute()
+{
+    if (!$this->thesis || !$this->thesis->authors) {
+        return collect();
+    }
+    return $this->thesis->authors->map(function($author) {
+        return trim($author->first_name . ' ' . $author->last_name);
+    });
+}
+
+public function getAuthorsStringAttribute()
+{
+    return $this->authors->implode(', ');
+}
+    
 }

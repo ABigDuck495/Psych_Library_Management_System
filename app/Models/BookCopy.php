@@ -12,8 +12,8 @@ class BookCopy extends Model
     // protected $primaryKey = 'id'; // ADD THIS LINE
 
     
-    protected $primaryKey = 'copy_id';
-    public $incrementing = true;
+    protected $primaryKey = 'book_id';
+    public $incrementing = false;
     protected $keyType = 'int';
 
     protected $fillable = [
@@ -32,7 +32,7 @@ class BookCopy extends Model
     // Fixed: Correct polymorphic relationship
     public function transactions()
     {
-        return $this->morphMany(Transaction::class, 'borrowable');
+         return $this->morphMany(Transaction::class, 'borrowable', 'borrowable_type', 'borrowable_id', 'book_id');
     }
 
     // Scopes
@@ -67,4 +67,18 @@ class BookCopy extends Model
     {
         return 'Book';
     }
+
+    public function getAuthorsAttribute()
+{
+    if (!$this->book || !$this->book->authors) {
+        return collect();
+    }
+    return $this->book->authors->map(function($author) {
+        return trim($author->first_name . ' ' . $author->last_name);
+    });
+}
+public function getAuthorsStringAttribute()
+{
+    return $this->authors->implode(', ');
+}
 }
