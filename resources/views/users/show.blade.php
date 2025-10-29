@@ -28,25 +28,26 @@
     @endif
 
     <!-- Enhanced Action Buttons -->
+    @if (Auth::user()->role === 'admin')
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
         <h2 class="text-xl font-semibold text-gray-800 mb-4">User Actions</h2>
         
         <div class="flex flex-wrap gap-3">
-            <a href="{{ route('users.edit', $user) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg font-medium flex items-center transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                <i class="fas fa-edit mr-2"></i>
-                Edit User
-            </a>
-            
-            @if($user->account_status === 'Active')
-                <form action="{{ route('users.deactivate', $user) }}" method="POST" class="inline">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" onclick="return confirm('Deactivate this user?')" class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-lg font-medium flex items-center transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                        <i class="fas fa-ban mr-2"></i>
-                        Deactivate Account
-                    </button>
-                </form>
-            @else
+                <a href="{{ route('users.edit', $user) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg font-medium flex items-center transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    <i class="fas fa-edit mr-2"></i>
+                    Edit User
+                </a>
+                @if($user->account_status === 'Active')
+                    <form action="{{ route('users.deactivate', $user) }}" method="POST" class="inline">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" onclick="return confirm('Deactivate this user?')" class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-lg font-medium flex items-center transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                            <i class="fas fa-ban mr-2"></i>
+                            Deactivate Account
+                        </button>
+                    </form>
+                @else    
+            @endif
                 <form action="{{ route('users.activate', $user) }}" method="POST" class="inline">
                     @csrf
                     @method('PATCH')
@@ -55,9 +56,9 @@
                         Activate Account
                     </button>
                 </form>
-            @endif
+            </div>
         </div>
-    </div>
+@endif
 
     <!-- User Information -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
@@ -202,12 +203,12 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-1">Academic Program</label>
-                        <p class="text-gray-800 font-medium">{{ $user->academic_program ?? 'Not Specified' }}</p>
+                        <p class="text-gray-800 font-medium">{{ $user->student->academic_program ?? 'Not Specified' }}</p>
                     </div>
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-1">Major/Department</label>
-                        <p class="text-gray-800 font-medium">{{ $user->department ?? 'Not Specified' }}</p>
+                        <p class="text-gray-800 font-medium">{{ $user->student->department ?? 'Not Specified' }}</p>
                     </div>
                 </div>
             </div>
