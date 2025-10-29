@@ -63,6 +63,9 @@ Route::middleware(['auth', 'role:user'])->get('/test', function () {
 Route::get('/users/self/edit', [UserController::class, 'editSelf'])
     ->middleware('auth')
     ->name('users.editSelf');
+Route::patch('/users/self/update', [UserController::class, 'updateSelf'])
+    ->middleware('auth')
+    ->name('users.updateSelf');
 
 
 Route::middleware(['auth'])->group(function () {

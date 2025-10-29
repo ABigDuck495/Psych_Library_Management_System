@@ -12,9 +12,9 @@
         </div>
         
         <div>
-            <a href="{{ route('users.show', $user) }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
+            <a href="{{ route('home', $user) }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
                 <i class="fas fa-arrow-left mr-2"></i>
-                Back to User Details
+                Back to Dashboard
             </a>
         </div>
     </div>
@@ -36,9 +36,9 @@
 
     <!-- Edit User Form -->
     <div class="bg-white rounded-xl shadow-sm p-6">
-        <form method="POST" action="{{ route('users.update', $user) }}" class="space-y-8">
+        <form method="POST" action="{{ route('users.updateSelf', $user) }}" class="space-y-8">
             @csrf
-            @method('PUT')
+            @method('PATCH')
 
             <!-- Basic Information Section -->
             <div class="form-section">
