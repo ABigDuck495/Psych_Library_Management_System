@@ -159,7 +159,7 @@
                 </div>
                 
                 <!-- User Profile Section - Now Clickable -->
-                <a href="{{ route('users.edit', Auth::user()) }}" class="user-profile-link">
+                <a href="{{ route('users.editSelf') }}" class="user-profile-link">
                     <div class="user-profile">
                         <div class="user-info">
                             <div class="user-avatar">
@@ -190,7 +190,7 @@
                         <h2 class="section-title">Main Navigation</h2>
                         <ul class="nav-menu">
                             <li>
-                                <a href="{{ in_array(Auth::user()->role, ['admin', 'librarian']) ? route('adminInterface.index') : route('userInterface.index') }}" 
+                                <a href="{{ route('home') }}" 
                                    class="nav-item {{ in_array(Auth::user()->role, ['admin', 'librarian']) ? 
                                                     (request()->routeIs('adminInterface.*') ? 'active' : '') : 
                                                     (request()->routeIs('userInterface.*') ? 'active' : '') }}">
