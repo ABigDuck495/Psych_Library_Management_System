@@ -72,10 +72,10 @@ class LoginController extends Controller
 {
     $credentials = $request->validate([
         'email' => [
-        'required',
-        'email',
-        'regex:/^[\w\.-]+@((gmail|googlemail)\.com|yahoo\.com|clsu\.edu\.ph)$/i',
-    ],
+            'required',
+            'email',
+            'regex:/^[\w\.-]+@(?:gmail\.com|google\.com|yahoo\.com|clsu\.edu\.ph)$/i',
+        ],
         'password' => ['required'],
     ]);
 
