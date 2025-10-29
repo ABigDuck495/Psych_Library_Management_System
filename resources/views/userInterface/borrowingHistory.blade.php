@@ -89,9 +89,9 @@
                         <i class="fas fa-clock text-orange-600"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Pending</p>
+                        <p class="text-sm text-gray-600">Borrowed</p>
                         <p class="text-xl font-bold text-gray-800">
-                            {{ $historyTransactions->where('transaction_status', 'pending')->count() }}
+                            {{ $historyTransactions->where('transaction_status', 'borrowed')->count() }}
                         </p>
                     </div>
                 </div>
@@ -147,37 +147,39 @@
                     <tbody>
                         @foreach($historyTransactions as $index => $transaction)
                             @php
-                                $item = $transaction->copy;
+                                $item = $transaction->borrowable;
                                 $title = 'N/A';
-                                $authors = collect();
+                                $authors = 'N/A';
                                 
-                                if ($transaction->copy instanceof \App\Models\BookCopy) {
+                                if ($item instanceof \App\Models\BookCopy && $item->book) {
                                     $title = $item->book->title ?? 'N/A';
-                                    $authors = $item->book->authors ?? collect();
-                                } elseif ($transaction->copy instanceof \App\Models\ThesisCopy) {
+                                    // Handle authors for book
+                                    if ($item->book->authors && $item->book->authors->count() > 0) {
+                                        $authors = $item->book->authors->map(function($author) {
+                                            return trim($author->first_name . ' ' . $author->last_name);
+                                        })->implode(', ');
+                                    }
+                                } elseif ($item instanceof \App\Models\ThesisCopy && $item->thesis) {
                                     $title = $item->thesis->title ?? 'N/A';
-                                    $authors = $item->thesis->authors ?? collect();
+                                    // Handle authors for thesis
+                                    if ($item->thesis->authors && $item->thesis->authors->count() > 0) {
+                                        $authors = $item->thesis->authors->map(function($author) {
+                                            return trim($author->first_name . ' ' . $author->last_name);
+                                        })->implode(', ');
+                                    }
                                 }
                             @endphp
 
                             <tr class="border-b hover:bg-gray-50">
                                 <td class="px-4 py-3">{{ $index + 1 }}</td>
-                                <td class="px-4 py-3 font-medium">{{ $title }}</td>
+                                <td class="px-4 py-3 font-medium text-left">{{ $title }}</td>
                                 <td class="px-4 py-3">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                        {{ $transaction->copy instanceof \App\Models\BookCopy ? 'type-badge-book' : 'type-badge-thesis' }}">
-                                        {{ $transaction->copy instanceof \App\Models\BookCopy ? 'Book' : 'Thesis' }}
+                                        {{ $item instanceof \App\Models\BookCopy ? 'type-badge-book' : 'type-badge-thesis' }}">
+                                        {{ $item instanceof \App\Models\BookCopy ? 'Book' : 'Thesis' }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3">
-                                    @if($authors->count())
-                                        {{ $authors->map(function($author) { 
-                                            return trim($author->first_name . ' ' . $author->last_name); 
-                                        })->implode(', ') }}
-                                    @else
-                                        <span class="text-gray-400">N/A</span>
-                                    @endif
-                                </td>
+                                <td class="px-4 py-3 text-left">{{ $authors }}</td>
                                 <td class="px-4 py-3">
                                     {{ $transaction->borrow_date ? $transaction->borrow_date->format('M d, Y') : '—' }}
                                 </td>
@@ -205,13 +207,6 @@
                     </tbody>
                 </table>
             </div>
-
-            <!-- Pagination (if applicable) -->
-            @if(method_exists($historyTransactions, 'links'))
-                <div class="mt-6">
-                    {{ $historyTransactions->links() }}
-                </div>
-            @endif
         @endif
     </div>
 </div>

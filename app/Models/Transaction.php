@@ -119,25 +119,25 @@ class Transaction extends Model
 
     // Fixed: Added proper polymorphic handling
     public function markAsReturned()
-    {
-        $this->update([
-            'return_date' => now(),
-            'transaction_status' => 'returned',
-        ]);
+{
+    $this->update([
+        'return_date' => now(),
+        'transaction_status' => 'returned',
+    ]);
 
-        if ($this->borrowable) {
-            $this->borrowable->markAsAvailable();
-        }
+    if ($this->borrowable) {
+        $this->borrowable->markAsAvailable();
     }
+}
 
-    public function markAsBorrowed()
-    {
-        $this->update(['transaction_status' => 'borrowed']);
-        
-        if ($this->borrowable) {
-            $this->borrowable->markAsUnavailable();
-        }
+public function markAsBorrowed()
+{
+    $this->update(['transaction_status' => 'borrowed']);
+
+    if ($this->borrowable) {
+        $this->borrowable->markAsUnavailable();
     }
+}
 
     public function markAsApproved()
     {
@@ -169,28 +169,32 @@ class Transaction extends Model
 
 
     //bagoooooooooooooooooooooooooooooooooooooooooooooooooooo
-    public function bookCopy()
-{
-    return $this->belongsTo(\App\Models\BookCopy::class, 'copy_id', 'id');
-}
+//     public function bookCopy()
+// {
+//     return $this->belongsTo(\App\Models\BookCopy::class, 'copy_id', 'id');
+// }
 
-public function thesisCopy()
-{
-    return $this->belongsTo(\App\Models\ThesisCopy::class, 'copy_id', 'id');
-}
+// public function thesisCopy()
+// {
+//     return $this->belongsTo(\App\Models\ThesisCopy::class, 'copy_id', 'id');
+// }
 
+// public function copy()
+// {
+//     if ($this->borrowable_type === BookCopy::class) {
+//         return $this->belongsTo(BookCopy::class, 'copy_id');
+//     }
 public function copy()
 {
-    if ($this->borrowable_type === BookCopy::class) {
-        return $this->belongsTo(BookCopy::class, 'copy_id');
-    }
-
-    if ($this->borrowable_type === ThesisCopy::class) {
-        return $this->belongsTo(ThesisCopy::class, 'copy_id');
-    }
-
-    // Optional: fallback in case it's neither
-    return null;
+    return $this->morphTo('borrowable');
 }
+
+//     if ($this->borrowable_type === ThesisCopy::class) {
+//         return $this->belongsTo(ThesisCopy::class, 'copy_id');
+//     }
+
+//     // Optional: fallback in case it's neither
+//     return null;
+// }
 
 }

@@ -109,12 +109,16 @@ public function borrowingHistory()
 {
     $user = auth()->user();
 
-    $historyTransactions = Transaction::with('copy')
+    $historyTransactions = Transaction::with(['borrowable' => function ($morphTo) {
+        $morphTo->morphWith([
+            BookCopy::class => ['book.authors'], // Load book with authors
+            ThesisCopy::class => ['thesis.authors'], // Load thesis with authors
+        ]);
+    }])
     ->where('user_id', $user->id)
     ->whereIn('transaction_status', ['borrowed', 'overdue', 'returned'])
     ->orderByDesc('borrow_date')
     ->get();
-
 
     return view('userInterface.borrowingHistory', compact('historyTransactions'));
 }
