@@ -40,6 +40,8 @@
             @csrf
             @method('PUT')
 
+            <input type="hidden" name="user_type" value="{{ old('user_type', $user->user_type ?? 'student') }}">
+            <input type="hidden" name="university_id" value="{{ old('university_id', $user->university_id ?? null) }}">
             <!-- Basic Information Section -->
             <div class="form-section">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">

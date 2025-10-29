@@ -66,7 +66,12 @@ class UserController extends Controller
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
                 'username' => 'required|string|max:255|unique:users',
-                'email' => 'required|email|unique:users',
+                'email' => [
+                    'required',
+                    'email',
+                    'unique:users',
+                    'regex:/^[\w\.-]+@(?:gmail\.com|google\.com|yahoo\.com|clsu\.edu\.ph)$/i'
+                ],
                 'phone_number' => 'nullable|string|max:20',
                 'university_id' => 'nullable|string|max:50|unique:users',
                 'password' => [
