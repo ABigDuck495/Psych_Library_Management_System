@@ -27,11 +27,11 @@
 @section('content')
 <div class="flex-1 p-8">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
+    <!-- <div class="flex justify-between items-center mb-8">
         <div>
             <h1 class="text-3xl font-bold text-gray-800">Edit Author</h1>
             <p class="text-gray-600 mt-2">Update author information in the library system</p>
-        </div>
+        </div> -->
         <!-- Notification and message icons removed -->
     </div>
 
@@ -173,9 +173,9 @@
         </div>
     </div>
 
-    <!-- Quick Stats -->
+    <!-- Quick Stats
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <!-- Last Updated -->
+        <!-- Last Updated
         <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
             <div class="flex items-center">
                 <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mr-3">
@@ -188,7 +188,7 @@
             </div>
         </div>
 
-        <!-- Created Date -->
+        <!-- Created Date 
         <div class="bg-green-50 rounded-xl p-4 border border-green-200">
             <div class="flex items-center">
                 <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3">
@@ -201,7 +201,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 @endsection
 
 @push('scripts')

@@ -118,6 +118,24 @@
         .sidebar::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.5);
         }
+
+        /* Clickable user profile styles */
+        .user-profile-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .user-profile-link:hover {
+            background-color: rgba(34, 197, 94, 0.1);
+            transform: translateX(5px);
+        }
+
+        .user-profile-link:hover .user-avatar {
+            background-color: rgba(34, 197, 94, 0.2);
+        }
     </style>
     
     @stack('styles')
@@ -140,28 +158,30 @@
                     <h1 class="logo-text">Psych Library</h1>
                 </div>
                 
-                <!-- User Profile Section -->
-                <div class="user-profile">
-                    <div class="user-info">
-                        <div class="user-avatar">
-                            <i class="fas fa-user text-green-600 text-xl"></i>
+                <!-- User Profile Section - Now Clickable -->
+                <a href="{{ route('users.edit', Auth::user()) }}" class="user-profile-link">
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <i class="fas fa-user text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="user-name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                                <div class="user-role">{{ Auth::user()->role }}</div>
+                            </div>
                         </div>
-                        <div>
-                            <div class="user-name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
-                            <div class="user-role">{{ Auth::user()->role }}</div>
+                        <div class="user-details">
+                            <div class="user-detail">
+                                <span class="detail-label">University ID:</span>
+                                <span class="detail-value">{{ Auth::user()->university_id }}</span>
+                            </div>
+                            <div class="user-detail">
+                                <span class="detail-label">Status:</span>
+                                <span class="status-active">{{ Auth::user()->account_status }}</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="user-details">
-                        <div class="user-detail">
-                            <span class="detail-label">University ID:</span>
-                            <span class="detail-value">{{ Auth::user()->university_id }}</span>
-                        </div>
-                        <div class="user-detail">
-                            <span class="detail-label">Status:</span>
-                            <span class="status-active">{{ Auth::user()->account_status }}</span>
-                        </div>
-                    </div>
-                </div>
+                </a>
                 
                 <!-- Scrollable Content -->
                 <div class="sidebar-content">
