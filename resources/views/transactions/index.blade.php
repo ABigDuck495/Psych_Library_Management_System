@@ -196,7 +196,7 @@
                                     @elseif($transaction->transaction_status === 'overdue')
                                         <span class="status-badge bg-red-100 text-red-800">Overdue</span>
                                     @else
-                                        <span class="status-badge bg-gray-100 text-gray-800">Unknown</span>
+                                        <span class="status-badge bg-gray-100 text-gray-800">Cancelled</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

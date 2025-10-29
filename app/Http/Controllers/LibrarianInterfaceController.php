@@ -18,22 +18,36 @@ class LibrarianInterfaceController extends Controller
 
     public function index()
     {
-        $recentTransactions = Transaction::latest()->take(5)->get();
+        // Fetch recent 5 transactions with related user info
+        $recentTransactions = Transaction::with([
+    'borrowable' => function ($morphTo) {
+        $morphTo->morphWith([
+            \App\Models\BookCopy::class => ['book'],
+            \App\Models\ThesisCopy::class => ['thesis'],
+        ]);
+    },
+])
+->latest()
+->take(5)
+->get();
+
+
         $totalBooks = Book::count();
         $totalTheses = Thesis::count();
         $activeUsers = User::where('account_status', 'active')->count();
 
+        // Stats
         $borrowedBooks = Transaction::borrowed()->count();
-        $pendingBorrowings = Transaction::pending()->count(); 
-        $overdueBooks = Transaction::overdue()->count();
+        $pendingRequests = Transaction::where('transaction_status', 'requested')->count(); 
+        $overdueItems = Transaction::overdue()->count();
 
-        return view('librarianInterface.index', compact(
+        return view('adminInterface.index', compact(
             'totalBooks',
             'totalTheses',
             'activeUsers',
             'borrowedBooks',
-            'pendingBorrowings', // ✅ Pass it to the view
-            'overdueBooks',
+            'pendingRequests',
+            'overdueItems',
             'recentTransactions'
         ));
     }
