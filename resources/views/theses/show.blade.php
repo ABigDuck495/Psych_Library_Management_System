@@ -77,7 +77,19 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-1">Authors</label>
-                        <p class="text-gray-800 font-medium">{{ $thesis->authors_list ?? 'N/A' }}</p>
+                        <div class="flex flex-wrap gap-2">
+                            @if($thesis->authors->isNotEmpty())
+                                @foreach($thesis->authors as $author)
+                                    <a href="{{ route('authors.show', $author->id) }}" 
+                                       class="bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors px-3 py-1 rounded-full text-sm font-medium inline-flex items-center group">
+                                        {{ $author->first_name }} {{ $author->last_name }}
+                                        <i class="fas fa-external-link-alt ml-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    </a>
+                                @endforeach
+                            @else
+                                <span class="text-gray-500">N/A</span>
+                            @endif
+                        </div>
                     </div>
                     
                     <div>
@@ -202,14 +214,23 @@
             <div class="space-y-3">
                 @if($thesis->authors->isNotEmpty())
                     @foreach ($thesis->authors as $author)
-                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                        <a href="{{ route('authors.show', $author->id) }}" 
+                           class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3 group-hover:bg-indigo-200 transition">
                                 <i class="fas fa-user text-indigo-600"></i>
                             </div>
-                            <div>
-                                <h4 class="font-medium text-gray-800">{{ $author->first_name }} {{ $author->last_name }}</h4>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-gray-800 group-hover:text-indigo-700 transition">
+                                    {{ $author->first_name }} {{ $author->last_name }}
+                                </h4>
+                                @if($author->email)
+                                    <p class="text-sm text-gray-500">{{ $author->email }}</p>
+                                @endif
                             </div>
-                        </div>
+                            <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </div>
+                        </a>
                     @endforeach
                 @else
                     <div class="text-center py-8 text-gray-400">
