@@ -310,4 +310,6 @@ class ThesisController extends Controller
             'Content-Type' => 'application/pdf',
         ]);
     }
+
+    
 }
