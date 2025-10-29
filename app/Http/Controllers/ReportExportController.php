@@ -285,7 +285,7 @@ class ReportExportController extends Controller
             $overdueDays = 0;
             if ($transaction->transaction_status === 'overdue' || 
                 ($transaction->transaction_status === 'borrowed' && now()->gt($transaction->due_date))) {
-                $overdueDays = now()->diffInDays($transaction->due_date);
+                (int) $overdueDays = now()->diffInDays($transaction->due_date);
             }
 
             $sheet->setCellValue('A'.$row, $transaction->id);
