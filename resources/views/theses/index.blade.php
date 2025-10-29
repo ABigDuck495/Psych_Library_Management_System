@@ -171,116 +171,108 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Abstract</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year Published</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Authors</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Available Copies</th> 
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200" id="thesesTableBody">
                     @forelse ($theses as $thesis)
-                        <tr class="table-row-hover thesis-row" 
-                            data-title="{{ strtolower($thesis->title) }}"
-                            data-department="{{ strtolower($thesis->department) }}"
-                            data-year="{{ $thesis->year_published }}">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $thesis->id }}</td>
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900 max-w-xs">{{ $thesis->title }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500 max-w-md">
-                                <div class="abstract-preview">{{ $thesis->abstract }}</div>
-                                @if(strlen($thesis->abstract) > 200)
-                                    <a href="{{ route('theses.show', $thesis->id) }}" 
-                                       class="text-blue-600 text-xs mt-1 hover:text-blue-800 focus:outline-none inline-flex items-center">
-                                        Read full abstract
-                                        <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                                    </a>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <span class="bg-blue-100 text-blue-800 department-badge">
-                                    {{ $thesis->year_published }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <span class="bg-purple-100 text-purple-800 department-badge">
-                                    {{ $thesis->department }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <div class="flex items-center">
-                                    @if($thesis->copies_available > 0)
-                                        <span class="bg-green-100 text-green-800 stock-badge">
-                                            <i class="fas fa-check-circle mr-1"></i>
-                                            {{ $thesis->copies_available }} available
-                                        </span>
-                                    @else
-                                        <span class="bg-red-100 text-red-800 stock-badge">
-                                            <i class="fas fa-times-circle mr-1"></i>
-                                            Out of stock
-                                        </span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-900">
-                                @if($thesis->authors->isNotEmpty())
-                                    <div class="space-y-1">
-                                        @foreach ($thesis->authors as $author)
-                                            <div class="flex items-center">
-                                                <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                                                <span>{{ $author->first_name }} {{ $author->last_name }}</span>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <span class="text-gray-400 italic">No authors linked</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div class="flex space-x-2">
-                                    @if(in_array(auth()->user()->role, ['admin', 'librarian']))
-                                        <a href="{{ route('theses.edit', $thesis->id) }}" 
-                                        class="text-yellow-600 hover:text-yellow-900 action-btn" 
-                                        title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                    @endif
-                                    <a href="{{ route('theses.show', $thesis->id) }}" 
-                                       class="text-blue-600 hover:text-blue-900 action-btn" 
-                                       title="View">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    @if(in_array(auth()->user()->role, ['admin', 'librarian']))
-                                        <form action="{{ route('theses.destroy', $thesis->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" 
-                                                    onclick="return confirm('Are you sure you want to delete this thesis?');"
-                                                    class="text-red-600 hover:text-red-900 action-btn" 
-                                                    title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center justify-center text-gray-400">
-                                    <i class="fas fa-file-alt text-5xl mb-4"></i>
-                                    <h3 class="text-lg font-medium mb-2">No theses found</h3>
-                                    <p class="mb-4">Get started by adding your first thesis</p>
-                                    <div class="flex space-x-3">
-                                        @if(in_array(auth()->user()->role, ['admin', 'librarian']))
-                                        <a href="{{ route('theses.create') }}" class="add-thesis-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
-                                            <i class="fas fa-plus-circle mr-2"></i>
-                                            Add New Thesis
-                                        </a>
-                                        @endif
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
+    <tr class="table-row-hover thesis-row" 
+        data-title="{{ strtolower($thesis->title) }}"
+        data-department="{{ strtolower($thesis->department) }}"
+        data-year="{{ $thesis->year_published }}">
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $thesis->id }}</td>
+        <td class="px-6 py-4 text-sm font-medium text-gray-900 max-w-xs">{{ $thesis->title }}</td>
+        <td class="px-6 py-4 text-sm text-gray-500 max-w-md">
+            <div class="abstract-preview">{{ $thesis->abstract }}</div>
+            @if(strlen($thesis->abstract) > 200)
+                <a href="{{ route('theses.show', $thesis->id) }}" 
+                   class="text-blue-600 text-xs mt-1 hover:text-blue-800 focus:outline-none inline-flex items-center">
+                    Read full abstract
+                    <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                </a>
+            @endif
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <span class="bg-blue-100 text-blue-800 department-badge">
+                {{ $thesis->year_published }}
+            </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <span class="bg-purple-100 text-purple-800 department-badge">
+                {{ $thesis->department }}
+            </span>
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-900">
+            @if($thesis->authors->isNotEmpty())
+                <div class="space-y-1">
+                    @foreach ($thesis->authors as $author)
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                            <span>{{ $author->first_name }} {{ $author->last_name }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <span class="text-gray-400 italic">No authors linked</span>
+            @endif
+        </td>
+
+        <!-- Add Available Copies here -->
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            {{ $thesis->availableCopies()->where('is_available', true)->count() }} <!-- Available copies count -->
+        </td>
+
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <div class="flex space-x-2">
+                @if(in_array(auth()->user()->role, ['admin', 'librarian']))
+                    <a href="{{ route('theses.edit', $thesis->id) }}" 
+                       class="text-yellow-600 hover:text-yellow-900 action-btn" 
+                       title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                @endif
+                <a href="{{ route('theses.show', $thesis->id) }}" 
+                   class="text-blue-600 hover:text-blue-900 action-btn" 
+                   title="View">
+                    <i class="fas fa-eye"></i>
+                </a>
+                @if(in_array(auth()->user()->role, ['admin', 'librarian']))
+                    <form action="{{ route('theses.destroy', $thesis->id) }}" method="POST" class="inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                onclick="return confirm('Are you sure you want to delete this thesis?');"
+                                class="text-red-600 hover:text-red-900 action-btn" 
+                                title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </td>
+    </tr>
+@empty
+    <tr>
+        <td colspan="8" class="px-6 py-12 text-center">
+            <div class="flex flex-col items-center justify-center text-gray-400">
+                <i class="fas fa-file-alt text-5xl mb-4"></i>
+                <h3 class="text-lg font-medium mb-2">No theses found</h3>
+                <p class="mb-4">Get started by adding your first thesis</p>
+                <div class="flex space-x-3">
+                    @if(in_array(auth()->user()->role, ['admin', 'librarian']))
+                        <a href="{{ route('theses.create') }}" class="add-thesis-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
+                            <i class="fas fa-plus-circle mr-2"></i>
+                            Add New Thesis
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </td>
+    </tr>
+@endforelse
+
                 </tbody>
             </table>
         </div>
@@ -323,12 +315,6 @@
         font-weight: 500;
     }
     
-    .stock-badge {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
-    }
     
     .add-thesis-btn {
         transition: all 0.3s ease;

@@ -126,4 +126,18 @@ public function borrowingHistory()
     return view('userInterface.borrowingHistory', compact('historyTransactions'));
 }
 
+public function show(Thesis $thesis)
+{
+    $thesis->load('authors', 'copies');
+    $thesis->available_copies = $thesis->copies()->where('is_available', true)->count();
+
+    $activeTransaction = $thesis->transactions()
+        ->where('user_id', Auth::id())
+        ->where('transaction_status', 'requested')
+        ->latest()
+        ->first();
+
+    return view('theses.show', compact('thesis', 'activeTransaction'));
+}
+
 }
