@@ -17,7 +17,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('can:manage-users')->except(['index', 'show','editSelf']);
+        $this->middleware('can:manage-users')->except(['index', 'show','editSelf', 'updateSelf']);
     }
 
     public function index()
@@ -156,10 +156,45 @@ class UserController extends Controller
 
     public function editSelf()
     {
-        $authUser = auth()->user();
+        $user = auth()->user();
         // This will call edit() with the user's own ID, which now passes the check
-        return $this->edit($authUser->id);
+        return view('users.editself', compact('user'));
     }
+    public function updateSelf(Request $request)
+    {
+        $authUser = auth()->user(); // Get the authenticated user
+
+        $validated = $request->validate([
+            'username' => 'required|string|max:255|unique:users,username,' . $authUser->id,
+            'phone_number' => 'nullable|string|max:20',
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',      // at least one lowercase letter
+                'regex:/[A-Z]/',      // at least one uppercase letter
+                'regex:/[0-9]/',      // at least one digit
+                'regex:/[@$!%*#?&]/', // at least one special character
+            ],
+        ]);
+
+                // Prepare update data
+        $updateData = [
+            'username' => $validated['username'],
+            'phone_number' => $validated['phone_number'],
+        ];
+
+        // Only update password if provided
+        if (!empty($validated['password'])) {
+            $updateData['password'] = Hash::make($validated['password']);
+        }
+
+        // Update the authenticated user's data
+        $authUser->update($updateData);
+
+        return redirect('/')->with('success', 'Your profile has been updated.');
+    }
+
 
 
     public function update(Request $request, $id)

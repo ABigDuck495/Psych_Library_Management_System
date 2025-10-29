@@ -349,11 +349,6 @@
           @enderror
         </div>
 
-        <div class="remember-container">
-          <input type="checkbox" name="remember" id="remember" class="remember-checkbox">
-          <label for="remember" class="remember-label">Remember Me</label>
-        </div>
-
         <button type="submit" class="submit-button" id="submitButton">
           Sign In
         </button>
