@@ -12,9 +12,9 @@
         </div>
         
         <div>
-            <a href="{{ route('authors.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
+            <a href="{{ url()->previous() }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
                 <i class="fas fa-arrow-left mr-2"></i>
-                Back to Authors
+                Back
             </a>
         </div>
     </div>
