@@ -9,6 +9,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('book_copies', function (Blueprint $table) {
+            $table->id('id');
             $table->foreignId('book_id')
                 ->constrained('books')
                 ->onDelete('cascade'); //makes it so it deletes the copies when you delete a book
