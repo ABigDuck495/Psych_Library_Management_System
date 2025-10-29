@@ -85,10 +85,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/requested-books', [TransactionController::class, 'requestedBooks'])->name('transactions.requested-books');
         Route::get('/requested-theses', [TransactionController::class, 'requestedTheses'])->name('transactions.requested-theses');
         Route::get('/transactions/overdue', [TransactionController::class, 'overdueTransactions'])->name('transactions.overdue');
-        Route::patch('/transactions/{transaction}/approve', [TransactionController::class, 'approveRequest'])->name('transactions.approve-request');
-        Route::patch('/transactions/{transaction}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
-        Route::patch('/transactions/{transaction}/mark-overdue', [TransactionController::class, 'markOverdue'])->name('transactions.mark-overdue');
-
+        
         // Admin interfaces
         Route::get('/admin/interface', [AdminInterfaceController::class, 'index'])->name('adminInterface.index');
     });
@@ -103,6 +100,12 @@ Route::middleware(['auth'])->group(function () {
         //pdf
         Route::get('theses/{thesis}/download', [ThesisController::class, 'downloadPdf'])->name('theses.downloadPdf');
         Route::get('theses/{thesis}/view', [ThesisController::class, 'viewPdf'])->name('theses.viewPdf');
+
+        //transaction management
+        Route::patch('/transactions/{transaction}/approve', [TransactionController::class, 'approveRequest'])->name('transactions.approve-request');
+        Route::patch('/transactions/{transaction}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
+        Route::patch('/transactions/{transaction}/mark-overdue', [TransactionController::class, 'markOverdue'])->name('transactions.mark-overdue');
+
 
         //user index and show
         Route::resource('users', UserController::class)->only(['index', 'show']);
