@@ -100,82 +100,107 @@
         </div>
         
         <!-- Request Card -->
-        <div class="bg-white rounded-xl shadow-sm p-6 info-card">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-book mr-2 text-green-600"></i>
-                Request Book
-            </h2>
-            
-            <div class="flex flex-col items-center mb-6">
-                <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                    <i class="fas fa-book-open text-blue-600 text-2xl"></i>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-800 text-center">{{ Str::limit($book->title, 50) }}</h3>
-                <p class="text-gray-600 text-center mt-1">{{ $book->category->category_name ?? 'General' }}</p>
-            </div>
-            
-            <div class="space-y-4">
-                @auth
-                    @if($book->canBeRequested() && !$book->hasUserRequested(Auth::id()))
-                        <form action="{{ route('transactions.request-book', $book) }}" method="POST" class="w-full">
-                            @csrf
-                            <button type="submit"
-                                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
-                                <i class="fas fa-book mr-2"></i>
-                                Request This Book
-                            </button>
-                        </form>
-                    @elseif($book->hasUserRequested(Auth::id()))
-                        @php
-                            $activeTransaction = $book->transactions()
-                                ->where('user_id', Auth::id())
-                                ->where('transaction_status', 'requested')
-                                ->latest()
-                                ->first();
-                        @endphp
+<div class="bg-white rounded-xl shadow-sm p-6 info-card">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-book mr-2 text-green-600"></i>
+        Request Book
+    </h2>
 
-                        @if($activeTransaction)
-                            <form action="{{ route('transactions.cancel-request', $activeTransaction->id) }}" method="POST" class="w-full">
-                                @csrf
-                                <button type="submit"
-                                        class="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
-                                    <i class="fas fa-clock mr-2"></i>
-                                    Cancel Request
-                                </button>
-                            </form>
-                            <p class="text-sm text-gray-500 text-center">You have a pending request. You may cancel it.</p>
-                        @else
-                            <button disabled
-                                    class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed">
-                                <i class="fas fa-times-circle mr-2"></i>
-                                No Active Request Found
-                            </button>
-                        @endif
-                    @else
-                        <button disabled
-                                class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed">
-                            <i class="fas fa-times-circle mr-2"></i>
-                            No Copies Available
-                        </button>
-                        <p class="text-sm text-gray-500 text-center">Check back later for availability</p>
-                    @endif
-
-                    <div class="text-center">
-                        <a href="{{ route('userInterface.borrowedBooks') }}" class="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                            <i class="fas fa-list mr-1"></i>
-                            View My Requests
-                        </a>
-                    </div>
-                @else
-                    <a href="{{ route('login') }}" 
-                       class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
-                        <i class="fas fa-sign-in-alt mr-2"></i>
-                        Login to Request
-                    </a>
-                @endauth
-            </div>
+    <div class="flex flex-col items-center mb-6">
+        <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+            <i class="fas fa-book-open text-blue-600 text-2xl"></i>
         </div>
+        <h3 class="text-lg font-semibold text-gray-800 text-center">
+            {{ Str::limit($book->title, 50) }}
+        </h3>
+        <p class="text-gray-600 text-center mt-1">{{ $book->category->category_name ?? 'General' }}</p>
     </div>
+
+    <div class="space-y-4">
+        @auth
+            @php
+                $user = Auth::user();
+                $hasOverdue = $user->hasOverdueTransactions();
+                $hasRequested = $book->hasUserRequested($user->id);
+                $canRequest = $book->canBeRequested();
+            @endphp
+
+            {{-- Case 1: User has overdue transactions --}}
+            @if($hasOverdue)
+                <button disabled
+                        class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed shadow-md">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    You Have Overdue Books
+                </button>
+                <p class="text-sm text-gray-500 text-center">Please return overdue books before requesting new ones.</p>
+
+            {{-- Case 2: Book can be requested and user has not yet requested --}}
+            @elseif($canRequest && !$hasRequested)
+                <form action="{{ route('transactions.request-book', $book) }}" method="POST" class="w-full">
+                    @csrf
+                    <button type="submit"
+                            class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
+                        <i class="fas fa-book mr-2"></i>
+                        Request This Book
+                    </button>
+                </form>
+
+            {{-- Case 3: User already has a pending request --}}
+            @elseif($hasRequested)
+                @php
+                    $activeTransaction = $book->transactions()
+                        ->where('user_id', $user->id)
+                        ->where('transaction_status', 'requested')
+                        ->latest()
+                        ->first();
+                @endphp
+
+                @if($activeTransaction)
+                    <form action="{{ route('transactions.cancel-request', $activeTransaction->id) }}" method="POST" class="w-full">
+                        @csrf
+                        <button type="submit"
+                                class="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
+                            <i class="fas fa-clock mr-2"></i>
+                            Cancel Request
+                        </button>
+                    </form>
+                    <p class="text-sm text-gray-500 text-center">You have a pending request. You may cancel it.</p>
+                @else
+                    <button disabled
+                            class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed shadow-md">
+                        <i class="fas fa-times-circle mr-2"></i>
+                        No Active Request Found
+                    </button>
+                @endif
+
+            {{-- Case 4: No copies available --}}
+            @else
+                <button disabled
+                        class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed shadow-md">
+                    <i class="fas fa-times-circle mr-2"></i>
+                    No Copies Available
+                </button>
+                <p class="text-sm text-gray-500 text-center">Check back later for availability</p>
+            @endif
+
+            <div class="text-center">
+                <a href="{{ route('userInterface.borrowedBooks') }}"
+                   class="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                    <i class="fas fa-list mr-1"></i>
+                    View My Requests
+                </a>
+            </div>
+
+        @else
+            <a href="{{ route('login') }}" 
+               class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                Login to Request
+            </a>
+        @endauth
+    </div>
+</div>
+
 
     <!-- Description Section -->
     @if($book->description)

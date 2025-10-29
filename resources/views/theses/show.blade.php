@@ -117,24 +117,45 @@
             </div>
         </div>
         
-        <!-- Request Card -->
+            <!-- Request Card -->
         <div class="bg-white rounded-xl shadow-sm p-6 info-card">
             <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                 <i class="fas fa-file-alt mr-2 text-green-600"></i>
                 Request Thesis
             </h2>
-            
+
             <div class="flex flex-col items-center mb-6">
                 <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mb-4">
                     <i class="fas fa-file-pdf text-blue-600 text-2xl"></i>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-800 text-center">{{ Str::limit($thesis->title, 50) }}</h3>
-                <p class="text-gray-600 text-center mt-1">{{ $thesis->department }}</p>
+                <h3 class="text-lg font-semibold text-gray-800 text-center">
+                    {{ Str::limit($thesis->title, 50) }}
+                </h3>
+                <p class="text-gray-600 text-center mt-1">{{ $thesis->department ?? 'General' }}</p>
             </div>
-            
+
             <div class="space-y-4">
                 @auth
-                    @if($thesis->canBeRequested() && !$thesis->hasUserRequested(Auth::id()))
+                    @php
+                        $user = Auth::user();
+                        $hasOverdue = $user->hasOverdueTransactions();
+                        $hasRequested = $thesis->hasUserRequested($user->id);
+                        $canRequest = $thesis->canBeRequested();
+                    @endphp
+
+                    {{-- Case 1: User has overdue transactions --}}
+                    @if($hasOverdue)
+                        <button disabled
+                                class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed shadow-md">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            You Have Overdue Transactions
+                        </button>
+                        <p class="text-sm text-gray-500 text-center">
+                            Please return overdue items before requesting another thesis.
+                        </p>
+
+                    {{-- Case 2: Thesis can be requested and user has not yet requested --}}
+                    @elseif($canRequest && !$hasRequested)
                         <form action="{{ route('transactions.request-thesis', $thesis) }}" method="POST" class="w-full">
                             @csrf
                             <button type="submit"
@@ -143,10 +164,12 @@
                                 Request This Thesis
                             </button>
                         </form>
-                    @elseif($thesis->hasUserRequested(Auth::id()))
+
+                    {{-- Case 3: User already has a pending request --}}
+                    @elseif($hasRequested)
                         @php
                             $activeTransaction = $thesis->transactions()
-                                ->where('user_id', Auth::id())
+                                ->where('user_id', $user->id)
                                 ->where('transaction_status', 'requested')
                                 ->latest()
                                 ->first();
@@ -161,31 +184,38 @@
                                     Cancel Request
                                 </button>
                             </form>
-                            <p class="text-sm text-gray-500 text-center">You have a pending request. You may cancel it.</p>
+                            <p class="text-sm text-gray-500 text-center">
+                                You have a pending request. You may cancel it.
+                            </p>
                         @else
                             <button disabled
-                                    class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed">
+                                    class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed shadow-md">
                                 <i class="fas fa-times-circle mr-2"></i>
                                 No Active Request Found
                             </button>
                         @endif
+
+                    {{-- Case 4: No copies available --}}
                     @else
                         <button disabled
-                                class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed">
+                                class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed shadow-md">
                             <i class="fas fa-times-circle mr-2"></i>
                             No Copies Available
                         </button>
-                        <p class="text-sm text-gray-500 text-center">Check back later for availability</p>
+                        <p class="text-sm text-gray-500 text-center">
+                            Check back later for availability.
+                        </p>
                     @endif
                 @else
                     <a href="{{ route('login') }}" 
-                       class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
+                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-md">
                         <i class="fas fa-sign-in-alt mr-2"></i>
                         Login to Request
                     </a>
                 @endauth
             </div>
         </div>
+
     </div>
 
     <!-- Abstract Section -->
