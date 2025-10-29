@@ -34,9 +34,12 @@ class UserInterfaceController extends Controller
         ->count();
 
     $overdueCount = $user->transactions()
-        ->where('transaction_status', 'borrowed')
-        ->where('due_date', '<', now())
-        ->count();
+     ->where(function ($query) {
+         $query->where('transaction_status', 'borrowed')
+               ->where('due_date', '<', now());
+     })
+     ->orWhere('transaction_status', 'overdue') // ✅ count manually overdue too
+    ->count();
 
     return view('userInterface.index', compact(
         'books',

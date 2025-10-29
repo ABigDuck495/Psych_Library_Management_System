@@ -130,6 +130,9 @@ Route::middleware(['auth'])->group(function () {
             return view('catalogue.catalogue');
         })->name('catalogue');
 
+        //pdf thesis
+        Route::get('theses/{thesis}/download', [ThesisController::class, 'downloadPdf'])->name('theses.downloadPdf');
+        Route::get('theses/{thesis}/view', [ThesisController::class, 'viewPdf'])->name('theses.viewPdf');
         // Request actions and renew
         // Route::post('/books/{id}/request', [BookController::class, 'requestBook'])->name('books.request');
 

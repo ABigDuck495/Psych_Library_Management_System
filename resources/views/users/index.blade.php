@@ -87,10 +87,12 @@
             </div>
 
             <!-- Add User Button -->
-            <a href="{{ route('users.create') }}" class="add-user-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg font-medium flex items-center transition shadow-md">
-                <i class="fas fa-user-plus mr-2"></i>
-                Add New User
-            </a>
+            @if (Auth::user() === 'admin')
+                <a href="{{ route('users.create') }}" class="add-user-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg font-medium flex items-center transition shadow-md">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Add New User
+                </a>
+            @endif
         </div>
     </div>
 
@@ -276,21 +278,23 @@
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="8" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center justify-center text-gray-400">
-                                    <i class="fas fa-users text-5xl mb-4"></i>
-                                    <h3 class="text-lg font-medium mb-2">No users found</h3>
-                                    <p class="mb-4">Get started by adding your first user</p>
-                                    <div class="flex space-x-3">
-                                        <a href="{{ route('users.create') }}" class="add-user-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
-                                            <i class="fas fa-user-plus mr-2"></i>
-                                            Add New User
-                                        </a>
+                        @if (Auth::user() === 'admin')
+                            <tr>
+                                <td colspan="8" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center text-gray-400">
+                                        <i class="fas fa-users text-5xl mb-4"></i>
+                                        <h3 class="text-lg font-medium mb-2">No users found</h3>
+                                        <p class="mb-4">Get started by adding your first user</p>
+                                        <div class="flex space-x-3">
+                                            <a href="{{ route('users.create') }}" class="add-user-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
+                                                <i class="fas fa-user-plus mr-2"></i>
+                                                Add New User
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
+                        @endif
                     @endforelse
                 </tbody>
             </table>
