@@ -77,9 +77,23 @@
                     
                     <div>
                         <label class="block text-sm font-medium text-gray-500 mb-1">Authors</label>
-                        <p class="text-gray-800 font-medium">
-                            {{ $book->authors->map(function($a) { return trim($a->first_name . ' ' . $a->last_name); })->implode(', ') ?: 'N/A' }}
-                        </p>
+                        <div class="flex flex-wrap gap-2">
+                            @if($book->authors->isNotEmpty())
+                                @foreach($book->authors as $author)
+                                    <a href="{{ route('authors.show', $author->id) }}" 
+                                       class="bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors px-3 py-1 rounded-full text-sm font-medium inline-flex items-center group">
+                                        {{ $author->appellation ? $author->appellation . ' ' : '' }}
+                                        {{ $author->first_name }} 
+                                        {{ $author->middle_name ? $author->middle_name . ' ' : '' }}
+                                        {{ $author->last_name }}
+                                        {{ $author->extension ? ', ' . $author->extension : '' }}
+                                        <i class="fas fa-external-link-alt ml-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    </a>
+                                @endforeach
+                            @else
+                                <span class="text-gray-500">N/A</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
@@ -189,12 +203,13 @@
             <div class="space-y-3">
                 @if($book->authors->isNotEmpty())
                     @foreach ($book->authors as $author)
-                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                        <a href="{{ route('authors.show', $author->id) }}" 
+                           class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition group cursor-pointer">
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3 group-hover:bg-indigo-200 transition">
                                 <i class="fas fa-user text-indigo-600"></i>
                             </div>
                             <div>
-                                <h4 class="font-medium text-gray-800">
+                                <h4 class="font-medium text-gray-800 group-hover:text-indigo-700 transition">
                                     {{ $author->appellation ? $author->appellation . ' ' : '' }}
                                     {{ $author->first_name }} 
                                     {{ $author->middle_name ? $author->middle_name . ' ' : '' }}
@@ -203,7 +218,7 @@
                                 </h4>
                                 <p class="text-sm text-gray-600">Author</p>
                             </div>
-                        </div>
+                        </a>
                     @endforeach
                 @else
                     <div class="text-center py-8 text-gray-400">
