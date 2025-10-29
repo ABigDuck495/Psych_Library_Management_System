@@ -171,6 +171,7 @@
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Abstract</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year Published</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Authors</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -202,6 +203,21 @@
                                 <span class="bg-purple-100 text-purple-800 department-badge">
                                     {{ $thesis->department }}
                                 </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <div class="flex items-center">
+                                    @if($thesis->copies_available > 0)
+                                        <span class="bg-green-100 text-green-800 stock-badge">
+                                            <i class="fas fa-check-circle mr-1"></i>
+                                            {{ $thesis->copies_available }} available
+                                        </span>
+                                    @else
+                                        <span class="bg-red-100 text-red-800 stock-badge">
+                                            <i class="fas fa-times-circle mr-1"></i>
+                                            Out of stock
+                                        </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-900">
                                 @if($thesis->authors->isNotEmpty())
@@ -248,7 +264,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
+                            <td colspan="8" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-gray-400">
                                     <i class="fas fa-file-alt text-5xl mb-4"></i>
                                     <h3 class="text-lg font-medium mb-2">No theses found</h3>
@@ -301,6 +317,13 @@
     }
     
     .department-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .stock-badge {
         padding: 4px 12px;
         border-radius: 20px;
         font-size: 12px;
