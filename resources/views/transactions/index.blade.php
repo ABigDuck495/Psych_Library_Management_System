@@ -225,23 +225,26 @@
                                                 </form>
                                             @endif
 
-                                            @if($transaction->transaction_status === 'borrowed')
-                                                <form action="{{ route('transactions.return', $transaction) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit" class="text-indigo-600 hover:text-indigo-900 action-btn" title="Return">
-                                                        <i class="fas fa-undo"></i>
-                                                    </button>
-                                                </form>
-                                                
-                                                <form action="{{ route('transactions.mark-overdue', $transaction) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit" class="text-red-600 hover:text-red-900 action-btn" title="Mark Overdue">
-                                                        <i class="fas fa-exclamation-triangle"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
+                                            @if(in_array($transaction->transaction_status, ['borrowed', 'overdue']))
+    <form action="{{ route('transactions.return', $transaction) }}" method="POST" class="inline">
+        @csrf
+        @method('PATCH')
+        <button type="submit" class="text-indigo-600 hover:text-indigo-900 action-btn" title="Return">
+            <i class="fas fa-undo"></i>
+        </button>
+    </form>
+
+    @if($transaction->transaction_status === 'borrowed')
+        <form action="{{ route('transactions.mark-overdue', $transaction) }}" method="POST" class="inline">
+            @csrf
+            @method('PATCH')
+            <button type="submit" class="text-red-600 hover:text-red-900 action-btn" title="Mark Overdue">
+                <i class="fas fa-exclamation-triangle"></i>
+            </button>
+        </form>
+    @endif
+@endif
+
 
                                             <!-- <a href="{{ route('transactions.edit', $transaction) }}" class="text-yellow-600 hover:text-yellow-900 action-btn" title="Edit">
                                                 <i class="fas fa-edit"></i>
