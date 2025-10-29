@@ -75,18 +75,18 @@
 
     <!-- Action Buttons for Librarians/Admins -->
     @if(in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian']))
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+    <!-- <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
         <div class="flex space-x-4">
             <!-- <a href="{{ route('transactions.requested-books') }}" class="action-button bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
                 <i class="fas fa-clock mr-2"></i>
                 View Requested Books
             </a> -->
-            <a href="{{ route('export.transactions', 'overdue') }}" class="action-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
+            <!-- <a href="{{ route('export.transactions', 'overdue') }}" class="action-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium flex items-center transition">
                 <i class="fas fa-exclamation-triangle mr-2"></i>
                 Overdue Report
-            </a>
+            </a> 
         </div>
-    </div>
+    </div> -->
     @endif
 
     <!-- Success Message -->

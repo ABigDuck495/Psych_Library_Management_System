@@ -12,7 +12,8 @@
         </div>
         
         <div class="flex space-x-3">
-            <!-- Export Dropdown -->
+            <!-- Export Dropdown - Only show for admin/librarian -->
+            @if(in_array(auth()->user()->role, ['admin', 'librarian']))
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" 
                         class="export-dropdown-btn bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
@@ -82,12 +83,15 @@
                     </div>
                 </div>
             </div>
+            @endif
 
-            <!-- Add Thesis Button -->
+            <!-- Add Thesis Button - Only show for admin/librarian -->
+            @if(in_array(auth()->user()->role, ['admin', 'librarian']))
             <a href="{{ route('theses.create') }}" class="add-thesis-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg font-medium flex items-center transition shadow-md">
                 <i class="fas fa-plus-circle mr-2"></i>
                 Add New Thesis
             </a>
+            @endif
         </div>
     </div>
 
@@ -250,10 +254,12 @@
                                     <h3 class="text-lg font-medium mb-2">No theses found</h3>
                                     <p class="mb-4">Get started by adding your first thesis</p>
                                     <div class="flex space-x-3">
+                                        @if(in_array(auth()->user()->role, ['admin', 'librarian']))
                                         <a href="{{ route('theses.create') }}" class="add-thesis-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
                                             <i class="fas fa-plus-circle mr-2"></i>
                                             Add New Thesis
                                         </a>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
