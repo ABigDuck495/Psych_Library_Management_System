@@ -1,3 +1,6 @@
+@php
+use Illuminate\Support\Carbon;
+@endphp
 @extends('layouts.app')
 
 @section('title', 'User Details - ' . $user->first_name . ' ' . $user->last_name . ' | Psych Library')
@@ -163,8 +166,8 @@
                 <div class="flex justify-between">
                     <span class="text-gray-500">Last Login</span>
                     <span class="text-gray-800 font-medium">
-                        @if($user->last_login_at)
-                            {{ \Carbon\Carbon::parse($user->last_login_at)->format('M d, Y H:i') }}
+                        @if($user->last_login_date)
+                            {{ $user->last_login_date->format('M d, Y H:i') }}
                         @else
                             Never
                         @endif
@@ -173,7 +176,7 @@
                 
                 <div class="flex justify-between">
                     <span class="text-gray-500">Account Created</span>
-                    <span class="text-gray-800 font-medium">{{ $user->created_at->format('M d, Y') }}</span>
+                    <span class="text-gray-800 font-medium">{{ $user->registration_date->format('M d, Y') }}</span>
                 </div>
                 
                 <div class="flex justify-between">

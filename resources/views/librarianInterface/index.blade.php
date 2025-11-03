@@ -238,10 +238,6 @@
                     <i class="fas fa-user-plus text-green-600 text-2xl mb-2"></i>
                     <p class="font-medium text-sm">Add New Author</p>
                 </a>
-                <a href="{{ route('transactions.create') }}" class="bg-orange-50 hover:bg-orange-100 p-4 rounded-lg text-center transition">
-                    <i class="fas fa-exchange-alt text-orange-600 text-2xl mb-2"></i>
-                    <p class="font-medium text-sm">New Transaction</p>
-                </a>
             </div>
         </div>
     </div>

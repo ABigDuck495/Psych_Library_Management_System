@@ -45,11 +45,11 @@ return new class extends Migration
                         IF NEW.borrowable_type = 'App\\\\Models\\\\BookCopy' THEN
                             UPDATE book_copies
                             SET is_available = FALSE
-                            WHERE copy_id = NEW.borrowable_id;
+                            WHERE id = NEW.borrowable_id;
                         ELSEIF NEW.borrowable_type = 'App\\\\Models\\\\ThesisCopy' THEN
                             UPDATE thesis_copies
                             SET is_available = FALSE
-                            WHERE copy_id = NEW.borrowable_id;
+                            WHERE id = NEW.borrowable_id;
                         END IF;
                     END IF;
                 END;

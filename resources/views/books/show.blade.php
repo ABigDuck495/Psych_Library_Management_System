@@ -169,7 +169,7 @@
                     <button disabled
                             class="w-full bg-gray-400 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center cursor-not-allowed shadow-md">
                         <i class="fas fa-times-circle mr-2"></i>
-                        No Active Request Found
+                        You already borrowed this book
                     </button>
                 @endif
 

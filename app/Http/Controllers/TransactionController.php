@@ -47,6 +47,7 @@ class TransactionController extends Controller
             $query->where('created_at', '<=', $request->date_to . ' 23:59:59');
         }
 
+        $query->orderByRaw("FIELD(transaction_status, 'requested', 'borrowed', 'returned') DESC");
         $transactions = $query->latest()->paginate(50);
         $users = User::where('role', 'user')->get();
 
@@ -247,7 +248,7 @@ class TransactionController extends Controller
     }
 
     public function requestBook(Request $request, Book $book)
-{
+    {
     $user = Auth::user();
     if (!$user) {
         return redirect()->route('login');
@@ -280,7 +281,7 @@ class TransactionController extends Controller
         // ✅ Create transaction (keep borrowable_id = $availableCopy->book_id as requested)
         $transaction = Transaction::create([
             'user_id' => $user->id,
-            'borrowable_id' => $availableCopy->book_id, // you wanted to keep this
+            'borrowable_id' => $availableCopy->id, // you wanted to keep this
             'borrowable_type' => BookCopy::class,
             'transaction_status' => 'requested',
             'borrow_date' => now(),

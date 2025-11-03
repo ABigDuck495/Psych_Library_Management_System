@@ -12,7 +12,7 @@ class BookCopy extends Model
     // protected $primaryKey = 'id'; // ADD THIS LINE
 
     
-    protected $primaryKey = 'book_id';
+    protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'int';
 
