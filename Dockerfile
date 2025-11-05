@@ -2,17 +2,25 @@
 FROM php:8.3-fpm-alpine
 
 # Install core OS utilities and PHP extensions for Laravel (including MySQL and GD)
-RUN apk add --no-cache \
+# Step 1: Install core OS utilities and dependencies
+# The '--virtual .build-deps' creates a temporary dependency group for PHP extensions
+RUN apk update && apk add --no-cache \
     nginx \
-    libzip-dev \
-    libpng-dev \
-    libjpeg-turbo-dev \
     mysql-client \
     \
-    # Install PHP extensions
-    && docker-php-ext-install pdo pdo_mysql opcache zip \
-    && docker-php-ext-configure gd --with-jpeg --with-png \
-    && docker-php-ext-install gd
+    # Install build dependencies required for PHP extensions
+    && apk add --no-cache --virtual .build-deps \
+        libzip-dev \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev
+
+# Step 2: Configure and install PHP extensions
+RUN docker-php-ext-configure gd --with-jpeg --with-png --with-freetype \
+    && docker-php-ext-install -j$(nproc) pdo pdo_mysql opcache zip gd \
+    \
+    # Cleanup: Remove the temporary build dependencies to keep the image small
+    && apk del .build-deps
 
 # Set the working directory
 WORKDIR /var/www/html
