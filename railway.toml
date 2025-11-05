@@ -1,0 +1,13 @@
+[build]
+nixpacksVersion = "1.4.0"
+
+[phases.setup]
+nixPkgs = ["php81", "php81Packages.composer", "php81Extensions.gd"]
+
+[phases.build]
+cmds = [
+  "composer install --optimize-autoloader --no-scripts --no-interaction",
+  "php artisan optimize:clear",
+  "php artisan migrate --force",
+  "php artisan db:seed"
+]
