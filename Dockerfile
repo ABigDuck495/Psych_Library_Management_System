@@ -17,11 +17,13 @@ RUN apk update && apk add --no-cache \
         libpng-dev \
         libjpeg-turbo-dev \
         freetype-dev \
-        libsodium-dev   # Required for the 'sodium' extension
+        libsodium-dev
 
 # Step 2: Install PHP extensions and clean up build dependencies
-# NOTE: The 'configure' command for GD is not needed, as dependencies are auto-detected.
 RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql opcache zip gd sodium \
+    \
+    # Fix for Composer: explicitly enable gd and zip for the CLI environment
+    && docker-php-ext-enable gd zip \
     \
     # Cleanup: Remove the temporary build dependencies to keep the image small
     && apk del .build-deps
