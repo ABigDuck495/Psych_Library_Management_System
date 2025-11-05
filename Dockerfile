@@ -1,28 +1,32 @@
 # Use a stable PHP-FPM base image (FPM is required for production web serving)
 FROM php:8.3-fpm-alpine
 
-# Install core OS utilities and PHP extensions for Laravel (including MySQL and GD)
-# Step 1: Install core OS utilities and dependencies
-# The '--virtual .build-deps' creates a temporary dependency group for PHP extensions
+# Set the working directory for the application code
+WORKDIR /var/www/html
+
+# --- Build Dependencies and PHP Extensions ---
+
+# Step 1: Install core OS utilities and required build dependencies
 RUN apk update && apk add --no-cache \
     nginx \
     mysql-client \
     \
-    # Install build dependencies required for PHP extensions
+    # Install build dependencies for PHP extensions, creating a temporary group
     && apk add --no-cache --virtual .build-deps \
         libzip-dev \
         libpng-dev \
         libjpeg-turbo-dev \
-        freetype-dev
+        freetype-dev \
+        libsodium-dev   # Required for the 'sodium' extension
 
-# Step 2: Configure and install PHP extensions
-RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql opcache zip gd \
+# Step 2: Install PHP extensions and clean up build dependencies
+# NOTE: The 'configure' command for GD is not needed, as dependencies are auto-detected.
+RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql opcache zip gd sodium \
     \
     # Cleanup: Remove the temporary build dependencies to keep the image small
     && apk del .build-deps
 
-# Set the working directory
-WORKDIR /var/www/html
+# --- Application Setup ---
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -35,10 +39,12 @@ RUN composer install --no-dev --optimize-autoloader
 # Copy the rest of the application code
 COPY . .
 
-# Set correct permissions using Docker's user system (no 'chmod' needed)
+# Set correct permissions for storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Create a temporary Nginx config file that listens on $PORT
+# --- NGINX Configuration ---
+
+# Create a simple Nginx config file that passes PHP requests to PHP-FPM
 RUN echo "server { \
     listen 8000 default_server; \
     root /var/www/html/public; \
@@ -47,7 +53,7 @@ RUN echo "server { \
         try_files \$uri \$uri/ /index.php?\$query_string; \
     } \
     location ~ \.php$ { \
-        # Pass the PHP scripts to PHP-FPM
+        # Pass the PHP scripts to PHP-FPM running on 9000
         fastcgi_pass 127.0.0.1:9000; \
         fastcgi_index index.php; \
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name; \
@@ -55,9 +61,10 @@ RUN echo "server { \
     } \
 }" > /etc/nginx/conf.d/default.conf
 
-# Expose the standard port (Railway will map $PORT to this)
+# --- Startup Command ---
+
+# Expose the port NGINX is listening on
 EXPOSE 8000
 
-# Start PHP-FPM and Nginx simultaneously
-# This command runs both services in the foreground to prevent the container from exiting
+# Start PHP-FPM and Nginx simultaneously (required to keep the container alive)
 CMD sh -c "php-fpm -D && nginx -g 'daemon off;'"
