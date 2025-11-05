@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-# Install system dependencies
+# Install system dependencies including Composer
 RUN apk update && apk add --no-cache \
     nginx \
     php83 \
@@ -33,6 +33,9 @@ RUN apk update && apk add --no-cache \
     curl \
     git
 
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 # Create necessary directories
 RUN mkdir -p /var/www/html \
     && mkdir -p /var/log/nginx \
@@ -41,7 +44,7 @@ RUN mkdir -p /var/www/html \
     && mkdir -p /etc/nginx/conf.d \
     && mkdir -p /var/run/php
 
-# Create Nginx config file for Railway (uses PORT environment variable)
+# Create Nginx config file for Railway
 RUN echo "server { \
     listen \${PORT:-8000} default_server; \
     root /var/www/html/public; \
@@ -80,7 +83,7 @@ pm.max_children = 5 \
 pm.start_servers = 2 \
 pm.min_spare_servers = 1 \
 pm.max_spare_servers = 3 \
-php_admin_value[memory_limit] = 256M \
+php_admin_value[memory_limit] = 512M \
 php_admin_value[upload_max_filesize] = 100M \
 php_admin_value[post_max_size] = 100M \
 php_admin_value[max_execution_time] = 300 \
@@ -111,22 +114,22 @@ stderr_logfile_maxbytes=0" > /etc/supervisord.conf
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy application code (uncomment when you have your app)
-# COPY . .
+# Copy application code
+COPY . .
 
-# Create a default index.php if no app is copied (for testing)
-RUN mkdir -p /var/www/html/public && echo "<?php echo 'PHP is working!'; phpinfo(); ?>" > /var/www/html/public/index.php
+# Install Composer dependencies and run Laravel optimizations
+RUN composer install --no-dev --optimize-autoloader
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
 
 # Set permissions
 RUN chown -R nobody:nobody /var/www/html \
-    && chmod -R 755 /var/www/html
+    && chmod -R 755 /var/www/html \
+    && chmod +x artisan
 
-# Expose port (Railway will override this with their PORT env variable)
+# Expose port
 EXPOSE 8000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000} || exit 1
 
 # Start supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
