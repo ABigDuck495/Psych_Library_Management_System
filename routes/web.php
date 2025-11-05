@@ -19,6 +19,9 @@ use App\Http\Controllers\AdminInterfaceController;
 use App\Http\Controllers\LibrarianInterfaceController;
 
 // Login routes
+Route::get('/ping', function () {
+    return 'pong';
+});
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
