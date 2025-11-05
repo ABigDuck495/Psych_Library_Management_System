@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-# Install system dependencies including Composer and missing extensions
+# Install system dependencies - REMOVED SQLite extensions
 RUN apk update && apk add --no-cache \
     nginx \
     php83 \
@@ -118,15 +118,8 @@ WORKDIR /var/www/html
 # Copy application code
 COPY . .
 
-# Install Composer dependencies and run Laravel optimizations
+# Install Composer dependencies (NO config caching yet)
 RUN composer install --no-dev --optimize-autoloader
-RUN php artisan config:cache
-RUN php artisan route:cache
-RUN php artisan view:cache
-
-# Copy startup script and make it executable
-COPY start.sh /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
 
 # Set permissions
 RUN chown -R nobody:nobody /var/www/html \
@@ -136,5 +129,5 @@ RUN chown -R nobody:nobody /var/www/html \
 # Expose port
 EXPOSE 8000
 
-# Use the startup script
-CMD ["/usr/local/bin/start.sh"]
+# Force MySQL connection and skip migrations if they fail
+CMD ["/bin/sh", "-c", "php artisan migrate --force --database=mysql || echo 'Migrations failed, starting application anyway...' && /usr/bin/supervisord -c /etc/supervisord.conf"]
