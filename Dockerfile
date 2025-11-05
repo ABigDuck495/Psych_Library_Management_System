@@ -10,6 +10,12 @@ WORKDIR /var/www/html
 RUN apk update && apk add --no-cache \
     nginx \
     mysql-client \
+    # Runtime dependencies for extensions
+    libzip \
+    libpng \
+    libjpeg-turbo \
+    freetype \
+    libsodium \
     \
     # Install build dependencies for PHP extensions
     && apk add --no-cache --virtual .build-deps \
@@ -19,8 +25,9 @@ RUN apk update && apk add --no-cache \
         freetype-dev \
         libsodium-dev
 
-# Step 2: Install PHP extensions and clean up build dependencies
-RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql opcache zip gd sodium \
+# Step 2: Configure and install PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) pdo pdo_mysql opcache zip gd sodium \
     \
     # Explicitly enable extensions for the CLI environment (Fixes Composer)
     && docker-php-ext-enable \
@@ -41,12 +48,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Copy ALL files from the repository root into the container's working directory
 COPY . .
 
-# CRITICAL FIX: Run composer install while IGNORING the problematic platform requirements.
-# We know the extensions are installed, so this bypasses the stubborn CLI check.
-RUN composer install --no-dev --optimize-autoloader \
-    --ignore-platform-req=ext-gd \
-    --ignore-platform-req=ext-sodium \
-    --ignore-platform-req=ext-zip
+# Install composer dependencies (no need to ignore platform requirements now)
+RUN composer install --no-dev --optimize-autoloader
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
