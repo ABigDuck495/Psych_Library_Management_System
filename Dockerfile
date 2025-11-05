@@ -124,6 +124,10 @@ RUN php artisan config:cache
 RUN php artisan route:cache
 RUN php artisan view:cache
 
+# Copy startup script and make it executable
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
 # Set permissions
 RUN chown -R nobody:nobody /var/www/html \
     && chmod -R 755 /var/www/html \
@@ -132,5 +136,5 @@ RUN chown -R nobody:nobody /var/www/html \
 # Expose port
 EXPOSE 8000
 
-# Start supervisord
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+# Use the startup script
+CMD ["/usr/local/bin/start.sh"]
