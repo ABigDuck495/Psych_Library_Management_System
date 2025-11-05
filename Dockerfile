@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-# Install system dependencies - REMOVED SQLite extensions
+# Install system dependencies
 RUN apk update && apk add --no-cache \
     nginx \
     php83 \
@@ -45,89 +45,38 @@ RUN mkdir -p /var/www/html \
     && mkdir -p /etc/nginx/conf.d \
     && mkdir -p /var/run/php
 
-# Create Nginx config file for Railway
+# Create Nginx config
 RUN echo "server { \
     listen \${PORT:-8000} default_server; \
     root /var/www/html/public; \
     index index.php index.html; \
-    client_max_body_size 100M; \
-    \
     location / { \
         try_files \$uri \$uri/ /index.php?\$query_string; \
     } \
-    \
     location ~ \.php$ { \
         fastcgi_pass 127.0.0.1:9000; \
         fastcgi_index index.php; \
         fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name; \
         include fastcgi_params; \
-        fastcgi_read_timeout 300; \
-    } \
-    \
-    location ~ /\.ht { \
-        deny all; \
     } \
 }" > /etc/nginx/conf.d/default.conf
 
 # Create PHP-FPM config
-RUN echo "[global] \
-daemonize = no \
-\
-[www] \
-user = nobody \
-group = nobody \
-listen = 127.0.0.1:9000 \
-listen.owner = nobody \
-listen.group = nobody \
-pm = dynamic \
-pm.max_children = 5 \
-pm.start_servers = 2 \
-pm.min_spare_servers = 1 \
-pm.max_spare_servers = 3 \
-php_admin_value[memory_limit] = 512M \
-php_admin_value[upload_max_filesize] = 100M \
-php_admin_value[post_max_size] = 100M \
-php_admin_value[max_execution_time] = 300 \
-php_admin_value[max_input_time] = 300" > /etc/php83/php-fpm.d/www.conf
+RUN echo "[global]\ndaemonize=no\n[www]\nuser=nobody\ngroup=nobody\nlisten=127.0.0.1:9000\npm=dynamic\npm.max_children=5\npm.start_servers=2\npm.min_spare_servers=1\npm.max_spare_servers=3" > /etc/php83/php-fpm.d/www.conf
 
 # Create supervisord config
-RUN echo "[supervisord] \
-nodaemon=true \
-\
-[program:nginx] \
-command=nginx -g 'daemon off;' \
-autostart=true \
-autorestart=true \
-stdout_logfile=/dev/stdout \
-stdout_logfile_maxbytes=0 \
-stderr_logfile=/dev/stderr \
-stderr_logfile_maxbytes=0 \
-\
-[program:php-fpm] \
-command=php-fpm83 -F \
-autostart=true \
-autorestart=true \
-stdout_logfile=/dev/stdout \
-stdout_logfile_maxbytes=0 \
-stderr_logfile=/dev/stderr \
-stderr_logfile_maxbytes=0" > /etc/supervisord.conf
+RUN echo "[supervisord]\nnodaemon=true\n[program:nginx]\ncommand=nginx -g 'daemon off;'\nautostart=true\nautorestart=true\n[program:php-fpm]\ncommand=php-fpm83 -F\nautostart=true\nautorestart=true" > /etc/supervisord.conf
 
-# Set working directory
 WORKDIR /var/www/html
-
-# Copy application code
 COPY . .
 
-# Install Composer dependencies (NO config caching yet)
+# Install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
 # Set permissions
-RUN chown -R nobody:nobody /var/www/html \
-    && chmod -R 755 /var/www/html \
-    && chmod +x artisan
+RUN chown -R nobody:nobody /var/www/html && chmod -R 755 /var/www/html
 
-# Expose port
 EXPOSE 8000
 
-# Force MySQL connection and skip migrations if they fail
-CMD ["/bin/sh", "-c", "php artisan migrate --force --database=mysql || echo 'Migrations failed, starting application anyway...' && /usr/bin/supervisord -c /etc/supervisord.conf"]
+# Simple start command - skip migrations for now
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
