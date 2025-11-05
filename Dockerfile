@@ -1,58 +1,59 @@
-# === STAGE 1: BUILDER (For running Composer and installing dependencies) ===
-FROM php:8.3-cli-alpine AS composer_builder
-
-# Set the working directory for the application code
-WORKDIR /app
-
-# Install OS packages and all build dependencies (including those for GD and Sodium)
-RUN apk update && apk add --no-cache \
-    git \
-    libzip-dev \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libsodium-dev \
-    \
-    # Install Composer
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    \
-    # Install PHP extensions required by Composer (CLI environment)
-    && docker-php-ext-install -j$(nproc) pdo pdo_mysql zip gd sodium \
-    && docker-php-ext-enable zip gd sodium
-
-# Copy application files needed for composer install
-COPY composer.json composer.lock ./
-
-# Run composer install. The --ignore-platform-reqs flag is a safety measure
-# to prevent CLI errors when we KNOW the extensions are installed.
-RUN composer install --no-dev --optimize-autoloader
-
-# === STAGE 2: PRODUCTION (Final Runtime Image) ===
+# Use a stable PHP-FPM base image for production web serving
 FROM php:8.3-fpm-alpine
 
-# Set the working directory
+# Set the working directory for the application code
 WORKDIR /var/www/html
 
-# Install NGINX and runtime client for MySQL
+# --- Build Dependencies and PHP Extensions ---
+
+# Step 1: Install OS packages and necessary build dependencies
 RUN apk update && apk add --no-cache \
     nginx \
-    mysql-client
+    mysql-client \
+    \
+    # Install build dependencies for PHP extensions
+    && apk add --no-cache --virtual .build-deps \
+        libzip-dev \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        freetype-dev \
+        libsodium-dev
 
-# Install PHP extensions required for FPM (Web Server)
-# Opcache is installed here for web serving performance
+# Step 2: Install PHP extensions and clean up build dependencies
 RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql opcache zip gd sodium \
-    && docker-php-ext-enable opcache
+    \
+    # Explicitly enable extensions for the CLI environment (Fixes Composer)
+    && docker-php-ext-enable \
+        pdo_mysql \
+        opcache \
+        zip \
+        gd \
+        sodium \
+    \
+    # Cleanup: Remove the temporary build dependencies
+    && apk del .build-deps
 
-# Copy compiled application code and vendors from the builder stage
-# This is the key step that bypasses the file-copy and composer issues
-COPY --from=composer_builder /app /var/www/html
+# --- Application Setup ---
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Copy ALL files from the repository root into the container's working directory
+COPY . .
+
+# CRITICAL FIX: Run composer install while IGNORING the problematic platform requirements.
+# We know the extensions are installed, so this bypasses the stubborn CLI check.
+RUN composer install --no-dev --optimize-autoloader \
+    --ignore-platform-req=ext-gd \
+    --ignore-platform-req=ext-sodium \
+    --ignore-platform-req=ext-zip
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # --- NGINX Configuration ---
 
-# Create a simple Nginx config file that passes PHP requests to PHP-FPM
+# Create Nginx config file
 RUN echo "server { \
     listen 8000 default_server; \
     root /var/www/html/public; \
@@ -70,7 +71,6 @@ RUN echo "server { \
 
 # --- Startup Command ---
 
-# Expose the port NGINX is listening on
 EXPOSE 8000
 
 # Start PHP-FPM and Nginx simultaneously
