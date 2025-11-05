@@ -16,10 +16,7 @@ RUN apk update && apk add --no-cache \
         freetype-dev
 
 # Step 2: Configure and install PHP extensions
-# NOTE: We remove --with-jpeg, --with-png, and --with-freetype, as they are
-# automatically detected on modern Alpine images.
-RUN docker-php-ext-configure gd \
-    && docker-php-ext-install -j$(nproc) pdo pdo_mysql opcache zip gd \
+RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql opcache zip gd \
     \
     # Cleanup: Remove the temporary build dependencies to keep the image small
     && apk del .build-deps
