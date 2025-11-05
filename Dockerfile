@@ -29,7 +29,7 @@ RUN apk update && apk add --no-cache \
     php83-bcmath \
     php83-intl \
     php83-openssl \
-    php83-iconv \  # ← ADDED THIS LINE
+    php83-iconv \
     supervisor \
     curl \
     git
