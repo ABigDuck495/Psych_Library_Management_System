@@ -11,3 +11,5 @@ cmds = [
   "php artisan migrate --force",
   "php artisan db:seed"
 ]
+[start]
+cmd = "php -S 0.0.0.0:80 -t public"
