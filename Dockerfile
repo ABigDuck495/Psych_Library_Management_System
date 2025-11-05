@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-# Install system dependencies including Composer
+# Install system dependencies including Composer and missing extensions
 RUN apk update && apk add --no-cache \
     nginx \
     php83 \
@@ -29,6 +29,7 @@ RUN apk update && apk add --no-cache \
     php83-bcmath \
     php83-intl \
     php83-openssl \
+    php83-iconv \  # ← ADDED THIS LINE
     supervisor \
     curl \
     git
