@@ -38,13 +38,15 @@ RUN docker-php-ext-install -j$(nproc) pdo pdo_mysql opcache zip gd sodium \
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copy ALL files from the repository root into the container's working directory
-# This single command ensures composer.json/lock and all other files are available
-COPY . .
+# CRITICAL FIX: Copy *only* the required composer files first to guarantee they are found
+# This invalidates the cache only when composer.json/lock change.
+COPY composer.json composer.lock ./
 
 # Run composer install to install dependencies
-# We run this AFTER COPY . . to ensure the files are present in the build context
 RUN composer install --no-dev --optimize-autoloader
+
+# Now copy the rest of the application code, including the public, storage, etc.
+COPY . .
 
 # Set correct permissions for storage and cache directories
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
