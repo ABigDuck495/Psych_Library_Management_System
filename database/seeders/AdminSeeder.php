@@ -16,25 +16,30 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
-            DB::table('users')->insert([
-                'id' => 1,
-                'university_id' => '23-2634',
-                'username' => 'Admin Tester',
-                'email' => 'admintester@gmail.com',
-                'first_name' => 'Admin',
-                'last_name' => 'Tester',
-                'role' => 'admin',
-                'phone_number' => '09064093019',
-                'account_status' => 'Active',
-                'password' => Hash::make('P@ssw0rd'),
-                'user_type' => 'student',
-            ]);
+            // Use updateOrCreate to avoid duplicates
+            $admin = User::updateOrCreate(
+                ['email' => 'admintester@gmail.com'],
+                [
+                    'university_id' => '23-2634',
+                    'username' => 'Admin Tester',
+                    'first_name' => 'Admin',
+                    'last_name' => 'Tester',
+                    'role' => 'admin',
+                    'phone_number' => '09064093019',
+                    'account_status' => 'Active',
+                    'password' => Hash::make('P@ssw0rd'),
+                    'user_type' => 'student',
+                ]
+            );
 
-            DB::table('students')->insert([
-                'id' => 1,
-                'academic_program' => 'Undergraduate',
-                'department' => 'BSIT',
-            ]);
+            // Update or create student record without hardcoded ID
+            DB::table('students')->updateOrInsert(
+                ['user_id' => $admin->id],
+                [
+                    'academic_program' => 'Undergraduate',
+                    'department' => 'BSIT',
+                ]
+            );
         });
     }
 }
