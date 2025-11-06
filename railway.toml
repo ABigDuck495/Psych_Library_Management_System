@@ -2,25 +2,23 @@
 nixpacksVersion = "1.4.0"
 
 [phases.setup]
-nixPkgs = ["php81", "php81Packages.composer", "php81Extensions.gd", "php81Packages.php-fpm", "nginx"]
-
-[phases.build]
-cmds = [
-  "nginx",
+nixPkgs = [
   "php81",
-  "composer install --optimize-autoloader --no-scripts --no-interaction",
-  "php artisan optimize:clear",
   "php81Packages.composer",
   "php81Extensions.gd",
   "php81Packages.php-fpm",
+  "nginx"
+]
+
+[phases.build]
+cmds = [
+  "composer install --optimize-autoloader --no-scripts --no-interaction",
+  "php artisan optimize:clear",
   "chmod +x start.sh",
   "chmod +x php-fpm.conf",
   "php artisan migrate --force",
   "php artisan db:seed"
-  
 ]
-[start]
-cmd = "php -S 0.0.0.0:80 -t public"
 
 [deploy]
 startCommand = "sh start.sh"
