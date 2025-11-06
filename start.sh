@@ -14,4 +14,4 @@ php artisan db:seed --force
 php-fpm -y /app/php-fpm.conf &
 
 # Start Nginx with our custom config
-nginx -g 'daemon off;'
+nginx -c /app/nginx.conf -g 'daemon off;'
