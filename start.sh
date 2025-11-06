@@ -8,7 +8,7 @@ php artisan migrate --force
 php artisan db:seed --force
 
 # Start PHP-FPM in background
-php-fpm -y app/php-fpm.conf &
+php-fpm -y /php-fpm.conf &
 
 # Start Nginx with our custom config
 nginx -g 'daemon off;'
