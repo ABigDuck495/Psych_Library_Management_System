@@ -28,5 +28,4 @@ setupCommands = [
 [start]
 cmd = "./start.sh"
 
-[providers]
-php = "upstream"
+providers = ["php"]
