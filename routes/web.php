@@ -6,14 +6,14 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ThesisController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\LogoutController;
+use App\Http\Controllers\auth\LoginController;
+use App\Http\Controllers\auth\LogoutController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ReportExportController;
 use App\Http\Controllers\Admin\LoginAttemptController;
 
 //Role Based Access Control Controllers
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\auth\RegisterController;
 use App\Http\Controllers\UserInterfaceController;
 use App\Http\Controllers\AdminInterfaceController;
 use App\Http\Controllers\LibrarianInterfaceController;
