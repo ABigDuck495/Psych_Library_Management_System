@@ -1,15 +1,24 @@
-/* Sidebar Styles */
-.sidebar-content {
-    width: 16rem;
-    min-height: 100vh;
-    padding: 1.5rem;
-    color: white;
+.sidebar-container {
+    width: 280px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
     display: flex;
     flex-direction: column;
     background: linear-gradient(180deg, #14532d 0%, #16a34a 100%);
+    color: white;
 }
 
-/* Logo Section */
+.sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+/* Keep all your existing styles below, they should work fine */
 .sidebar-logo {
     display: flex;
     align-items: center;
@@ -152,27 +161,31 @@
     color: white;
     text-decoration: none;
     transition: all 0.3s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
 }
 
 .logout-btn:hover {
     background-color: rgba(21, 128, 61, 0.7);
 }
 
-/* Responsive Design */
+/* Update Responsive Design */
 @media (max-width: 768px) {
-    .sidebar {
+    .sidebar-container {
         width: 100%;
-        min-height: auto;
+        height: auto;
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
         z-index: 50;
-        transform: translateY(-100%);
+        transform: translateX(-100%);
         transition: transform 0.3s ease;
     }
     
-    .sidebar.active {
-        transform: translateY(0);
+    .sidebar-container.mobile-open {
+        transform: translateX(0);
     }
 }
