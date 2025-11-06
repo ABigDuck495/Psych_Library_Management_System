@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
 
             // Update or create student record without hardcoded ID
             DB::table('students')->updateOrInsert(
-                ['user_id' => $user->id],
+                ['id' => $user->id],
                 [
                     'academic_program' => 'Undergraduate',
                     'department' => 'BSIT',

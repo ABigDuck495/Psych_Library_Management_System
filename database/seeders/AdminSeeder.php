@@ -34,7 +34,7 @@ class AdminSeeder extends Seeder
 
             // Update or create student record without hardcoded ID
             DB::table('students')->updateOrInsert(
-                ['user_id' => $admin->id],
+                ['id' => $admin->id],
                 [
                     'academic_program' => 'Undergraduate',
                     'department' => 'BSIT',
