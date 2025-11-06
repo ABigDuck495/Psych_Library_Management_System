@@ -17,8 +17,48 @@
     padding: 1.5rem;
     overflow-y: auto;
 }
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+}
 
-/* Keep all your existing styles below, they should work fine */
+.logout-section {
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.main-content {
+    margin-left: 280px;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+    width: calc(100% - 280px);
+}
+
+/* Rest of your existing sidebar.css styles... */
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.3rem;
+}
+
+.logo-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+
 .sidebar-logo {
     display: flex;
     align-items: center;
@@ -170,6 +210,7 @@
 .logout-btn:hover {
     background-color: rgba(21, 128, 61, 0.7);
 }
+
 
 /* Update Responsive Design */
 @media (max-width: 768px) {
