@@ -10,7 +10,22 @@ mkdir -p /etc/nginx /var/log/nginx /var/run/php
 cp nginx.conf /etc/nginx/nginx.conf
 
 # Ensure Laravel can write logs and cache
+echo "Fixing Laravel permissions..."
 chmod -R 775 storage bootstrap/cache
+chown -R nobody:nogroup storage bootstrap/cache
+
+# Ensure log file exists
+mkdir -p storage/logs
+touch storage/logs/laravel.log
+chmod 664 storage/logs/laravel.log
+chown nobody:nogroup storage/logs/laravel.log
+
+# Clear and cache Laravel config
+echo "Caching Laravel config..."
+php artisan config:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
 
 echo "Running Laravel setup..."
 php artisan migrate --force
