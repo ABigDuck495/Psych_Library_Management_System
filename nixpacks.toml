@@ -1,0 +1,32 @@
+[phpenv]
+version = "8.3"
+
+[phpenv.extensions]
+iconv = "*"
+gd = "*"
+pdo_mysql = "*"
+mbstring = "*"
+xml = "*"
+curl = "*"
+zip = "*"
+sodium = "*"
+bcmath = "*"
+intl = "*"
+opcache = "*"
+pdo_sqlite = "*"
+sqlite3 = "*"
+
+[build]
+buildCommand = "composer install --no-dev --optimize-autoloader && php artisan config:cache && php artisan route:cache && php artisan view:cache"
+
+# Install nginx and setup
+setupCommands = [
+    "apk add nginx",
+    "mkdir -p /var/log/nginx /var/run/php",
+]
+
+[start]
+cmd = "./start.sh"
+
+[providers]
+php = "upstream"
