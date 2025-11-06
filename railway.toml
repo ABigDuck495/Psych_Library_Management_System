@@ -2,7 +2,7 @@
 nixpacksVersion = "1.4.0"
 
 [phases.setup]
-nixPkgs = ["php81", "php81Packages.composer", "php81Extensions.gd", "php81Packages.php-fpm, "nginx"]
+nixPkgs = ["php81", "php81Packages.composer", "php81Extensions.gd", "php81Packages.php-fpm", "nginx"]
 
 [phases.build]
 cmds = [
