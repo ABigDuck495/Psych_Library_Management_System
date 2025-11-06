@@ -3,8 +3,14 @@ set -e
 
 echo "Preparing environment..."
 
+# Create necessary directories
 mkdir -p /etc/nginx /var/log/nginx /var/run/php
+
+# Copy nginx config to correct location
 cp nginx.conf /etc/nginx/nginx.conf
+
+# Ensure Laravel can write logs and cache
+chmod -R 775 storage bootstrap/cache
 
 echo "Running Laravel setup..."
 php artisan migrate --force
@@ -24,6 +30,9 @@ sleep 2
 
 echo "Checking PHP-FPM process..."
 ps aux | grep php-fpm | grep -v grep && echo "PHP-FPM process is running" || echo "PHP-FPM process not found"
+
+echo "Inspecting Laravel error log..."
+tail -n 50 /app/storage/logs/laravel.log || echo "No Laravel log found"
 
 echo "Starting Nginx..."
 exec nginx -c /app/nginx.conf -g 'daemon off;'
