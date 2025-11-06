@@ -3,10 +3,7 @@ set -e
 
 echo "Preparing environment..."
 
-# Create necessary directories
 mkdir -p /etc/nginx /var/log/nginx /var/run/php
-
-# Copy nginx config to correct location
 cp nginx.conf /etc/nginx/nginx.conf
 
 echo "Running Laravel setup..."
@@ -21,12 +18,12 @@ which php-fpm || echo "php-fpm not found"
 php-fpm -v || echo "php-fpm failed to run"
 
 echo "Starting PHP-FPM..."
-php-fpm --nodaemonize --fpm-config /app/php-fpm.conf
-# Wait briefly to allow PHP-FPM to bind
+php-fpm --nodaemonize --fpm-config /app/php-fpm.conf &
+
 sleep 2
 
-echo "Checking PHP-FPM port binding..."
-ss -an | grep 9000 && echo "PHP-FPM is listening on port 9000" || echo "PHP-FPM is NOT listening on port 9000"
+echo "Checking PHP-FPM process..."
+ps aux | grep php-fpm | grep -v grep && echo "PHP-FPM process is running" || echo "PHP-FPM process not found"
 
 echo "Starting Nginx..."
 exec nginx -c /app/nginx.conf -g 'daemon off;'
