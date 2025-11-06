@@ -10,6 +10,7 @@ cmds = [
   "php81",
   "composer install --optimize-autoloader --no-scripts --no-interaction",
   "php artisan optimize:clear",
+  "php81Packages.composer",
   "php81Extensions.gd",
   "php81Packages.php-fpm",
   "chmod +x start.sh",
