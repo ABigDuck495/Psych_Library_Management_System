@@ -21,8 +21,7 @@ which php-fpm || echo "php-fpm not found"
 php-fpm -v || echo "php-fpm failed to run"
 
 echo "Starting PHP-FPM..."
-php-fpm -y /app/php-fpm.conf &
-
+php-fpm --nodaemonize --fpm-config /app/php-fpm.conf
 # Wait briefly to allow PHP-FPM to bind
 sleep 2
 
