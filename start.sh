@@ -10,8 +10,8 @@ cp nginx.conf /etc/nginx/nginx.conf
 php artisan migrate --force
 php artisan db:seed --force
 
-# Start PHP-FPM with default config (no custom config needed)
-php-fpm -D
+# Start PHP-FPM with default config
+php-fpm -y /app/php-fpm.conf &
 
 # Start Nginx with our custom config
 nginx -g 'daemon off;'
