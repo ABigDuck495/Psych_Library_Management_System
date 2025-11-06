@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-# Install only what we absolutely need
+# Install only what we need
 RUN apk update && apk add --no-cache \
     nginx \
     php83 \
@@ -23,37 +23,11 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Create directories
 RUN mkdir -p /var/www/html /run/nginx
 
-# Simple nginx config
-RUN echo "events {}\n\
-http {\n\
-    server {\n\
-        listen \${PORT:-8000};\n\
-        root /var/www/html/public;\n\
-        index index.php;\n\
-        location / {\n\
-            try_files \$uri \$uri/ /index.php?\$query_string;\n\
-        }\n\
-        location ~ \.php$ {\n\
-            fastcgi_pass 127.0.0.1:9000;\n\
-            fastcgi_index index.php;\n\
-            fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;\n\
-            include fastcgi_params;\n\
-        }\n\
-    }\n\
-}" > /etc/nginx/nginx.conf
+# Create proper PHP-FPM config without escape issues
+RUN printf "[global]\ndaemonize = no\nerror_log = /dev/stderr\n\n[www]\nuser = nobody\ngroup = nobody\nlisten = 127.0.0.1:9000\npm = dynamic\npm.max_children = 5\npm.start_servers = 2\npm.min_spare_servers = 1\npm.max_spare_servers = 3\n" > /etc/php83/php-fpm.d/www.conf
 
-# Simple PHP-FPM config
-RUN echo "[global]\n\
-daemonize=no\n\
-[www]\n\
-user=nobody\n\
-group=nobody\n\
-listen=127.0.0.1:9000\n\
-pm=dynamic\n\
-pm.max_children=5\n\
-pm.start_servers=2\n\
-pm.min_spare_servers=1\n\
-pm.max_spare_servers=3" > /etc/php83/php-fpm.d/www.conf
+# Create proper Nginx config without escape issues
+RUN printf "error_log /dev/stderr warn;\nevents {\n    worker_connections 1024;\n}\nhttp {\n    server {\n        listen \${PORT:-8000};\n        root /var/www/html/public;\n        index index.php;\n        location / {\n            try_files \$uri \$uri/ /index.php?\$query_string;\n        }\n        location ~ \.php\$ {\n            fastcgi_pass 127.0.0.1:9000;\n            fastcgi_index index.php;\n            fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;\n            include fastcgi_params;\n        }\n    }\n}\n" > /etc/nginx/nginx.conf
 
 WORKDIR /var/www/html
 COPY . .
