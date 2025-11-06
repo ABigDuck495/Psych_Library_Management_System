@@ -6,8 +6,12 @@ nixPkgs = ["php81", "php81Packages.composer", "php81Extensions.gd", "php81Packag
 
 [phases.build]
 cmds = [
+  "nginx",
+  "php81",
   "composer install --optimize-autoloader --no-scripts --no-interaction",
   "php artisan optimize:clear",
+  "php81Extensions.gd",
+  "php81Packages.php-fpm,
   "chmod +x start.sh",
   "chmod +x php-fpm.conf",
   "php artisan migrate --force",
