@@ -10,6 +10,9 @@ cp nginx.conf /etc/nginx/nginx.conf
 php artisan migrate --force
 php artisan db:seed --force
 
+# to confirm config
+echo "PHP-FPM config:"
+cat /app/php-fpm.conf
 # Start PHP-FPM with default config
 php-fpm -y /app/php-fpm.conf &
 
