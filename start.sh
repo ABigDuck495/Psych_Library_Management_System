@@ -2,7 +2,7 @@
 set -e
 
 # Copy nginx config to the correct location
-cp nginx.conf /etc/nginx/nginx.conf
+cp nginx.conf /nginx.conf
 
 php artisan migrate --force
 php artisan db:seed --force
