@@ -1,3 +1,4 @@
+/*
 .sidebar-container {
     width: 280px;
     height: 100vh;
@@ -35,29 +36,6 @@
     width: calc(100% - 280px);
 }
 
-/* Rest of your existing sidebar.css styles... */
-.sidebar-logo {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.3rem;
-}
-
-.logo-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background-color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 0.75rem;
-}
-
-.logo-text {
-    font-size: 1.25rem;
-    font-weight: bold;
-}
-
 
 .sidebar-logo {
     display: flex;
@@ -81,7 +59,30 @@
     font-weight: bold;
 }
 
-/* User Profile Section */
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.3rem;
+}
+
+.logo-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+
 .user-profile {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 0.75rem;
@@ -140,7 +141,7 @@
     color: #86efac;
 }
 
-/* Navigation Sections */
+/Navigation Sections 
 .nav-section {
     margin-bottom: 2rem;
 }
@@ -185,7 +186,7 @@
     text-align: center;
 }
 
-/* Logout Section */
+/* Logout Section 
 .logout-section {
     margin-top: auto;
     padding-top: 1.5rem;
@@ -212,7 +213,7 @@
 }
 
 
-/* Update Responsive Design */
+
 @media (max-width: 768px) {
     .sidebar-container {
         width: 100%;
@@ -229,4 +230,4 @@
     .sidebar-container.mobile-open {
         transform: translateX(0);
     }
-}
+}*/
