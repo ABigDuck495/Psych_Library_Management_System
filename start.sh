@@ -28,9 +28,24 @@ php artisan route:cache
 php artisan view:cache
 
 echo "Running Laravel setup..."
-php artisan migrate --force
-php artisan db:seed --force
 
+# Put Laravel in maintenance mode (optional but recommended)
+php artisan down || true
+
+# Reset the database
+php artisan migrate:fresh --force || {
+  echo "Migration failed. Check database connection and permissions."
+  exit 1
+}
+
+# Seed the database
+php artisan db:seed --force || {
+  echo "Seeding failed. Check your seeders."
+  exit 1
+}
+
+# Bring Laravel back up
+php artisan up
 echo "PHP-FPM config:"
 cat /app/php-fpm.conf
 
