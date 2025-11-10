@@ -55,12 +55,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Add Author Button -->
-            <a href="{{ route('authors.create') }}" class="add-author-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-lg font-medium flex items-center transition shadow-md">
-                <i class="fas fa-plus-circle mr-2"></i>
-                Add New Author
-            </a>
         </div>
     </div>
 
@@ -80,9 +74,9 @@
         </div>
     @endif
 
-    <!-- Search and Filter Section -->
+    <!-- Search and Sort Section -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Search -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Search Authors</label>
@@ -95,32 +89,23 @@
                 </div>
             </div>
             
-            <!-- First Name Filter -->
+            <!-- Sort Options -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                <select id="firstNameFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All First Names</option>
-                    @foreach($authors->pluck('first_name')->unique()->sort() as $firstName)
-                        <option value="{{ $firstName }}">{{ $firstName }}</option>
-                    @endforeach
-                </select>
-            </div>
-            
-            <!-- Last Name Filter -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                <select id="lastNameFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All Last Names</option>
-                    @foreach($authors->pluck('last_name')->unique()->sort() as $lastName)
-                        <option value="{{ $lastName }}">{{ $lastName }}</option>
-                    @endforeach
+                <label class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                <select id="sortSelect" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="name_asc">Name (A-Z)</option>
+                    <option value="name_desc">Name (Z-A)</option>
+                    <option value="works_asc">Works Count (Low to High)</option>
+                    <option value="works_desc">Works Count (High to Low)</option>
+                    <option value="id_asc">ID (Oldest First)</option>
+                    <option value="id_desc">ID (Newest First)</option>
                 </select>
             </div>
             
             <!-- Actions -->
             <div class="flex items-end space-x-2">
-                <button id="filterButton" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex-1 transition">
-                    Apply Filters
+                <button id="applySort" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex-1 transition">
+                    Apply Sort
                 </button>
                 <button id="resetButton" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition">
                     Reset
@@ -135,19 +120,29 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Works Count</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sort-header" data-sort="id">
+                            ID <i class="fas fa-sort ml-1"></i>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sort-header" data-sort="first_name">
+                            First Name <i class="fas fa-sort ml-1"></i>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sort-header" data-sort="last_name">
+                            Last Name <i class="fas fa-sort ml-1"></i>
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer sort-header" data-sort="works">
+                            Works Count <i class="fas fa-sort ml-1"></i>
+                        </th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200" id="authorsTableBody">
                     @forelse ($authors as $author)
                         <tr class="table-row-hover author-row" 
+                            data-id="{{ $author->id }}"
                             data-firstname="{{ strtolower($author->first_name) }}"
                             data-lastname="{{ strtolower($author->last_name) }}"
-                            data-fullname="{{ strtolower($author->first_name . ' ' . $author->last_name) }}">
+                            data-fullname="{{ strtolower($author->first_name . ' ' . $author->last_name) }}"
+                            data-works-count="{{ $author->books_count + $author->theses_count }}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $author->id }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $author->first_name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $author->last_name }}</td>
@@ -200,13 +195,7 @@
                                 <div class="flex flex-col items-center justify-center text-gray-400">
                                     <i class="fas fa-user-edit text-5xl mb-4"></i>
                                     <h3 class="text-lg font-medium mb-2">No authors found</h3>
-                                    <p class="mb-4">Get started by adding your first author</p>
-                                    <div class="flex space-x-3">
-                                        <a href="{{ route('authors.create') }}" class="add-author-btn bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 py-2 rounded-lg font-medium flex items-center transition shadow-md">
-                                            <i class="fas fa-plus-circle mr-2"></i>
-                                            Add New Author
-                                        </a>
-                                    </div>
+                                    <p class="mb-4">No authors are currently available in the system</p>
                                 </div>
                             </td>
                         </tr>
@@ -245,15 +234,6 @@
         font-weight: 500;
     }
     
-    .add-author-btn {
-        transition: all 0.3s ease;
-    }
-    
-    .add-author-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
-    }
-
     .export-dropdown-btn {
         transition: all 0.3s ease;
     }
@@ -261,6 +241,15 @@
     .export-dropdown-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .sort-header {
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+    
+    .sort-header:hover {
+        background-color: #f1f5f9;
     }
 
     /* Pagination Styles */
@@ -307,44 +296,157 @@
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Filter functionality
+    // Filter and Sort functionality
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('searchInput');
-        const firstNameFilter = document.getElementById('firstNameFilter');
-        const lastNameFilter = document.getElementById('lastNameFilter');
-        const filterButton = document.getElementById('filterButton');
+        const sortSelect = document.getElementById('sortSelect');
+        const applySort = document.getElementById('applySort');
         const resetButton = document.getElementById('resetButton');
         const authorRows = document.querySelectorAll('.author-row');
+        const sortHeaders = document.querySelectorAll('.sort-header');
 
-        function filterAuthors() {
+        let currentSort = {
+            field: 'first_name',
+            direction: 'asc'
+        };
+
+        function sortAuthors() {
+            const rowsArray = Array.from(authorRows);
             const searchTerm = searchInput.value.toLowerCase();
-            const firstNameValue = firstNameFilter.value.toLowerCase();
-            const lastNameValue = lastNameFilter.value.toLowerCase();
 
-            authorRows.forEach(row => {
-                const firstname = row.getAttribute('data-firstname');
-                const lastname = row.getAttribute('data-lastname');
+            // First filter by search term
+            const filteredRows = rowsArray.filter(row => {
                 const fullname = row.getAttribute('data-fullname');
+                return fullname.includes(searchTerm);
+            });
 
-                const matchesSearch = fullname.includes(searchTerm);
-                const matchesFirstName = !firstNameValue || firstname.includes(firstNameValue);
-                const matchesLastName = !lastNameValue || lastname.includes(lastNameValue);
+            // Then sort the filtered rows
+            filteredRows.sort((a, b) => {
+                let aValue, bValue;
 
-                row.style.display = (matchesSearch && matchesFirstName && matchesLastName) ? '' : 'none';
+                switch (currentSort.field) {
+                    case 'id':
+                        aValue = parseInt(a.getAttribute('data-id'));
+                        bValue = parseInt(b.getAttribute('data-id'));
+                        break;
+                    case 'works':
+                        aValue = parseInt(a.getAttribute('data-works-count'));
+                        bValue = parseInt(b.getAttribute('data-works-count'));
+                        break;
+                    case 'first_name':
+                        aValue = a.getAttribute('data-firstname');
+                        bValue = b.getAttribute('data-firstname');
+                        break;
+                    case 'last_name':
+                        aValue = a.getAttribute('data-lastname');
+                        bValue = b.getAttribute('data-lastname');
+                        break;
+                    default:
+                        aValue = a.getAttribute('data-firstname') + ' ' + a.getAttribute('data-lastname');
+                        bValue = b.getAttribute('data-firstname') + ' ' + b.getAttribute('data-lastname');
+                }
+
+                if (currentSort.direction === 'asc') {
+                    return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+                } else {
+                    return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+                }
+            });
+
+            // Update the table
+            const tbody = document.getElementById('authorsTableBody');
+            tbody.innerHTML = '';
+
+            if (filteredRows.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center justify-center text-gray-400">
+                                <i class="fas fa-search text-5xl mb-4"></i>
+                                <h3 class="text-lg font-medium mb-2">No authors found</h3>
+                                <p class="mb-4">Try adjusting your search criteria</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                filteredRows.forEach(row => tbody.appendChild(row));
+            }
+        }
+
+        function updateSortIcons() {
+            sortHeaders.forEach(header => {
+                const icon = header.querySelector('i');
+                const field = header.getAttribute('data-sort');
+                
+                if (field === currentSort.field) {
+                    icon.className = currentSort.direction === 'asc' ? 
+                        'fas fa-sort-up ml-1' : 'fas fa-sort-down ml-1';
+                } else {
+                    icon.className = 'fas fa-sort ml-1';
+                }
             });
         }
 
-        filterButton.addEventListener('click', filterAuthors);
-        
+        // Apply sort from dropdown
+        applySort.addEventListener('click', function() {
+            const sortValue = sortSelect.value;
+            
+            switch (sortValue) {
+                case 'name_asc':
+                    currentSort = { field: 'first_name', direction: 'asc' };
+                    break;
+                case 'name_desc':
+                    currentSort = { field: 'first_name', direction: 'desc' };
+                    break;
+                case 'works_asc':
+                    currentSort = { field: 'works', direction: 'asc' };
+                    break;
+                case 'works_desc':
+                    currentSort = { field: 'works', direction: 'desc' };
+                    break;
+                case 'id_asc':
+                    currentSort = { field: 'id', direction: 'asc' };
+                    break;
+                case 'id_desc':
+                    currentSort = { field: 'id', direction: 'desc' };
+                    break;
+            }
+            
+            updateSortIcons();
+            sortAuthors();
+        });
+
+        // Header click sorting
+        sortHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const field = this.getAttribute('data-sort');
+                
+                if (currentSort.field === field) {
+                    // Toggle direction if same field
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    // New field, default to ascending
+                    currentSort.field = field;
+                    currentSort.direction = 'asc';
+                }
+                
+                updateSortIcons();
+                sortAuthors();
+            });
+        });
+
+        // Reset functionality
         resetButton.addEventListener('click', function() {
             searchInput.value = '';
-            firstNameFilter.value = '';
-            lastNameFilter.value = '';
-            authorRows.forEach(row => row.style.display = '');
+            sortSelect.value = 'name_asc';
+            currentSort = { field: 'first_name', direction: 'asc' };
+            updateSortIcons();
+            sortAuthors();
         });
 
         // Real-time search
-        searchInput.addEventListener('input', filterAuthors);
+        searchInput.addEventListener('input', sortAuthors);
 
         // SweetAlert for delete confirmation
         document.querySelectorAll('.delete-btn').forEach(button => {
@@ -398,6 +500,9 @@
             confirmButtonText: 'OK'
         });
         @endif
+
+        // Initialize sort icons
+        updateSortIcons();
     });
 </script>
 @endpush
