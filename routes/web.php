@@ -106,6 +106,7 @@ Route::middleware(['auth'])->group(function () {
 
         //transaction management
         Route::patch('/transactions/{transaction}/approve', [TransactionController::class, 'approveRequest'])->name('transactions.approve-request');
+        Route::patch('/transactions/{transaction}/reject', [TransactionController::class, 'rejectRequest'])->name('transactions.reject-request');
         Route::patch('/transactions/{transaction}/return', [TransactionController::class, 'returnBook'])->name('transactions.return');
         Route::patch('/transactions/{transaction}/mark-overdue', [TransactionController::class, 'markOverdue'])->name('transactions.mark-overdue');
 

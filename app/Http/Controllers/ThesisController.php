@@ -19,11 +19,41 @@ class ThesisController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $theses = Thesis::with('authors')->paginate(10);
+        $query = Thesis::with('authors');
+
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('abstract', 'LIKE', "%{$searchTerm}%")
+                  ->orWhereHas('authors', function($authorQuery) use ($searchTerm) {
+                      $authorQuery->where('first_name', 'LIKE', "%{$searchTerm}%")
+                                 ->orWhere('last_name', 'LIKE', "%{$searchTerm}%");
+                  });
+            });
+        }
+
+        // Department filter
+        if ($request->has('department') && !empty($request->department)) {
+            $query->where('department', $request->department);
+        }
+
+        // Year filter
+        if ($request->has('year') && !empty($request->year)) {
+            $query->where('year_published', $request->year);
+        }
+
+        $theses = $query->paginate(10);
+
+        // Preserve search parameters in pagination links
+        $theses->appends($request->except('page'));
+
         return view('theses.index', compact('theses'));
     }
+
 
     public function userInterface()
     {
