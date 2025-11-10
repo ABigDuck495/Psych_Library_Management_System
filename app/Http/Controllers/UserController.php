@@ -170,7 +170,7 @@ class UserController extends Controller
         $authUser = auth()->user(); // Get the authenticated user
 
         $validated = $request->validate([
-            'username' => 'required|string|max:255|unique:users,username,' . $authUser->id,
+            'username' => 'required|string|max:255|unique:users,username,',
             'phone_number' => 'nullable|string|max:20',
             'password' => [
                 'nullable',

@@ -346,7 +346,7 @@
                                 <i class="fas fa-user text-green-600 text-xl"></i>
                             </div>
                             <div>
-                                <div class="user-name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+                                <div class="user-name">{{ Auth::user()->username }}</div>
                                 <div class="user-role">{{ Auth::user()->role }}</div>
                             </div>
                         </div>
