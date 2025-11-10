@@ -152,6 +152,7 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/transactions/{transaction}/renew', [TransactionController::class, 'renew'])->name('transactions.renew');
 
         // Route::get('')
+        Route::get('authors/{author}', [AuthorController::class, 'show'])->name('authors.show');
 
         // Books: users may only view index & show
         Route::get('books', [BookController::class, 'index'])->name('books.index');
