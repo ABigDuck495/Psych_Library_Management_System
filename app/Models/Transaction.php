@@ -143,6 +143,9 @@ public function markAsBorrowed()
     {
         $this->update(['transaction_status' => 'borrowed']);
     }
+    public function markAsRejected(){
+        $this->update(['transaction_status' => 'rejected']);
+    }
 
     // Accessors
     public function getItemTitleAttribute()

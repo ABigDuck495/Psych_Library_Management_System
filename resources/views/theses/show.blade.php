@@ -98,21 +98,24 @@
                     </div>
                     
                     <!-- Enhanced PDF Actions Section -->
-                    <div class="pt-2">
-                        <label class="block text-sm font-medium text-gray-500 mb-3">Document Access</label>
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <a href="{{ route('theses.viewPdf', $thesis->id) }}" 
-                               class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-sm flex-1 group">
-                                <i class="fas fa-eye mr-3 group-hover:scale-110 transition-transform"></i>
-                                View PDF
-                            </a>
-                            <a href="{{ route('theses.downloadPdf', $thesis->id) }}" 
-                               class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-sm flex-1 group">
-                                <i class="fas fa-download mr-3 group-hover:scale-110 transition-transform"></i>
-                                Download PDF
-                            </a>
+                     @if ($thesis->thesis_pdf)
+                     
+                     <div class="pt-2">
+                         <label class="block text-sm font-medium text-gray-500 mb-3">Document Access</label>
+                         <div class="flex flex-col sm:flex-row gap-3">
+                             <a href="{{ route('theses.viewPdf', $thesis->id) }}" 
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-sm flex-1 group">
+                                    <i class="fas fa-eye mr-3 group-hover:scale-110 transition-transform"></i>
+                                    View PDF
+                                </a>
+                                <a href="{{ route('theses.downloadPdf', $thesis->id) }}" 
+                                class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-medium flex items-center justify-center transition shadow-sm flex-1 group">
+                                    <i class="fas fa-download mr-3 group-hover:scale-110 transition-transform"></i>
+                                    Download PDF
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>

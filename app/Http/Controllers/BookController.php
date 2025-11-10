@@ -20,17 +20,48 @@ class BookController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-       $books = Book::with(['authors', 'category', 'copies'])->paginate(10);
+        $query = Book::with(['authors', 'category', 'copies']);
 
-    // Attach available copies count to each book
-    foreach ($books as $book) {
-        $book->available_stock = $book->copies()->where('is_available', true)->count();
+        // Search functionality
+        if ($request->has('search') && !empty($request->search)) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('description', 'LIKE', "%{$searchTerm}%")
+                  ->orWhereHas('authors', function($authorQuery) use ($searchTerm) {
+                      $authorQuery->where('first_name', 'LIKE', "%{$searchTerm}%")
+                                 ->orWhere('last_name', 'LIKE', "%{$searchTerm}%");
+                  });
+            });
+        }
+
+        // Category filter
+        if ($request->has('category') && !empty($request->category)) {
+            $query->whereHas('category', function($q) use ($request) {
+                $q->where('category_name', $request->category);
+            });
+        }
+
+        // Year filter
+        if ($request->has('year') && !empty($request->year)) {
+            $query->where('year_published', $request->year);
+        }
+
+        $books = $query->paginate(10);
+
+        // Attach available copies count to each book
+        foreach ($books as $book) {
+            $book->available_stock = $book->copies()->where('is_available', true)->count();
+        }
+
+        // Preserve search parameters in pagination links
+        $books->appends($request->except('page'));
+
+        return view('books.index', compact('books'));
     }
 
-    return view('books.index', compact('books'));
-    }
 
     public function userInterface()
     {

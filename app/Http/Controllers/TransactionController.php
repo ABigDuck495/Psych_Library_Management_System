@@ -361,6 +361,17 @@ class TransactionController extends Controller
         $transaction->markAsApproved();
         return redirect()->back()->with('success', 'Transaction approved successfully.');
     }
+    public function rejectRequest(Transaction $transaction){
+        if (!in_array(auth()->user()->role, ['admin', 'super-admin', 'librarian'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($transaction->transaction_status !== 'requested') {
+            return redirect()->back()->with('error', 'Only requested transactions can be approved.');
+        }
+        $transaction->markAsRejected();
+        return redirect()->back()->with('success', 'Transaction rejected successfully');
+    }
 
     public function markAsBorrowed(Transaction $transaction)
     {

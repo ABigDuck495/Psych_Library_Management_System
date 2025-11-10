@@ -185,70 +185,77 @@
 
     <!-- Search and Filter Section -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <!-- Search -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Search Books</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-search text-gray-400"></i>
+        <form action="{{ route('books.index') }}" method="GET" id="searchForm">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Search -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Search Books</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" name="search" id="searchInput" 
+                            value="{{ request('search') }}"
+                            placeholder="Title, author, or description..." 
+                            class="pl-10 w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
-                    <input type="text" id="searchInput" placeholder="Title, author, or description..." 
-                           class="pl-10 w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <!-- Category Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select name="category" id="categoryFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">All Categories</option>
+                        <option value="Agriculture" {{ request('category') == 'Agriculture' ? 'selected' : '' }}>Agriculture</option>
+                        <option value="Auxiliary Sciences of History" {{ request('category') == 'Auxiliary Sciences of History' ? 'selected' : '' }}>Auxiliary Sciences of History</option>
+                        <option value="Bibliography, Library Science, General Information Resources" {{ request('category') == 'Bibliography, Library Science, General Information Resources' ? 'selected' : '' }}>Bibliography & Library Science</option>
+                        <option value="Education" {{ request('category') == 'Education' ? 'selected' : '' }}>Education</option>
+                        <option value="Fine Arts" {{ request('category') == 'Fine Arts' ? 'selected' : '' }}>Fine Arts</option>
+                        <option value="General Works" {{ request('category') == 'General Works' ? 'selected' : '' }}>General Works</option>
+                        <option value="Geography, Anthropology, Recreation" {{ request('category') == 'Geography, Anthropology, Recreation' ? 'selected' : '' }}>Geography & Anthropology</option>
+                        <option value="History of the Americas (Local and Latin America)" {{ request('category') == 'History of the Americas (Local and Latin America)' ? 'selected' : '' }}>History (Latin America)</option>
+                        <option value="History of the Americas (United States)" {{ request('category') == 'History of the Americas (United States)' ? 'selected' : '' }}>History (United States)</option>
+                        <option value="Language and Literature" {{ request('category') == 'Language and Literature' ? 'selected' : '' }}>Language & Literature</option>
+                        <option value="Law" {{ request('category') == 'Law' ? 'selected' : '' }}>Law</option>
+                        <option value="Medicine" {{ request('category') == 'Medicine' ? 'selected' : '' }}>Medicine</option>
+                        <option value="Military Science" {{ request('category') == 'Military Science' ? 'selected' : '' }}>Military Science</option>
+                        <option value="Music" {{ request('category') == 'Music' ? 'selected' : '' }}>Music</option>
+                        <option value="Naval Science" {{ request('category') == 'Naval Science' ? 'selected' : '' }}>Naval Science</option>
+                        <option value="Philosophy, Psychology, Religion" {{ request('category') == 'Philosophy, Psychology, Religion' ? 'selected' : '' }}>Philosophy & Psychology</option>
+                        <option value="Political Science" {{ request('category') == 'Political Science' ? 'selected' : '' }}>Political Science</option>
+                        <option value="Science" {{ request('category') == 'Science' ? 'selected' : '' }}>Science</option>
+                        <option value="Social Sciences" {{ request('category') == 'Social Sciences' ? 'selected' : '' }}>Social Sciences</option>
+                        <option value="Technology" {{ request('category') == 'Technology' ? 'selected' : '' }}>Technology</option>
+                        <option value="World Sciences" {{ request('category') == 'World Sciences' ? 'selected' : '' }}>World Sciences</option>
+                    </select>
+                </div>
+                
+                <!-- Year Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Year Published</label>
+                    <select name="year" id="yearFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">All Years</option>
+                        @php
+                            $currentYear = date('Y');
+                            $selectedYear = request('year');
+                        @endphp
+                        @for($y = $currentYear; $y >= 1900; $y--)
+                            <option value="{{ $y }}" {{ $selectedYear == $y ? 'selected' : '' }}>{{ $y }}</option>
+                        @endfor
+                    </select>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex items-end space-x-2">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex-1 transition">
+                        Apply Filters
+                    </button>
+                    <a href="{{ route('books.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition text-center">
+                        Reset
+                    </a>
                 </div>
             </div>
-            
-            <!-- Category Filter -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select id="categoryFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All Categories</option>
-                    <option value="Agriculture">Agriculture</option>
-                    <option value="Auxiliary Sciences of History">Auxiliary Sciences of History</option>
-                    <option value="Bibliography, Library Science, General Information Resources">Bibliography, Library Science, General Information Resources</option>
-                    <option value="Education">Education</option>
-                    <option value="Fine Arts">Fine Arts</option>
-                    <option value="General Works">General Works</option>
-                    <option value="Geography, Anthropology, Recreation">Geography, Anthropology, Recreation</option>
-                    <option value="History of the Americas (Local and Latin America)">History of the Americas (Local and Latin America)</option>
-                    <option value="History of the Americas (United States)">History of the Americas (United States)</option>
-                    <option value="Language and Literature">Language and Literature</option>
-                    <option value="Law">Law</option>
-                    <option value="Medicine">Medicine</option>
-                    <option value="Military Science">Military Science</option>
-                    <option value="Music">Music</option>
-                    <option value="Naval Science">Naval Science</option>
-                    <option value="Philosophy, Psychology, Religion">Philosophy, Psychology, Religion</option>
-                    <option value="Political Science">Political Science</option>
-                    <option value="Science">Science</option>
-                    <option value="Social Sciences">Social Sciences</option>
-                    <option value="Technology">Technology</option>
-                    <option value="World Sciences">World Sciences</option>
-                </select>
-            </div>
-            
-            <!-- Year Filter -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Year Published</label>
-                <select id="yearFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All Years</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                    <option value="2020">2020</option>
-                </select>
-            </div>
-            
-            <!-- Actions -->
-            <div class="flex items-end space-x-2">
-                <button id="filterButton" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex-1 transition">
-                    Apply Filters
-                </button>
-                <button id="resetButton" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition">
-                    Reset
-                </button>
-            </div>
-        </div>
+        </form>
     </div>
 
     <!-- Books Table -->
@@ -499,45 +506,7 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script>
-    // Filter functionality
     document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
-        const categoryFilter = document.getElementById('categoryFilter');
-        const yearFilter = document.getElementById('yearFilter');
-        const filterButton = document.getElementById('filterButton');
-        const resetButton = document.getElementById('resetButton');
-        const bookRows = document.querySelectorAll('.book-row');
-
-        function filterBooks() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const categoryValue = categoryFilter.value.toLowerCase();
-            const yearValue = yearFilter.value;
-
-            bookRows.forEach(row => {
-                const title = row.getAttribute('data-title');
-                const category = row.getAttribute('data-category');
-                const year = row.getAttribute('data-year');
-
-                const matchesSearch = title.includes(searchTerm);
-                const matchesCategory = !categoryValue || category.includes(categoryValue);
-                const matchesYear = !yearValue || year === yearValue;
-
-                row.style.display = (matchesSearch && matchesCategory && matchesYear) ? '' : 'none';
-            });
-        }
-
-        filterButton.addEventListener('click', filterBooks);
-        
-        resetButton.addEventListener('click', function() {
-            searchInput.value = '';
-            categoryFilter.value = '';
-            yearFilter.value = '';
-            bookRows.forEach(row => row.style.display = '');
-        });
-
-        // Real-time search
-        searchInput.addEventListener('input', filterBooks);
-
         // Clickable row functionality
         document.querySelectorAll('.clickable-row').forEach(row => {
             row.addEventListener('click', function(e) {
@@ -557,9 +526,16 @@
                 }
             });
         });
-    });
 
-    
+        // Auto-submit form when filters change (optional)
+        document.getElementById('categoryFilter').addEventListener('change', function() {
+            document.getElementById('searchForm').submit();
+        });
+
+        document.getElementById('yearFilter').addEventListener('change', function() {
+            document.getElementById('searchForm').submit();
+        });
+    });
 </script>
 @endpush
 @endsection

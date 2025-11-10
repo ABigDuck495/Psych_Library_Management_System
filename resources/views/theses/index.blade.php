@@ -113,51 +113,58 @@
 
     <!-- Search and Filter Section -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <!-- Search -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Search Theses</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-search text-gray-400"></i>
+        <form action="{{ route('theses.index') }}" method="GET" id="searchForm">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Search -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Search Theses</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" name="search" id="searchInput" 
+                            value="{{ request('search') }}"
+                            placeholder="Title, abstract, or author..." 
+                            class="pl-10 w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
-                    <input type="text" id="searchInput" placeholder="Title, abstract, or author..." 
-                           class="pl-10 w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <!-- Department Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                    <select name="department" id="departmentFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">All Departments</option>
+                        <option value="AB Psychology" {{ request('department') == 'AB Psychology' ? 'selected' : '' }}>AB Psychology</option>
+                        <option value="BS Psychology" {{ request('department') == 'BS Psychology' ? 'selected' : '' }}>BS Psychology</option>
+                    </select>
+                </div>
+                
+                <!-- Year Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Year Published</label>
+                    <select name="year" id="yearFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">All Years</option>
+                        @php
+                            $currentYear = date('Y');
+                            $selectedYear = request('year');
+                        @endphp
+                        @for($y = $currentYear; $y >= 1900; $y--)
+                            <option value="{{ $y }}" {{ $selectedYear == $y ? 'selected' : '' }}>{{ $y }}</option>
+                        @endfor
+                    </select>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex items-end space-x-2">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex-1 transition">
+                        Apply Filters
+                    </button>
+                    <a href="{{ route('theses.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition text-center">
+                        Reset
+                    </a>
                 </div>
             </div>
-            
-            <!-- Department Filter -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
-                <select id="departmentFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All Departments</option>
-                    <option value="AB Psychology">AB Psychology</option>
-                    <option value="BS Psychology">BS Psychology</option>
-                </select>
-            </div>
-            
-            <!-- Year Filter -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Year Published</label>
-                <select id="yearFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <option value="">All Years</option>
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                    <option value="2020">2020</option>
-                </select>
-            </div>
-            
-            <!-- Actions -->
-            <div class="flex items-end space-x-2">
-                <button id="filterButton" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex-1 transition">
-                    Apply Filters
-                </button>
-                <button id="resetButton" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition">
-                    Reset
-                </button>
-            </div>
-        </div>
+        </form>
     </div>
 
     <!-- Theses Table -->
@@ -401,45 +408,7 @@
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Filter functionality
     document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
-        const departmentFilter = document.getElementById('departmentFilter');
-        const yearFilter = document.getElementById('yearFilter');
-        const filterButton = document.getElementById('filterButton');
-        const resetButton = document.getElementById('resetButton');
-        const thesisRows = document.querySelectorAll('.thesis-row');
-
-        function filterTheses() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const departmentValue = departmentFilter.value.toLowerCase();
-            const yearValue = yearFilter.value;
-
-            thesisRows.forEach(row => {
-                const title = row.getAttribute('data-title');
-                const department = row.getAttribute('data-department');
-                const year = row.getAttribute('data-year');
-
-                const matchesSearch = title.includes(searchTerm);
-                const matchesDepartment = !departmentValue || department.includes(departmentValue);
-                const matchesYear = !yearValue || year === yearValue;
-
-                row.style.display = (matchesSearch && matchesDepartment && matchesYear) ? '' : 'none';
-            });
-        }
-
-        filterButton.addEventListener('click', filterTheses);
-        
-        resetButton.addEventListener('click', function() {
-            searchInput.value = '';
-            departmentFilter.value = '';
-            yearFilter.value = '';
-            thesisRows.forEach(row => row.style.display = '');
-        });
-
-        // Real-time search
-        searchInput.addEventListener('input', filterTheses);
-
         // Clickable row functionality
         document.querySelectorAll('.clickable-row').forEach(row => {
             row.addEventListener('click', function(e) {
@@ -458,6 +427,15 @@
                     window.location.href = href;
                 }
             });
+        });
+
+        // Auto-submit form when filters change (optional)
+        document.getElementById('departmentFilter').addEventListener('change', function() {
+            document.getElementById('searchForm').submit();
+        });
+
+        document.getElementById('yearFilter').addEventListener('change', function() {
+            document.getElementById('searchForm').submit();
         });
 
         // SweetAlert for delete confirmation
