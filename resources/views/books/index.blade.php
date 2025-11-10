@@ -57,78 +57,21 @@
                             
                             <!-- Category Dropdown Menu -->
                             <div x-show="categoryOpen" 
-                                 @click.away="categoryOpen = false"
-                                 x-transition:enter="transition ease-out duration-100"
-                                 x-transition:enter-start="transform opacity-0 scale-95"
-                                 x-transition:enter-end="transform opacity-100 scale-100"
-                                 x-transition:leave="transition ease-in duration-75"
-                                 x-transition:leave-start="transform opacity-100 scale-100"
-                                 x-transition:leave-end="transform opacity-0 scale-95"
-                                 class="absolute left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 max-h-60 overflow-y-auto z-20">
+                                @click.away="categoryOpen = false"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute left-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 max-h-60 overflow-y-auto z-20">
                                 <div class="space-y-1">
-                                    <a href="{{ route('export.books', ['category' => 'Agriculture']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Agriculture
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Auxiliary Sciences of History']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Auxiliary Sciences of History
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Bibliography, Library Science, General Information Resources']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Bibliography & Library Science
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Education']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Education
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Fine Arts']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Fine Arts
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'General Works']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        General Works
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Geography, Anthropology, Recreation']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Geography & Anthropology
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'History of the Americas (Local and Latin America)']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        History (Latin America)
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'History of the Americas (United States)']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        History (United States)
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Language and Literature']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Language & Literature
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Law']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Law
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Medicine']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Medicine
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Military Science']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Military Science
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Music']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Music
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Naval Science']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Naval Science
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Philosophy, Psychology, Religion']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Philosophy & Psychology
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Political Science']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Political Science
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Science']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Science
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Social Sciences']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Social Sciences
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'Technology']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        Technology
-                                    </a>
-                                    <a href="{{ route('export.books', ['category' => 'World Sciences']) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
-                                        World Sciences
-                                    </a>
+                                    @foreach ($categories as $category)
+                                        <a href="{{ route('export.books', ['category' => $category->category_name]) }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition">
+                                            {{ $category->category_name ?? $category->category_name }}
+                                        </a>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>
@@ -206,27 +149,11 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
                     <select name="category" id="categoryFilter" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <option value="">All Categories</option>
-                        <option value="Agriculture" {{ request('category') == 'Agriculture' ? 'selected' : '' }}>Agriculture</option>
-                        <option value="Auxiliary Sciences of History" {{ request('category') == 'Auxiliary Sciences of History' ? 'selected' : '' }}>Auxiliary Sciences of History</option>
-                        <option value="Bibliography, Library Science, General Information Resources" {{ request('category') == 'Bibliography, Library Science, General Information Resources' ? 'selected' : '' }}>Bibliography & Library Science</option>
-                        <option value="Education" {{ request('category') == 'Education' ? 'selected' : '' }}>Education</option>
-                        <option value="Fine Arts" {{ request('category') == 'Fine Arts' ? 'selected' : '' }}>Fine Arts</option>
-                        <option value="General Works" {{ request('category') == 'General Works' ? 'selected' : '' }}>General Works</option>
-                        <option value="Geography, Anthropology, Recreation" {{ request('category') == 'Geography, Anthropology, Recreation' ? 'selected' : '' }}>Geography & Anthropology</option>
-                        <option value="History of the Americas (Local and Latin America)" {{ request('category') == 'History of the Americas (Local and Latin America)' ? 'selected' : '' }}>History (Latin America)</option>
-                        <option value="History of the Americas (United States)" {{ request('category') == 'History of the Americas (United States)' ? 'selected' : '' }}>History (United States)</option>
-                        <option value="Language and Literature" {{ request('category') == 'Language and Literature' ? 'selected' : '' }}>Language & Literature</option>
-                        <option value="Law" {{ request('category') == 'Law' ? 'selected' : '' }}>Law</option>
-                        <option value="Medicine" {{ request('category') == 'Medicine' ? 'selected' : '' }}>Medicine</option>
-                        <option value="Military Science" {{ request('category') == 'Military Science' ? 'selected' : '' }}>Military Science</option>
-                        <option value="Music" {{ request('category') == 'Music' ? 'selected' : '' }}>Music</option>
-                        <option value="Naval Science" {{ request('category') == 'Naval Science' ? 'selected' : '' }}>Naval Science</option>
-                        <option value="Philosophy, Psychology, Religion" {{ request('category') == 'Philosophy, Psychology, Religion' ? 'selected' : '' }}>Philosophy & Psychology</option>
-                        <option value="Political Science" {{ request('category') == 'Political Science' ? 'selected' : '' }}>Political Science</option>
-                        <option value="Science" {{ request('category') == 'Science' ? 'selected' : '' }}>Science</option>
-                        <option value="Social Sciences" {{ request('category') == 'Social Sciences' ? 'selected' : '' }}>Social Sciences</option>
-                        <option value="Technology" {{ request('category') == 'Technology' ? 'selected' : '' }}>Technology</option>
-                        <option value="World Sciences" {{ request('category') == 'World Sciences' ? 'selected' : '' }}>World Sciences</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->category_name }}" {{ request('category') == $category->category_name ? 'selected' : '' }}>
+                                {{ $category->category_name ?? $category->category_name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
                 

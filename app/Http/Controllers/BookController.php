@@ -59,7 +59,8 @@ class BookController extends Controller
         // Preserve search parameters in pagination links
         $books->appends($request->except('page'));
 
-        return view('books.index', compact('books'));
+        $categories = Category::orderBy('category_name')->get();
+        return view('books.index', compact('books', 'categories'));
     }
 
 
